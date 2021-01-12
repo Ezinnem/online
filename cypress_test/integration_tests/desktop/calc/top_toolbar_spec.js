@@ -17,18 +17,43 @@ describe('Top toolbar tests.', function() {
 		helper.afterAll(testFileName, this.currentTest.state);
 	});
 
-	it('Merge cells', function() {
+	function getTextEndPosForFirstCell() {
+		calcHelper.dblClickOnFirstCell();
 
-		// Select the full column
+		helper.getCursorPos('left', 'currentTextEndPos');
+	}
+
+	it('Enable text wrapping.', function() {
+		calcHelper.clickOnFirstCell(true, false);
+		calcHelper.typeIntoFormulabar('_This_is_a_really_long_text');
+		helper.initAliasToNegative('originalTextEndPos');
+
+		getTextEndPosForFirstCell();
+		cy.get('@currentTextEndPos')
+			.as('originalTextEndPos');
+
+		cy.get('@currentTextEndPos')
+			.should('be.greaterThan', 0);
+
 		calcHelper.selectFirstColumn();
-	
-		// Despite the selection is there, merge cells needs more time here.
-		cy.wait(1000);
-	
-		cy.get('.w2ui-tb-image.w2ui-icon.togglemergecells')
+
+		cy.get('.w2ui-tb-image.w2ui-icon.wraptext')
 			.click();
 
-		desktopHelper.checkDialogAndClose('Merge Cells');
+		calcHelper.clickOnFirstCell(true, false);
+
+		// We use the text position as indicator
+		cy.waitUntil(function() {
+			getTextEndPosForFirstCell();
+
+			return cy.get('@currentTextEndPos')
+				.then(function(currentTextEndPos) {
+					return cy.get('@originalTextEndPos')
+						.then(function(originalTextEndPos) {
+							return originalTextEndPos > currentTextEndPos;
+						});
+				});
+		});
 	});
 
 
