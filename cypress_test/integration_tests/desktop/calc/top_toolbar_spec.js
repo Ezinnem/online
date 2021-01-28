@@ -52,6 +52,37 @@ describe('Top toolbar tests.', function() {
 		cy.window().its('open').should('be.called');
 	});
 
+	it('Clone Formatting.', function() {
+		helper.typeIntoDocument('{home}');
+
+		helper.textSelectionShouldNotExist();
+
+		helper.typeIntoDocument('{shift}{rightArrow}');
+
+		// Apply bold and try to clone it to the whole word.
+		cy.get('#tb_editbar_item_bold')
+			.click();
+
+		cy.get('#tb_editbar_item_formatpaintbrush')
+			.click();
+
+		// Click at the blinking cursor position.
+		cy.get('.leaflet-cursor.blinking-cursor')
+			.then(function(cursor) {
+				var boundRect = cursor[0].getBoundingClientRect();
+				var XPos = boundRect.left;
+				var YPos = (boundRect.top + boundRect.bottom) / 2;
+
+				cy.get('body')
+					.click(XPos, YPos);
+			});
+
+		calcHelper.selectEntireSheet();
+		// Full word should have bold font.
+		cy.get('#copy-paste-container table td b')
+			.should('contain', 'text');
+	});
+
 	it('Enable text wrapping.', function() {
 		getTextEndPosForFirstCell();
 
