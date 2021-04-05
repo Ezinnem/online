@@ -492,6 +492,24 @@ L.Clipboard = L.Class.extend({
 		return true; // prevent default
 	},
 
+	_isAnyInputFieldSelected: function() {
+		if ($('#search-input').is(':focus'))
+			return true;
+
+		if ($('.ui-edit').is(':focus'))
+			return true;
+
+		if ($('.w2ui-input').is(':focus'))
+			return true;
+
+		if (isAnyVexDialogActive() && !(this.pasteSpecialVex && this.pasteSpecialVex.isOpen))
+			return true;
+
+		if ($('.annotation-active').length) return true;
+
+		return false;
+	},
+
 	// only used by IE.
 	_beforePasteIE: function(ev) {
 		console.log('IE11 work ...');
