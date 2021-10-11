@@ -53,6 +53,7 @@ find etc/ld.so.* \
      usr/share/liblangtag \
      usr/share/hyphen \
 	 -type f 2>/dev/null
+     home/ezinne/certificate
 
 find etc/fonts \
      lib/ld-* lib64/ld-* \

@@ -1,0 +1,1787 @@
+~+6396196~Hq6ISfkfkDmudgtZ~02a~NewSession: http://192.168.43.203/index.php/apps/richdocuments/wopi/files/494_oct4ei0irh8v?access_token=L1lgFWznU4tmXTjcOJnNJP8ok7m4SorZ&access_token_ttl=0&reuse_cookies=nc_sameSiteCookielax%3Dtrue%3Anc_sameSiteCookiestrict%3Dtrue%3Anc_username%3Dadmin%3Aoc_sessionPassphrase%3DeXSNPuKoiG54CW5eWXHmAloxPsNJBU7cKXHt8sUVdNan8leNQXAmASgwRf2ioYJaXlkiuV2lGD4Dl7dYI4bINVSbAE%252BEOQw3iFEQehGvfdRXuvd8H03NinxMwPyeFR0B%3Aoct4ei0irh8v%3Db8ddt4h1qsvsa4o6us8vgssft3%3Anc_token%3DUjpBLzndOWf2UpO7ZadvJvHaVIVsEjft%3Anc_session_id%3Db8ddt4h1qsvsa4o6us8vgssft3
+>+8392>Hq6ISfkfkDmudgtZ>02a>loolclient 0.1 1633985581676 973.6000000000931
+>+1303>Hq6ISfkfkDmudgtZ>02a>load url=http%3A%2F%2F192.168.43.203%2Findex.php%2Fapps%2Frichdocuments%2Fwopi%2Ffiles%2F494_oct4ei0irh8v lang=en deviceFormFactor=desktop
+>+6374275>Hq6ISfkfkDmudgtZ>02a>commandvalues command=.uno:StyleApply
+>+1071>Hq6ISfkfkDmudgtZ>02a>commandvalues command=.uno:CharFontName
+>+272>Hq6ISfkfkDmudgtZ>02a>commandvalues command=.uno:AcceptTrackedChanges
+>+252>Hq6ISfkfkDmudgtZ>02a>requestloksession
+>+148>Hq6ISfkfkDmudgtZ>02a>commandvalues command=.uno:LanguageStatus
+>+216>Hq6ISfkfkDmudgtZ>02a>commandvalues command=.uno:ViewAnnotations
+>+286>Hq6ISfkfkDmudgtZ>02a>commandvalues command=.uno:StyleApply
+>+197>Hq6ISfkfkDmudgtZ>02a>commandvalues command=.uno:CharFontName
+>+229>Hq6ISfkfkDmudgtZ>02a>freemiumstatus isFreemiumUser=false
+>+195>Hq6ISfkfkDmudgtZ>02a>clientvisiblearea x=-3495 y=-2235 width=22860 height=13395 splitx=0 splity=0
+>+203>Hq6ISfkfkDmudgtZ>02a>clientzoom tilepixelwidth=256 tilepixelheight=256 tiletwipwidth=3840 tiletwipheight=3840
+>+217>Hq6ISfkfkDmudgtZ>02a>canceltiles
+>+1726>Hq6ISfkfkDmudgtZ>02a>tilecombine nviewid=0 part=0 width=256 height=256 tileposx=0,3840,7680,11520,15360,0,3840,7680,11520,15360,0,3840,7680,11520,15360 tileposy=0,0,0,0,0,3840,3840,3840,3840,3840,7680,7680,7680,7680,7680 tilewidth=3840 tileheight=3840
+>+10987>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=0 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=0 broadcast=no
+>+303>Hq6ISfkfkDmudgtZ>02a>clientvisiblearea x=-2115 y=-1770 width=20100 height=12465 splitx=0 splity=0
+>+1866>Hq6ISfkfkDmudgtZ>02a>canceltiles
+>+176984>Hq6ISfkfkDmudgtZ>02a>tilecombine nviewid=0 part=0 width=256 height=256 tileposx=0,3840,7680,11520,15360,0,3840,7680,11520,15360,0,3840,7680,11520,15360 tileposy=0,0,0,0,0,3840,3840,3840,3840,3840,7680,7680,7680,7680,7680 tilewidth=3840 tileheight=3840
+>+228330>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+418>Hq6ISfkfkDmudgtZ>02a>uno .uno:SidebarHide
+>+828>Hq6ISfkfkDmudgtZ>02a>canceltiles
+>+2706>Hq6ISfkfkDmudgtZ>02a>tilecombine nviewid=0 part=0 width=256 height=256 tileposx=0,3840,7680,11520,15360,0,3840,7680,11520,15360,0,3840,7680,11520,15360 tileposy=0,0,0,0,0,3840,3840,3840,3840,3840,7680,7680,7680,7680,7680 tilewidth=3840 tileheight=3840
+>+288845>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+364>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=3 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=3 broadcast=no
+>+342>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=4 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=4 broadcast=no
+>+658152>Hq6ISfkfkDmudgtZ>02a>clientvisiblearea x=-1980 y=-1770 width=19815 height=12465 splitx=0 splity=0
+>+4506>Hq6ISfkfkDmudgtZ>02a>canceltiles
+>+1583>Hq6ISfkfkDmudgtZ>02a>tilecombine nviewid=0 part=0 width=256 height=256 tileposx=0,3840,7680,11520,15360,0,3840,7680,11520,15360,0,3840,7680,11520,15360 tileposy=0,0,0,0,0,3840,3840,3840,3840,3840,7680,7680,7680,7680,7680 tilewidth=3840 tileheight=3840
+>+1003>Hq6ISfkfkDmudgtZ>02a>canceltiles
+>+1582>Hq6ISfkfkDmudgtZ>02a>tilecombine nviewid=0 part=0 width=256 height=256 tileposx=0,3840,7680,11520,15360,0,3840,7680,11520,15360,0,3840,7680,11520,15360 tileposy=0,0,0,0,0,3840,3840,3840,3840,3840,7680,7680,7680,7680,7680 tilewidth=3840 tileheight=3840
+>+307315>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=0:0:0:15875:8930:0
+>+103293>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=0:0:0:3840:3840:0
+>+673>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=0:11520:0:3840:3840:0
+>+7388>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=0:7680:0:3840:3840:0
+>+154>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=0:3840:0:3840:3840:0
+>+1202>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=0:15360:0:3840:3840:0
+>+127>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=0:0:3840:3840:3840:0
+>+172>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=0:3840:3840:3840:3840:0
+>+140>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=0:7680:3840:3840:3840:0
+>+645>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=0:11520:3840:3840:3840:0
+>+136>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=0:15360:3840:3840:3840:0
+>+13440>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=0:7680:7680:3840:3840:0
+>+668>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=0:3840:7680:3840:3840:0
+>+5577>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=0:0:7680:3840:3840:0
+>+234013>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=5 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=5 broadcast=no
+>+333>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=6 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=6 broadcast=no
+>+352>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+658>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+99113>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=7 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=7 broadcast=no
+>+330>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=0 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=0 broadcast=no
+>+885>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=3:0:0:15875:8930:0
+>+6588>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=0:0:0:15875:8930:0
+>+2044>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=0:11520:7680:3840:3840:0
+>+1396>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=0:15360:7680:3840:3840:0
+>+326372>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=4:0:0:15875:8930:0
+>+144>Hq6ISfkfkDmudgtZ>02a>clientvisiblearea x=-4395 y=-1770 width=24660 height=12465 splitx=0 splity=0
+>+7626>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=5:0:0:15875:8930:0
+>+73052>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=6:0:0:15875:8930:0
+>+9697>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=7:0:0:15875:8930:0
+>+29937101>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=-3900 y=210 count=1 buttons=0 modifier=0
+>+661716>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=8 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=8 broadcast=no
+>+750>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=9 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=9 broadcast=no
+>+22894>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=10 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=10 broadcast=no
+>+17495>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=11 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=11 broadcast=no
+>+20625>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=12 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=12 broadcast=no
+>+1373>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=8:0:0:15875:8930:0
+>+2439>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=9:0:0:15875:8930:0
+>+11933>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:0:15875:8930:0
+>+5721>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:0:0:15875:8930:0
+>+14478>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=12:0:0:15875:8930:0
+>+111355>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+4209768>Hq6ISfkfkDmudgtZ>02a>uno .uno:InsertPage
+>+2624>Hq6ISfkfkDmudgtZ>02a>setclientpart part=1
+>+8646>Hq6ISfkfkDmudgtZ>02a>canceltiles
+>+777>Hq6ISfkfkDmudgtZ>02a>tilecombine nviewid=0 part=1 width=256 height=256 tileposx=0,3840,7680,11520,15360,0,3840,7680,11520,15360,0,3840,7680,11520,15360 tileposy=0,0,0,0,0,3840,3840,3840,3840,3840,7680,7680,7680,7680,7680 tilewidth=3840 tileheight=3840
+>+88234>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:15360:0:3840:3840:0
+>+156>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:15360:3840:3840:3840:0
+>+562>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+8851>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+581>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+563>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:0:3840:3840:0
+>+547>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+981>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:3840:3840:3840:0
+>+147>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:3840:3840:3840:0
+>+143>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:3840:3840:3840:0
+>+496>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:7680:3840:3840:0
+>+176>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:7680:3840:3840:0
+>+504>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:7680:3840:3840:0
+>+378261>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:15360:7680:3840:3840:0
+>+103>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+357452>Hq6ISfkfkDmudgtZ>02a>freemiumstatus isFreemiumUser=false
+>+242>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=0 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=0 broadcast=no
+>+381>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+391>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+358>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=3 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=3 broadcast=no
+>+336748>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+179>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+220>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+178>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:0:3840:3840:0
+>+173>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:15360:0:3840:3840:0
+>+171>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+178>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:3840:3840:3840:0
+>+293>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:3840:3840:3840:0
+>+455>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:3840:3840:3840:0
+>+175>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:15360:3840:3840:3840:0
+>+164>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:19200:0:3840:3840:0
+>+214>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:19200:3840:3840:3840:0
+>+1152>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+677>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:7680:3840:3840:0
+>+1252>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:7680:3840:3840:0
+>+4669>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:7680:3840:3840:0
+>+183>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:15360:7680:3840:3840:0
+>+199>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:19200:7680:3840:3840:0
+>+4927>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=4 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=4 broadcast=no
+>+372>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=5 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=5 broadcast=no
+>+2005>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=0:0:0:15875:8930:0
+>+168>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+1677>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=6 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=6 broadcast=no
+>+422>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=7 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=7 broadcast=no
+>+837>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+27707>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=3:0:0:15875:8930:0
+>+227625>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=-360 y=4020 count=1 buttons=0 modifier=0
+>+3873>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=8 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=8 broadcast=no
+>+364>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=9 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=9 broadcast=no
+>+944>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=4:0:0:15875:8930:0
+>+36925>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=5:0:0:15875:8930:0
+>+1352>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+402>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+401>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=6:0:0:15875:8930:0
+>+5158>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+625>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+3565>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=0 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=0 broadcast=no
+>+3462>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+642>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=0:0:0:15875:8930:0
+>+2833>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+3280>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=7:0:0:15875:8930:0
+>+10630>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=8:0:0:15875:8930:0
+>+214228>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=9:0:0:15875:8930:0
+>+134022>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4260 y=1455 count=1 buttons=0 modifier=0
+>+167771>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4260 y=1470 count=1 buttons=0 modifier=0
+>+6682>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=4260 y=1470 count=1 buttons=1 modifier=0
+>+5120>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=4260 y=1470 count=1 buttons=1 modifier=0
+>+11932>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+100441>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+582714>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=4260 y=1470 count=1 buttons=1 modifier=0
+>+744>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=4260 y=1470 count=1 buttons=1 modifier=0
+>+837>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+12779>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+191232>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=4260 y=1470 count=2 buttons=1 modifier=0
+>+1421>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=4260 y=1470 count=2 buttons=1 modifier=0
+>+185535>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:0:3840:3840:0
+>+4541>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+122>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+366>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+527438>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+144701>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+309377>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+10578>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+161678>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=A
+>+32891>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+196353>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+93680>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+182312>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=d
+>+34819>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+1178>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+135623>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=d
+>+34899>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+4958>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+236024>Hq6ISfkfkDmudgtZ>02a>key type=input char=32 key=0
+>+211>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1284
+>+44167>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+591>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+331233>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+33171>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+4656>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+333695>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=m
+>+30113>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+5121>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+977437>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+19273>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+225109>Hq6ISfkfkDmudgtZ>02a>removetextcontext id=0 before=1 after=0
+>+41632>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+4824>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+109220>Hq6ISfkfkDmudgtZ>02a>removetextcontext id=0 before=1 after=0
+>+19815>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+102>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+639540>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=r
+>+34021>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+626>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+179408>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+30738>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+190>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+412123>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=m
+>+72662>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+8293>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+537103>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=o
+>+66899>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+4205>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+115878>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=v
+>+37153>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+522>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+238301>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+35965>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+4455>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+282067>Hq6ISfkfkDmudgtZ>02a>key type=input char=32 key=0
+>+425>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1284
+>+39927>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+5500>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+860690>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=t
+>+69558>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+4328>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+156498>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=h
+>+37417>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+116>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+174246>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+79551>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+5322>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+411881>Hq6ISfkfkDmudgtZ>02a>key type=input char=32 key=0
+>+358>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1284
+>+36091>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+4314>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+973223>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+20682>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+192387>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=b
+>+69718>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+3923>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+284889>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=u
+>+28730>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+4691>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+242495>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=l
+>+32484>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+722>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+108886>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=l
+>+261856>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+6699>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:0:3840:3840:0
+>+3585>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+3361>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+395549>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+283>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:0:3840:3840:0
+>+203>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+181>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=t
+>+457>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=s
+>+46498>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+5111>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+866>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:0:3840:3840:0
+>+218589>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+745816>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+23739>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+257439>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1695 y=2925 count=1 buttons=0 modifier=0
+>+43313>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=1695 y=2925 count=1 buttons=1 modifier=0
+>+872>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=1695 y=2925 count=1 buttons=1 modifier=0
+>+394131>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+427>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+310>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=1695 y=2925 count=2 buttons=1 modifier=0
+>+441>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=1695 y=2925 count=2 buttons=1 modifier=0
+>+4503>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:0:3840:3840:0
+>+324>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+6204>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+742>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+382184>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+21576>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+248571>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+115>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2190 y=2490 count=1 buttons=0 modifier=0
+>+383>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+324>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=2190 y=2490 count=1 buttons=1 modifier=0
+>+298>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=2190 y=2490 count=1 buttons=1 modifier=0
+>+67878>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=2190 y=2490 count=2 buttons=1 modifier=0
+>+583>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=2190 y=2490 count=2 buttons=1 modifier=0
+>+614702>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+100260>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+219808>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+15157>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+58014>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=U
+>+24816>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+128224>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+80301>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+92052>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=n
+>+22775>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+377412>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=o
+>+47626>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+343639>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=r
+>+21189>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+221026>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=d
+>+27673>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+565938>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+50611>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+523191>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=r
+>+32376>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+210864>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+27435>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+127>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+214082>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=d
+>+24447>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+270288>Hq6ISfkfkDmudgtZ>02a>key type=input char=32 key=0
+>+367>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1284
+>+715256>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=l
+>+52532>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+830999>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=i
+>+47202>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+121691>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=s
+>+19432>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+234729>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+25260>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+655240>Hq6ISfkfkDmudgtZ>02a>removetextcontext id=0 before=1 after=0
+>+14548>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+295221>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=t
+>+22368>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+944880>Hq6ISfkfkDmudgtZ>02a>key type=input char=58 key=0
+>+855>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=5413
+>+50824>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+44085>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=5413
+>+266370>Hq6ISfkfkDmudgtZ>02a>key type=input char=13 key=1280
+>+22394>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+65911>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1280
+>+830348>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+92985>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+12741>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+16795>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+808913>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=R
+>+20711>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+285139>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+72264>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+134306>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=i
+>+50731>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+113947>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=c
+>+44414>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+162965>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+22141>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+835860>Hq6ISfkfkDmudgtZ>02a>key type=input char=39 key=0
+>+684>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=192
+>+48535>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+968738>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+20475>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+17177>Hq6ISfkfkDmudgtZ>02a>key type=input char=13 key=1280
+>+48187>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+45926>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1280
+>+304801>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+120627>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+213274>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=Y
+>+25228>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+114148>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+94036>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+121906>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=a
+>+22049>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+190532>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=m
+>+23474>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+200136>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=s
+>+23424>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+399170>Hq6ISfkfkDmudgtZ>02a>key type=input char=13 key=1280
+>+59467>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+34828>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1280
+>+864602>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+62257>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+1817>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+22729>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+290315>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=B
+>+47072>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+4871>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:3840:3840:3840:0
+>+117038>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+100705>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+151667>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+18698>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+248240>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=a
+>+25169>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+332518>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=n
+>+54622>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+54809>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=s
+>+26437>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+982420>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+12410>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+191649>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2670 y=4785 count=1 buttons=0 modifier=0
+>+568005>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=3240 y=5265 count=1 buttons=0 modifier=0
+>+284362>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=3240 y=5265 count=1 buttons=1 modifier=0
+>+2051>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=3180 y=5220 count=1 buttons=1 modifier=0
+>+13791>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2985 y=5100 count=1 buttons=1 modifier=0
+>+15739>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2685 y=4890 count=1 buttons=1 modifier=0
+>+18942>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2505 y=4755 count=1 buttons=1 modifier=0
+>+31548>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2265 y=4470 count=1 buttons=1 modifier=0
+>+242152>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2190 y=4380 count=1 buttons=1 modifier=0
+>+377>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2130 y=4305 count=1 buttons=1 modifier=0
+>+266>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2055 y=4200 count=1 buttons=1 modifier=0
+>+448>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1920 y=4035 count=1 buttons=1 modifier=0
+>+415>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1860 y=3960 count=1 buttons=1 modifier=0
+>+534>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1785 y=3900 count=1 buttons=1 modifier=0
+>+512>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+259>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1755 y=3795 count=1 buttons=1 modifier=0
+>+418>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1710 y=3720 count=1 buttons=1 modifier=0
+>+342>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1680 y=3690 count=1 buttons=1 modifier=0
+>+365>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1680 y=3660 count=1 buttons=1 modifier=0
+>+324>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1680 y=3630 count=1 buttons=1 modifier=0
+>+6660>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1680 y=3615 count=1 buttons=1 modifier=0
+>+28624>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1680 y=3585 count=1 buttons=1 modifier=0
+>+457360>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1680 y=3570 count=1 buttons=1 modifier=0
+>+240>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1665 y=3540 count=1 buttons=1 modifier=0
+>+267>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+353>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1665 y=3525 count=1 buttons=1 modifier=0
+>+240>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1635 y=3525 count=1 buttons=1 modifier=0
+>+254>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1635 y=3495 count=1 buttons=1 modifier=0
+>+267>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1620 y=3495 count=1 buttons=1 modifier=0
+>+235>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1590 y=3465 count=1 buttons=1 modifier=0
+>+227>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1560 y=3465 count=1 buttons=1 modifier=0
+>+234>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1530 y=3450 count=1 buttons=1 modifier=0
+>+476>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1500 y=3450 count=1 buttons=1 modifier=0
+>+448>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1470 y=3450 count=1 buttons=1 modifier=0
+>+337>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1455 y=3450 count=1 buttons=1 modifier=0
+>+317>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1440 y=3450 count=1 buttons=1 modifier=0
+>+5383>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1410 y=3450 count=1 buttons=1 modifier=0
+>+274925>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1395 y=3450 count=1 buttons=1 modifier=0
+>+1646>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1380 y=3450 count=1 buttons=1 modifier=0
+>+488>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1380 y=3420 count=1 buttons=1 modifier=0
+>+1222>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1350 y=3420 count=1 buttons=1 modifier=0
+>+384>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+364>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1320 y=3390 count=1 buttons=1 modifier=0
+>+362>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1215 y=3285 count=1 buttons=1 modifier=0
+>+349>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1215 y=3255 count=1 buttons=1 modifier=0
+>+99219>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=1215 y=3255 count=1 buttons=1 modifier=0
+>+2973097>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2175 y=-1560 count=1 buttons=0 modifier=0
+>+1424246>Hq6ISfkfkDmudgtZ>02a>uno .uno:DefaultBullet
+>+67590>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+5005>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:3840:3840:3840:0
+>+1081>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+102518>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+841514>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+29275>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+111320>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+314493>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2790 y=4950 count=1 buttons=0 modifier=0
+>+9212>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=2790 y=4950 count=1 buttons=1 modifier=0
+>+950>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=2790 y=4950 count=1 buttons=1 modifier=0
+>+109164>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+706986>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=2790 y=4950 count=1 buttons=1 modifier=0
+>+4067>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=2790 y=4950 count=1 buttons=1 modifier=0
+>+169612>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=2790 y=4950 count=2 buttons=1 modifier=0
+>+968>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=2790 y=4950 count=2 buttons=1 modifier=0
+>+879512>Hq6ISfkfkDmudgtZ>02a>key type=input char=13 key=1280
+>+56743>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1280
+>+954891>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+1260398>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+109452>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+258296>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=O
+>+48538>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:3840:3840:3840:0
+>+1653>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+55092>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+120152>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+240751>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=d
+>+44946>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+976393>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+18980>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+106367>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=%5D
+>+34986>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+91238>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+141592>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=%5D
+>+22630>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+558580>Hq6ISfkfkDmudgtZ>02a>removetextcontext id=0 before=1 after=0
+>+19531>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+149769>Hq6ISfkfkDmudgtZ>02a>removetextcontext id=0 before=1 after=0
+>+20535>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+131154>Hq6ISfkfkDmudgtZ>02a>removetextcontext id=0 before=1 after=0
+>+21186>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+92378>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+993634>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+11240>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+546798>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2250 y=4815 count=1 buttons=0 modifier=0
+>+606372>Hq6ISfkfkDmudgtZ>02a>removetextcontext id=0 before=1 after=0
+>+49283>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+676536>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5115 y=-1125 count=1 buttons=0 modifier=0
+>+290383>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+13129>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+1982776>Hq6ISfkfkDmudgtZ>02a>uno .uno:DefaultBullet
+>+26861>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+685386>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5175 y=3555 count=1 buttons=0 modifier=0
+>+305378>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+23142>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+8096>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+95015>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+886835>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=O
+>+48133>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+69971>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+99363>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+238852>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=d
+>+45266>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+193452>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+28751>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+205942>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=r
+>+32646>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+504317>Hq6ISfkfkDmudgtZ>02a>removetextcontext id=0 before=1 after=0
+>+18573>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+273931>Hq6ISfkfkDmudgtZ>02a>removetextcontext id=0 before=1 after=0
+>+16099>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+370136>Hq6ISfkfkDmudgtZ>02a>removetextcontext id=0 before=1 after=0
+>+14709>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+299703>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=r
+>+25778>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+266599>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=d
+>+22928>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+191715>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+22366>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+158973>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=r
+>+23923>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+272146>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+23965>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+196929>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=d
+>+25664>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+350114>Hq6ISfkfkDmudgtZ>02a>key type=input char=32 key=0
+>+291>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1284
+>+502132>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=l
+>+47797>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:3840:3840:3840:0
+>+4225>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+156564>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=i
+>+21654>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:3840:3840:3840:0
+>+374013>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=s
+>+19500>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:3840:3840:3840:0
+>+172011>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=t
+>+24930>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:3840:3840:3840:0
+>+987865>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+23694>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+24462>Hq6ISfkfkDmudgtZ>02a>key type=input char=58 key=0
+>+878>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=5413
+>+45949>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:3840:3840:3840:0
+>+20155>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=5413
+>+223024>Hq6ISfkfkDmudgtZ>02a>key type=input char=13 key=1280
+>+29867>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+5126>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:3840:3840:3840:0
+>+34803>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1280
+>+940538>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+11719>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+1369006>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2535 y=7140 count=1 buttons=0 modifier=0
+>+151887>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2520 y=7140 count=1 buttons=0 modifier=0
+>+1181734>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+93829>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+1338600>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=S
+>+53431>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:3840:3840:3840:0
+>+351>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+157975>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+100549>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+119430>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=o
+>+25049>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+136828>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=c
+>+24354>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+169988>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=k
+>+21268>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+160125>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=s
+>+25311>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+401378>Hq6ISfkfkDmudgtZ>02a>key type=input char=13 key=1280
+>+61505>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:3840:3840:3840:0
+>+162>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+5933>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+796>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+224>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:3840:3840:3840:0
+>+807>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+235>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:7680:3840:3840:0
+>+717>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:7680:3840:3840:0
+>+164>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:7680:3840:3840:0
+>+50971>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1280
+>+819336>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=s
+>+73165>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:3840:3840:3840:0
+>+246>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:7680:3840:3840:0
+>+5125>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+169>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+146>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:7680:3840:3840:0
+>+570>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:7680:3840:3840:0
+>+239960>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=h
+>+30277>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+500>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+276649>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=o
+>+70961>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+181502>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+21929>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+157531>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=s
+>+26085>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+982787>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+26144>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+18729>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=3060 y=7830 count=1 buttons=0 modifier=0
+>+232931>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=3060 y=7830 count=1 buttons=1 modifier=0
+>+887>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2955 y=7710 count=1 buttons=1 modifier=0
+>+15016>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2595 y=7455 count=1 buttons=1 modifier=0
+>+23923>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2355 y=7245 count=1 buttons=1 modifier=0
+>+10688>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2250 y=7140 count=1 buttons=1 modifier=0
+>+230127>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2145 y=7110 count=1 buttons=1 modifier=0
+>+428>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2115 y=7110 count=1 buttons=1 modifier=0
+>+358>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2115 y=7065 count=1 buttons=1 modifier=0
+>+327>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2085 y=7065 count=1 buttons=1 modifier=0
+>+381>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2085 y=7035 count=1 buttons=1 modifier=0
+>+359>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2055 y=7035 count=1 buttons=1 modifier=0
+>+361>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+337>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2055 y=7005 count=1 buttons=1 modifier=0
+>+297>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2025 y=7005 count=1 buttons=1 modifier=0
+>+14338>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2010 y=7005 count=1 buttons=1 modifier=0
+>+35261>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1980 y=7005 count=1 buttons=1 modifier=0
+>+420428>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1965 y=7005 count=1 buttons=1 modifier=0
+>+646>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1935 y=7005 count=1 buttons=1 modifier=0
+>+954>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+1496>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1920 y=7005 count=1 buttons=1 modifier=0
+>+486>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1920 y=6990 count=1 buttons=1 modifier=0
+>+469>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1890 y=6990 count=1 buttons=1 modifier=0
+>+367>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1860 y=6990 count=1 buttons=1 modifier=0
+>+262>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1860 y=6960 count=1 buttons=1 modifier=0
+>+277>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1830 y=6960 count=1 buttons=1 modifier=0
+>+277>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1830 y=6930 count=1 buttons=1 modifier=0
+>+299>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1800 y=6930 count=1 buttons=1 modifier=0
+>+286>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1785 y=6915 count=1 buttons=1 modifier=0
+>+269>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1755 y=6915 count=1 buttons=1 modifier=0
+>+288>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1755 y=6885 count=1 buttons=1 modifier=0
+>+272>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1725 y=6885 count=1 buttons=1 modifier=0
+>+330>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1725 y=6855 count=1 buttons=1 modifier=0
+>+13503>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1695 y=6855 count=1 buttons=1 modifier=0
+>+7399>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1695 y=6825 count=1 buttons=1 modifier=0
+>+15967>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1665 y=6825 count=1 buttons=1 modifier=0
+>+215405>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1665 y=6795 count=1 buttons=1 modifier=0
+>+479>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1650 y=6765 count=1 buttons=1 modifier=0
+>+457>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1650 y=6750 count=1 buttons=1 modifier=0
+>+619>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1650 y=6735 count=1 buttons=1 modifier=0
+>+662>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1620 y=6690 count=1 buttons=1 modifier=0
+>+898>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1620 y=6660 count=1 buttons=1 modifier=0
+>+3381>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1590 y=6660 count=1 buttons=1 modifier=0
+>+29067>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1590 y=6630 count=1 buttons=1 modifier=0
+>+282259>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1560 y=6630 count=1 buttons=1 modifier=0
+>+282>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1545 y=6630 count=1 buttons=1 modifier=0
+>+343>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1515 y=6630 count=1 buttons=1 modifier=0
+>+276>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+284>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1500 y=6630 count=1 buttons=1 modifier=0
+>+285>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1485 y=6630 count=1 buttons=1 modifier=0
+>+269>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1455 y=6630 count=1 buttons=1 modifier=0
+>+16194>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=1455 y=6630 count=1 buttons=1 modifier=0
+>+751599>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4950 y=-1725 count=1 buttons=0 modifier=0
+>+758190>Hq6ISfkfkDmudgtZ>02a>uno .uno:DefaultNumbering
+>+44947>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+3932>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+101456>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+876511>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+33482>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+117451>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=3510 y=7830 count=1 buttons=0 modifier=0
+>+1810>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+238266>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=3510 y=7830 count=1 buttons=1 modifier=0
+>+471>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=3510 y=7830 count=1 buttons=1 modifier=0
+>+110030>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+523846>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=3390 y=7785 count=1 buttons=0 modifier=0
+>+407008>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2625 y=7440 count=1 buttons=0 modifier=0
+>+362751>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=2985 y=7815 count=1 buttons=0 modifier=0
+>+13092>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=2985 y=7815 count=1 buttons=1 modifier=0
+>+773>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=2985 y=7815 count=1 buttons=1 modifier=0
+>+193021>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=2985 y=7815 count=2 buttons=1 modifier=0
+>+362>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=2985 y=7815 count=2 buttons=1 modifier=0
+>+1008275>Hq6ISfkfkDmudgtZ>02a>key type=input char=13 key=1280
+>+74551>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1280
+>+23363>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:3840:3840:3840:0
+>+550>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:7680:3840:3840:0
+>+143>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:7680:3840:3840:0
+>+4646>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:7680:3840:3840:0
+>+851>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+274>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+1522>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+199>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:3840:3840:3840:0
+>+205>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+924751>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+32270>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+771281>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+111171>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+487897>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=H
+>+64117>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:3840:3840:3840:0
+>+1451>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:7680:3840:3840:0
+>+2954>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:7680:3840:3840:0
+>+611>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:7680:3840:3840:0
+>+145>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+543>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+46366>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+106933>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+150803>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=a
+>+34714>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+890>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+176186>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=n
+>+31119>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+418>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+272207>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=d
+>+33079>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+1074>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+383300>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=b
+>+32458>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+4159>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+144978>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=a
+>+27089>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+385>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+205264>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=g
+>+41892>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+5254>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+539964>Hq6ISfkfkDmudgtZ>02a>key type=input char=13 key=1280
+>+93700>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1280
+>+4909>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:3840:3840:3840:0
+>+433>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:7680:3840:3840:0
+>+553>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:7680:3840:3840:0
+>+2968>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:7680:3840:3840:0
+>+238>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:3840:3840:3840:0
+>+688>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+195>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+1048>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+171>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+781293>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+61216>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+82151>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+37012>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+277611>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=C
+>+45018>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:3840:3840:3840:0
+>+241>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:7680:3840:3840:0
+>+533>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:7680:3840:3840:0
+>+166>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:7680:3840:3840:0
+>+3801>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+595>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+237556>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+81810>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+167932>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=l
+>+72372>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+10320>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+106743>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=o
+>+32258>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+677>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+228282>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=t
+>+29828>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+402>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+175109>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=h
+>+34789>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+120>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+85594>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=s
+>+25294>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+759>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+733777>Hq6ISfkfkDmudgtZ>02a>key type=input char=13 key=1280
+>+60338>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:3840:3840:3840:0
+>+3220>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:7680:3840:3840:0
+>+146>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:7680:3840:3840:0
+>+487>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:7680:3840:3840:0
+>+532>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+937>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+171>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+425>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+46746>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1280
+>+903284>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+13106>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+25101>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+63842>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+1112148>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=G
+>+55190>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:3840:3840:3840:0
+>+175>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:7680:3840:3840:0
+>+4580>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:7680:3840:3840:0
+>+733>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:7680:3840:3840:0
+>+194>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+518>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+66622>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+79198>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+195017>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=r
+>+26306>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+735>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+144643>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+29764>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+389>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+80443>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=a
+>+121080>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=t
+>+20457>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+3959>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+320271>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+423>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+82016>Hq6ISfkfkDmudgtZ>02a>key type=input char=32 key=0
+>+481>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1284
+>+957423>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=c
+>+57386>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+8031>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+178380>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=l
+>+37894>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+1059>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+179055>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=o
+>+89468>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+235>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+245610>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=t
+>+26057>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+687>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+195229>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=h
+>+25586>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+910>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+84442>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=s
+>+32662>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+183>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+979220>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+22816>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+819614>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=-3810 y=5370 count=1 buttons=0 modifier=0
+>+1266287>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4080 y=3405 count=1 buttons=0 modifier=0
+>+10838>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=4080 y=3405 count=1 buttons=1 modifier=0
+>+378>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=4080 y=3405 count=1 buttons=1 modifier=0
+>+101812>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:7680:3840:3840:0
+>+120>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:7680:3840:3840:0
+>+396>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:7680:3840:3840:0
+>+3961>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+211>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+194>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+787>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+191>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:0:3840:3840:0
+>+653>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:3840:3840:3840:0
+>+186>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+645>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:3840:3840:3840:0
+>+177>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:3840:3840:3840:0
+>+936332>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+15315>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+80478>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=-705 y=2670 count=1 buttons=0 modifier=0
+>+166517>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=-735 y=2670 count=1 buttons=0 modifier=0
+>+692662>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=-1935 y=3585 count=1 buttons=0 modifier=0
+>+50246>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=-1935 y=3585 count=1 buttons=1 modifier=0
+>+793>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=-1935 y=3585 count=1 buttons=1 modifier=0
+>+121448>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+435092>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=-4290 y=3240 count=1 buttons=0 modifier=0
+>+430138>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=10 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=10 broadcast=no
+>+18994>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:0:15875:8930:0
+>+198494>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=11 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=11 broadcast=no
+>+20390>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:0:0:15875:8930:0
+>+1333070>Hq6ISfkfkDmudgtZ>02a>uno .uno:InsertPage
+>+3173>Hq6ISfkfkDmudgtZ>02a>setclientpart part=2
+>+6474>Hq6ISfkfkDmudgtZ>02a>canceltiles
+>+1130>Hq6ISfkfkDmudgtZ>02a>tilecombine nviewid=0 part=2 width=256 height=256 tileposx=0,3840,7680,11520,15360,0,3840,7680,11520,15360,0,3840,7680,11520,15360 tileposy=0,0,0,0,0,3840,3840,3840,3840,3840,7680,7680,7680,7680,7680 tilewidth=3840 tileheight=3840
+>+417452>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:7680:3840:3840:0
+>+168>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:7680:3840:3840:0
+>+160>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:7680:3840:3840:0
+>+191>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:11520:7680:3840:3840:0
+>+187>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:3840:3840:0
+>+213>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+166>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:3840:3840:3840:0
+>+167>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+164>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:11520:0:3840:3840:0
+>+159>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:15360:0:3840:3840:0
+>+160>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+163>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+160>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:11520:3840:3840:3840:0
+>+179>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:15360:3840:3840:3840:0
+>+144>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:15360:7680:3840:3840:0
+>+17986>Hq6ISfkfkDmudgtZ>02a>freemiumstatus isFreemiumUser=false
+>+2510>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=0 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=0 broadcast=no
+>+280966>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+1034>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+26135>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:3840:3840:3840:0
+>+1040>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:3840:3840:0
+>+6927>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+182>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+275>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:11520:0:3840:3840:0
+>+630>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:15360:0:3840:3840:0
+>+115>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+100>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+482>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:11520:3840:3840:3840:0
+>+139>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:15360:3840:3840:3840:0
+>+441>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:7680:3840:3840:0
+>+224806>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:7680:3840:3840:0
+>+176>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:7680:3840:3840:0
+>+183>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:11520:7680:3840:3840:0
+>+188>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:15360:7680:3840:3840:0
+>+185>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:19200:0:3840:3840:0
+>+190>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:19200:3840:3840:3840:0
+>+191>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:19200:7680:3840:3840:0
+>+6429>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=0:0:0:15875:8930:0
+>+15861>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+9685>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+6307>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4905 y=4395 count=1 buttons=0 modifier=0
+>+327203>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5040 y=855 count=1 buttons=0 modifier=0
+>+95601>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5040 y=825 count=1 buttons=0 modifier=0
+>+156333>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=5040 y=825 count=1 buttons=1 modifier=0
+>+548>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=5040 y=825 count=1 buttons=1 modifier=0
+>+20349>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+279839>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+7266>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:3840:3840:0
+>+6168>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:11520:0:3840:3840:0
+>+4221>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+1324>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+1316>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:7680:3840:3840:0
+>+604>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:15360:7680:3840:3840:0
+>+175>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:7680:3840:3840:0
+>+661>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:7680:3840:3840:0
+>+459>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:11520:7680:3840:3840:0
+>+1011750>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+334>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+3595>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=3 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=3 broadcast=no
+>+282>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=4 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=4 broadcast=no
+>+647>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+6383>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+8725>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=5 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=5 broadcast=no
+>+404>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=6 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=6 broadcast=no
+>+1002>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=3:0:0:15875:8930:0
+>+33931>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=4:0:0:15875:8930:0
+>+30620>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=7 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=7 broadcast=no
+>+306>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=8 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=8 broadcast=no
+>+677>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=5:0:0:15875:8930:0
+>+195283>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+2859>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=9 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=9 broadcast=no
+>+256>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=10 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=10 broadcast=no
+>+1004>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=11 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=11 broadcast=no
+>+498>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=6:0:0:15875:8930:0
+>+51298>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+4746>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=7:0:0:15875:8930:0
+>+199272>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=8:0:0:15875:8930:0
+>+197>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+34585>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=9:0:0:15875:8930:0
+>+161>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:0:15875:8930:0
+>+8856>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:0:0:15875:8930:0
+>+1227793>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+920924>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=A
+>+61930>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+144819>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+90517>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+196478>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=d
+>+56820>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+667>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+119566>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=d
+>+27044>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+372>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+542124>Hq6ISfkfkDmudgtZ>02a>key type=input char=32 key=0
+>+639>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1284
+>+63757>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+8163>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+112252>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=a
+>+24484>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+394>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+234795>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=n
+>+34877>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+620>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+31157>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=d
+>+215691>Hq6ISfkfkDmudgtZ>02a>key type=input char=32 key=0
+>+466>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1284
+>+33786>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+159>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+71663>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+262810>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=d
+>+8576>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+4083>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+250047>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+678>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+51974>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=i
+>+360227>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=t
+>+1439>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+6080>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+298350>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+536>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+121>Hq6ISfkfkDmudgtZ>02a>key type=input char=32 key=0
+>+368>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1284
+>+32654>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+519>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+50828>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=s
+>+173710>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=h
+>+25451>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+298443>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+145>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=a
+>+2970>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+281689>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=p
+>+1303>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+1942>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+141>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+318281>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=s
+>+3931>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+4235>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+35494>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+241149>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+702>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:11520:0:3840:3840:0
+>+552518>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=3315 y=2760 count=1 buttons=0 modifier=0
+>+29548>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=3315 y=2760 count=1 buttons=1 modifier=0
+>+465>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=3315 y=2760 count=1 buttons=1 modifier=0
+>+30599>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+350871>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+6937>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:3840:3840:0
+>+7607>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:11520:0:3840:3840:0
+>+158>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+657>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+221268>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=3315 y=2760 count=1 buttons=1 modifier=0
+>+475>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=3315 y=2760 count=1 buttons=1 modifier=0
+>+369537>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=3315 y=2760 count=2 buttons=1 modifier=0
+>+571>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=3315 y=2760 count=2 buttons=1 modifier=0
+>+188923>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=3060 y=2760 count=1 buttons=0 modifier=0
+>+454>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+265288>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+370>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+195>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+20890>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:3840:3840:0
+>+143>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+448620>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5355 y=-735 count=1 buttons=0 modifier=0
+>+395405>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=9600 y=-1755 count=1 buttons=0 modifier=0
+>+834868>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+3399330>Hq6ISfkfkDmudgtZ>02a>uno .uno:undefined
+>+1894812>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11685 y=-1725 count=1 buttons=0 modifier=0
+>+1333815>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=10200 y=-1695 count=1 buttons=0 modifier=0
+>+1242442>Hq6ISfkfkDmudgtZ>02a>uno .uno:undefined
+>+1385518>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7275 y=-1440 count=1 buttons=0 modifier=0
+>+254942>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=9885 y=-1710 count=1 buttons=0 modifier=0
+>+2114676>Hq6ISfkfkDmudgtZ>02a>uno .uno:BasicShapes.round-rectangle
+>+81292>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+19838>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:3840:3840:0
+>+447749>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+849>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+178>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+162>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+184>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+530140>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+25175>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+462787>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5415 y=4260 count=1 buttons=0 modifier=0
+>+369094>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6060 y=4230 count=1 buttons=0 modifier=0
+>+363107>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5940 y=4290 count=1 buttons=0 modifier=0
+>+516690>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5775 y=4485 count=1 buttons=0 modifier=0
+>+873452>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7005 y=4245 count=1 buttons=0 modifier=0
+>+62594>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=7005 y=4245 count=1 buttons=1 modifier=0
+>+746>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=7005 y=4245 count=1 buttons=1 modifier=0
+>+295313>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=7005 y=4245 count=2 buttons=1 modifier=0
+>+1220>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=7005 y=4245 count=2 buttons=1 modifier=0
+>+3706>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=7005 y=4245 count=1 buttons=1 modifier=0
+>+766>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=7005 y=4245 count=1 buttons=1 modifier=0
+>+66774>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:7680:3840:3840:0
+>+1317>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:7680:3840:3840:0
+>+4826>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:7680:3840:3840:0
+>+654>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:11520:7680:3840:3840:0
+>+99>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:15360:7680:3840:3840:0
+>+968202>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+1469>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+120275>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+484153>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=G
+>+63709>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+42564>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+28694>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6990 y=4245 count=1 buttons=0 modifier=0
+>+92872>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+201666>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=r
+>+28738>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+186717>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+38928>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+638>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+262138>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=a
+>+31204>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+4379>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+159072>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=t
+>+143674>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+98>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+607560>Hq6ISfkfkDmudgtZ>02a>key type=input char=32 key=0
+>+868>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1284
+>+62857>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+10508>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+950829>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+19631>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+847879>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=o
+>+52580>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+125>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+149985>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=n
+>+44069>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+166>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+107754>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+157649>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+813>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+328254>Hq6ISfkfkDmudgtZ>02a>key type=input char=13 key=1280
+>+27868>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+169>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+92872>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1280
+>+660719>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+79722>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+150758>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+20674>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+56435>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=G
+>+53032>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+73573>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+100855>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+246253>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=r
+>+36817>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+164594>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+53622>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+17386>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+233584>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=a
+>+24337>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+7004>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+4320>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+4168>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+81101>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=T
+>+226518>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=E
+>+27586>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+144>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+238982>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=R
+>+4270>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+154>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+29968>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+296900>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+599291>Hq6ISfkfkDmudgtZ>02a>key type=input char=32 key=0
+>+810>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1284
+>+66756>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+5677>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+51305>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+167>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+356733>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=O
+>+43945>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+12714>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+195858>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=N
+>+31981>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+162>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+153740>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=E
+>+34878>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+5140>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+467801>Hq6ISfkfkDmudgtZ>02a>key type=input char=13 key=1280
+>+32038>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+245>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+138930>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1280
+>+240680>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+93559>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+508568>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+25599>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+247750>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=g
+>+50409>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+105862>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6855 y=4110 count=1 buttons=0 modifier=0
+>+146989>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=r
+>+27770>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+133732>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+30740>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+264952>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=a
+>+297351>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+174>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+150>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=t
+>+37092>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+170>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+18214>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+258694>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+4784>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+685118>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=s
+>+63197>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+372>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+126527>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=t
+>+35251>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+4338>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+303565>Hq6ISfkfkDmudgtZ>02a>key type=input char=32 key=0
+>+354>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1284
+>+37815>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+189>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+457713>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=o
+>+29815>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+431>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+255470>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=n
+>+29525>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+4698>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+156899>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+32691>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+1421>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+979929>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+28568>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+592921>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=8475 y=4260 count=1 buttons=0 modifier=0
+>+700222>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=9450 y=4620 count=1 buttons=0 modifier=0
+>+399761>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=9375 y=4620 count=1 buttons=0 modifier=0
+>+482838>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=8910 y=4440 count=1 buttons=0 modifier=0
+>+117499>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=8910 y=4440 count=1 buttons=1 modifier=0
+>+948>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=8625 y=4395 count=1 buttons=1 modifier=0
+>+18808>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=8250 y=4395 count=1 buttons=1 modifier=0
+>+22340>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7875 y=4395 count=1 buttons=1 modifier=0
+>+10745>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7770 y=4395 count=1 buttons=1 modifier=0
+>+17380>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7605 y=4395 count=1 buttons=1 modifier=0
+>+310234>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7500 y=4395 count=1 buttons=1 modifier=0
+>+575>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7365 y=4425 count=1 buttons=1 modifier=0
+>+416>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7185 y=4425 count=1 buttons=1 modifier=0
+>+349>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7050 y=4425 count=1 buttons=1 modifier=0
+>+328>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6945 y=4425 count=1 buttons=1 modifier=0
+>+408>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6840 y=4425 count=1 buttons=1 modifier=0
+>+330>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+340>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6735 y=4425 count=1 buttons=1 modifier=0
+>+336>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6675 y=4425 count=1 buttons=1 modifier=0
+>+316>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6600 y=4425 count=1 buttons=1 modifier=0
+>+348>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6570 y=4425 count=1 buttons=1 modifier=0
+>+308>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6540 y=4425 count=1 buttons=1 modifier=0
+>+570>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6525 y=4425 count=1 buttons=1 modifier=0
+>+343355>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+86113>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6510 y=4425 count=1 buttons=1 modifier=0
+>+17656>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+182744>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6495 y=4410 count=1 buttons=1 modifier=0
+>+16831>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6465 y=4410 count=1 buttons=1 modifier=0
+>+16943>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6465 y=4380 count=1 buttons=1 modifier=0
+>+71427>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=6465 y=4380 count=1 buttons=1 modifier=0
+>+486550>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6690 y=-1485 count=1 buttons=0 modifier=0
+>+1263797>Hq6ISfkfkDmudgtZ>02a>uno .uno:LeftPara
+>+59027>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+6276>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+103230>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+858617>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+30057>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+54533>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=9195 y=4770 count=1 buttons=0 modifier=0
+>+17083>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=9195 y=4770 count=1 buttons=1 modifier=0
+>+807>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=9195 y=4770 count=1 buttons=1 modifier=0
+>+39158>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+757947>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=9195 y=4770 count=1 buttons=1 modifier=0
+>+287>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=9150 y=4770 count=1 buttons=1 modifier=0
+>+17266>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=8715 y=4770 count=1 buttons=1 modifier=0
+>+18865>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=8430 y=4770 count=1 buttons=1 modifier=0
+>+17958>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=8235 y=4800 count=1 buttons=1 modifier=0
+>+270779>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=8100 y=4830 count=1 buttons=1 modifier=0
+>+756>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7950 y=4830 count=1 buttons=1 modifier=0
+>+391>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7890 y=4830 count=1 buttons=1 modifier=0
+>+436>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7815 y=4830 count=1 buttons=1 modifier=0
+>+522>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7785 y=4830 count=1 buttons=1 modifier=0
+>+567>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+329>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7755 y=4830 count=1 buttons=1 modifier=0
+>+375>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7725 y=4830 count=1 buttons=1 modifier=0
+>+265>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7710 y=4830 count=1 buttons=1 modifier=0
+>+276>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7680 y=4830 count=1 buttons=1 modifier=0
+>+265>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7665 y=4830 count=1 buttons=1 modifier=0
+>+5515>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7260 y=4830 count=1 buttons=1 modifier=0
+>+5052>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7200 y=4830 count=1 buttons=1 modifier=0
+>+11966>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7095 y=4830 count=1 buttons=1 modifier=0
+>+298602>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6855 y=4830 count=1 buttons=1 modifier=0
+>+371>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6750 y=4830 count=1 buttons=1 modifier=0
+>+536>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6675 y=4830 count=1 buttons=1 modifier=0
+>+443>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6645 y=4830 count=1 buttons=1 modifier=0
+>+349>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6615 y=4830 count=1 buttons=1 modifier=0
+>+289>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+500>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6585 y=4830 count=1 buttons=1 modifier=0
+>+249>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6570 y=4830 count=1 buttons=1 modifier=0
+>+117363>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+240183>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+27046>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=6570 y=4830 count=1 buttons=1 modifier=0
+>+83536>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+395765>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5730 y=-1665 count=1 buttons=0 modifier=0
+>+1239073>Hq6ISfkfkDmudgtZ>02a>uno .uno:RightPara
+>+52625>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+4107>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+105884>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+857296>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+24832>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+109105>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+106330>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7170 y=4920 count=1 buttons=0 modifier=0
+>+1051309>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6885 y=4785 count=1 buttons=0 modifier=0
+>+367715>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7155 y=5175 count=1 buttons=0 modifier=0
+>+83027>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=7155 y=5175 count=1 buttons=1 modifier=0
+>+998>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=7155 y=5175 count=1 buttons=1 modifier=0
+>+119230>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+810618>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=6675 y=5250 count=1 buttons=1 modifier=0
+>+507>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=6675 y=5250 count=1 buttons=1 modifier=0
+>+16359>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6675 y=5250 count=1 buttons=0 modifier=0
+>+44413>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+5108>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+818250>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=6855 y=5040 count=1 buttons=0 modifier=0
+>+166586>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+23226>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+971140>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=8370 y=3525 count=1 buttons=0 modifier=0
+>+204418>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=8340 y=3495 count=1 buttons=0 modifier=0
+>+1102877>Hq6ISfkfkDmudgtZ>02a>uno .uno:TransformDialog  {"TransformPosX":{"type":"long","value":9554},"TransformPosY":{"type":"long","value":2957}}
+>+62723>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+46315>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:11520:0:3840:3840:0
+>+419>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+172>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+168>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+231024>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+144>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:11520:3840:3840:3840:0
+>+154>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+329>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=12090 y=3420 count=1 buttons=0 modifier=0
+>+765708>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+21521>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+119448>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=14160 y=4320 count=1 buttons=0 modifier=0
+>+1731614>Hq6ISfkfkDmudgtZ>02a>uno .uno:MoveShapeHandle {"HandleNum":{"type":"long","value":"4"},"NewPosX":{"type":"long","value":14925},"NewPosY":{"type":"long","value":4380}}
+>+39061>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+40661>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:11520:0:3840:3840:0
+>+163>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+3782>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:11520:3840:3840:3840:0
+>+113>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+55621>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+913486>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+21720>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+41616>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=9450 y=4830 count=1 buttons=0 modifier=0
+>+312026>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=9510 y=4260 count=1 buttons=0 modifier=0
+>+566158>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4095 y=4140 count=1 buttons=0 modifier=0
+>+32669>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=4095 y=4140 count=1 buttons=1 modifier=0
+>+425>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=4095 y=4140 count=1 buttons=1 modifier=0
+>+18231>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+99686>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+503602>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=8265 y=-30 count=1 buttons=0 modifier=0
+>+286057>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=8820 y=-1605 count=1 buttons=0 modifier=0
+>+4652152>Hq6ISfkfkDmudgtZ>02a>uno .uno:BasicShapes.parallelogram
+>+49682>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+37669>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+6270>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+137>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+114>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+367610>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+399562>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7695 y=5130 count=1 buttons=0 modifier=0
+>+196560>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+19764>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+35111>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=7695 y=4515 count=1 buttons=0 modifier=0
+>+1097340>Hq6ISfkfkDmudgtZ>02a>uno .uno:TransformDialog  {"TransformPosX":{"type":"long","value":1454},"TransformPosY":{"type":"long","value":2852}}
+>+44372>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+61054>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:3840:3840:3840:0
+>+4012>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+206>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:3840:3840:0
+>+618>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+151>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+135>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:3840:3840:3840:0
+>+33561>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+175068>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=3585 y=4530 count=1 buttons=0 modifier=0
+>+541253>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5295 y=3990 count=1 buttons=0 modifier=0
+>+198257>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+20157>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+125105>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5895 y=4125 count=1 buttons=0 modifier=0
+>+377594>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5955 y=4530 count=1 buttons=0 modifier=0
+>+187469>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5955 y=4425 count=1 buttons=0 modifier=0
+>+1537010>Hq6ISfkfkDmudgtZ>02a>uno .uno:MoveShapeHandle {"HandleNum":{"type":"long","value":"4"},"NewPosX":{"type":"long","value":8160},"NewPosY":{"type":"long","value":4275}}
+>+19687>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+42092>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:0:3840:3840:0
+>+6929>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:3840:3840:0
+>+1604>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+120>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:3840:3840:3840:0
+>+6668>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+40547>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+668499>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4725 y=3810 count=1 buttons=0 modifier=0
+>+20707>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=4725 y=3810 count=1 buttons=1 modifier=0
+>+954>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=4725 y=3810 count=1 buttons=1 modifier=0
+>+163755>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=4725 y=3810 count=2 buttons=1 modifier=0
+>+563>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=4725 y=3810 count=2 buttons=1 modifier=0
+>+1038903>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+11313>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+96016>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=1282
+>+40573>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+39835>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1282
+>+184293>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+748903>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+1886793>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=W
+>+49989>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+174873>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+80602>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+140683>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=i
+>+78471>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+72981>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=s
+>+55512>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+324988>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=s
+>+384>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+31087>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+412453>Hq6ISfkfkDmudgtZ>02a>key type=input char=13 key=1280
+>+82362>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+52185>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:3840:3840:3840:0
+>+6446>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+4868>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1280
+>+844179>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+91006>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+32815>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+20359>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+118990>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=W
+>+38698>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:3840:3840:3840:0
+>+162>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+181461>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+90677>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+132246>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=i
+>+36342>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+429236>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=s
+>+27361>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+194841>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+30075>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+135222>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+34292>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+196528>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=r
+>+27973>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+616489>Hq6ISfkfkDmudgtZ>02a>key type=input char=13 key=1280
+>+76272>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+6571>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+42584>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:3840:3840:3840:0
+>+646>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+32813>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=1280
+>+485500>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+60358>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+268505>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=W
+>+82459>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:3840:3840:3840:0
+>+10600>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+148824>Hq6ISfkfkDmudgtZ>02a>key type=input char=0 key=20
+>+80277>Hq6ISfkfkDmudgtZ>02a>key type=up char=0 key=20
+>+178976>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=i
+>+37696>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+77784>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=s
+>+184423>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+47244>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+264838>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=r
+>+17841>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+28826>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+327091>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=s
+>+30023>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+233747>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=e
+>+26725>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+255653>Hq6ISfkfkDmudgtZ>02a>textinput id=0 text=t
+>+31664>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+982024>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+28531>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+463786>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5280 y=3750 count=1 buttons=0 modifier=0
+>+653633>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5685 y=3930 count=1 buttons=0 modifier=0
+>+227961>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=5685 y=3930 count=1 buttons=1 modifier=0
+>+608>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5640 y=3915 count=1 buttons=1 modifier=0
+>+15990>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5580 y=3885 count=1 buttons=1 modifier=0
+>+16879>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5505 y=3855 count=1 buttons=1 modifier=0
+>+17139>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5475 y=3855 count=1 buttons=1 modifier=0
+>+14599>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:3840:3840:3840:0
+>+6408>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5370 y=3810 count=1 buttons=1 modifier=0
+>+3706>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+16784>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5295 y=3810 count=1 buttons=1 modifier=0
+>+513169>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5265 y=3810 count=1 buttons=1 modifier=0
+>+520>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5235 y=3810 count=1 buttons=1 modifier=0
+>+632>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5175 y=3810 count=1 buttons=1 modifier=0
+>+455>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5130 y=3810 count=1 buttons=1 modifier=0
+>+472>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5100 y=3810 count=1 buttons=1 modifier=0
+>+493>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+2569>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5070 y=3810 count=1 buttons=1 modifier=0
+>+336>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5040 y=3810 count=1 buttons=1 modifier=0
+>+507>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5010 y=3810 count=1 buttons=1 modifier=0
+>+421>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4980 y=3810 count=1 buttons=1 modifier=0
+>+407>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4950 y=3810 count=1 buttons=1 modifier=0
+>+476>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4935 y=3810 count=1 buttons=1 modifier=0
+>+407>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4905 y=3810 count=1 buttons=1 modifier=0
+>+478>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4875 y=3810 count=1 buttons=1 modifier=0
+>+1708>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4845 y=3810 count=1 buttons=1 modifier=0
+>+525>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4830 y=3810 count=1 buttons=1 modifier=0
+>+438>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4800 y=3810 count=1 buttons=1 modifier=0
+>+422>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4785 y=3810 count=1 buttons=1 modifier=0
+>+419>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4755 y=3810 count=1 buttons=1 modifier=0
+>+502>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4740 y=3810 count=1 buttons=1 modifier=0
+>+429>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4710 y=3840 count=1 buttons=1 modifier=0
+>+371>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4680 y=3840 count=1 buttons=1 modifier=0
+>+523>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4680 y=3870 count=1 buttons=1 modifier=0
+>+573>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4650 y=3870 count=1 buttons=1 modifier=0
+>+17483>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4620 y=3870 count=1 buttons=1 modifier=0
+>+237861>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+1925>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4605 y=3870 count=1 buttons=1 modifier=0
+>+6697>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4590 y=3870 count=1 buttons=1 modifier=0
+>+131825>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4575 y=3870 count=1 buttons=1 modifier=0
+>+136014>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+361>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+31200>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4575 y=3870 count=1 buttons=1 modifier=0
+>+157406>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=4575 y=3870 count=1 buttons=1 modifier=0
+>+960246>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5130 y=-1755 count=1 buttons=0 modifier=0
+>+152078>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5130 y=-1770 count=1 buttons=0 modifier=0
+>+699874>Hq6ISfkfkDmudgtZ>02a>uno .uno:RightPara
+>+118158>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:3840:3840:3840:0
+>+313591>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:0:3840:3840:0
+>+483>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+109>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:15360:7680:3840:3840:0
+>+103>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:7680:3840:3840:0
+>+97>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:7680:3840:3840:0
+>+110>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:7680:3840:3840:0
+>+107>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:11520:7680:3840:3840:0
+>+106>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+622803>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+28525>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+31692>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5205 y=3930 count=1 buttons=0 modifier=0
+>+76068>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+306638>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5355 y=4230 count=1 buttons=0 modifier=0
+>+33500>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=5355 y=4230 count=1 buttons=1 modifier=0
+>+1332>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=5355 y=4230 count=1 buttons=1 modifier=0
+>+119996>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+580293>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=5355 y=4230 count=1 buttons=1 modifier=0
+>+13038>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4920 y=4230 count=1 buttons=1 modifier=0
+>+4548>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4515 y=4290 count=1 buttons=1 modifier=0
+>+32065>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4230 y=4320 count=1 buttons=1 modifier=0
+>+1587>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=3990 y=4395 count=1 buttons=1 modifier=0
+>+19778>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=3885 y=4395 count=1 buttons=1 modifier=0
+>+365760>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=3750 y=4395 count=1 buttons=1 modifier=0
+>+443>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=3720 y=4395 count=1 buttons=1 modifier=0
+>+353>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=3690 y=4395 count=1 buttons=1 modifier=0
+>+331>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=3660 y=4395 count=1 buttons=1 modifier=0
+>+317>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=3630 y=4395 count=1 buttons=1 modifier=0
+>+318>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+332>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=3630 y=4380 count=1 buttons=1 modifier=0
+>+338>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=3630 y=4350 count=1 buttons=1 modifier=0
+>+113590>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=3630 y=4350 count=1 buttons=1 modifier=0
+>+494637>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=3390 y=-1305 count=1 buttons=0 modifier=0
+>+946248>Hq6ISfkfkDmudgtZ>02a>uno .uno:LeftPara
+>+115474>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:7680:3840:3840:0
+>+5063>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:7680:7680:3840:3840:0
+>+563>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:11520:7680:3840:3840:0
+>+262154>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:3840:3840:3840:0
+>+123>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:7680:3840:3840:0
+>+935>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+115>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:15360:7680:3840:3840:0
+>+140>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+695430>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+31568>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+101692>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+188766>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5640 y=4710 count=1 buttons=0 modifier=0
+>+69141>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=5640 y=4710 count=1 buttons=1 modifier=0
+>+439>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=5640 y=4710 count=1 buttons=1 modifier=0
+>+109436>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+1318984>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=3300 y=6435 count=1 buttons=0 modifier=0
+>+867>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=3300 y=6435 count=1 buttons=1 modifier=0
+>+688>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=3300 y=6435 count=1 buttons=1 modifier=0
+>+78841>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+23405>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:3840:3840:3840:3840:0
+>+245562>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+739860>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+222841>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=-2265 y=4515 count=1 buttons=0 modifier=0
+>+1084517>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=-3495 y=10410 count=1 buttons=0 modifier=0
+>+439596>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=-4290 y=8700 count=1 buttons=0 modifier=0
+>+4800810>Hq6ISfkfkDmudgtZ>02a>setclientpart part=1
+>+33829>Hq6ISfkfkDmudgtZ>02a>canceltiles
+>+3283>Hq6ISfkfkDmudgtZ>02a>tilecombine nviewid=0 part=1 width=256 height=256 tileposx=0,3840,7680,11520,15360,0,3840,7680,11520,15360,0,3840,7680,11520,15360 tileposy=0,0,0,0,0,3840,3840,3840,3840,3840,7680,7680,7680,7680,7680 tilewidth=3840 tileheight=3840
+>+3287>Hq6ISfkfkDmudgtZ>02a>selectclientpart part=1 how=1
+>+21386>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+495>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+13716>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+1540>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+6108>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+245411>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+11691>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:7680:3840:3840:0
+>+146>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:7680:3840:3840:0
+>+192>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:7680:3840:3840:0
+>+2658>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:7680:3840:3840:0
+>+193>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:15360:7680:3840:3840:0
+>+699>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:3840:3840:0
+>+135>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:3840:3840:3840:0
+>+581>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:3840:0:3840:3840:0
+>+191>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:0:3840:3840:0
+>+639>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:0:3840:3840:0
+>+139>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:15360:0:3840:3840:0
+>+129>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:3840:3840:3840:0
+>+923>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:15360:3840:3840:3840:0
+>+160>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:7680:3840:3840:3840:0
+>+706>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:11520:3840:3840:3840:0
+>+357756>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+360687>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=1 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=1 broadcast=no
+>+443>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=2 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=2 broadcast=no
+>+4082>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=1:0:0:15875:8930:0
+>+678>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=2:0:0:15875:8930:0
+>+5729350>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=12 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=12 broadcast=no
+>+831>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=13 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=13 broadcast=no
+>+53480>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=12:0:0:15875:8930:0
+>+2217>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=13:0:0:15875:8930:0
+>+903097>Hq6ISfkfkDmudgtZ>02a>setclientpart part=11
+>+12143>Hq6ISfkfkDmudgtZ>02a>canceltiles
+>+232>Hq6ISfkfkDmudgtZ>02a>tilecombine nviewid=0 part=11 width=256 height=256 tileposx=0,3840,7680,11520,15360,0,3840,7680,11520,15360,0,3840,7680,11520,15360 tileposy=0,0,0,0,0,3840,3840,3840,3840,3840,7680,7680,7680,7680,7680 tilewidth=3840 tileheight=3840
+>+6948>Hq6ISfkfkDmudgtZ>02a>selectclientpart part=11 how=1
+>+121223>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:15360:0:3840:3840:0
+>+116>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:11520:3840:3840:3840:0
+>+344>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:15360:3840:3840:3840:0
+>+4970>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:11520:7680:3840:3840:0
+>+872>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:15360:7680:3840:3840:0
+>+547>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:7680:0:3840:3840:0
+>+172>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:3840:0:3840:3840:0
+>+181>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:0:0:3840:3840:0
+>+922>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:3840:3840:3840:3840:0
+>+202>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:11520:0:3840:3840:0
+>+122>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:0:3840:3840:3840:0
+>+10169>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:7680:3840:3840:3840:0
+>+273>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:0:7680:3840:3840:0
+>+540>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:3840:7680:3840:3840:0
+>+96>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:7680:7680:3840:3840:0
+>+3974806>Hq6ISfkfkDmudgtZ>02a>uno .uno:DeletePage
+>+716>Hq6ISfkfkDmudgtZ>02a>setclientpart part=11
+>+416454>Hq6ISfkfkDmudgtZ>02a>freemiumstatus isFreemiumUser=false
+>+386>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=11 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=11 broadcast=no
+>+59817>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:15360:0:3840:3840:0
+>+135>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:19200:0:3840:3840:0
+>+683>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:7680:3840:3840:3840:0
+>+8522>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:11520:3840:3840:3840:0
+>+443>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:15360:3840:3840:3840:0
+>+97>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:19200:3840:3840:3840:0
+>+329111>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:0:7680:3840:3840:0
+>+260>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:3840:7680:3840:3840:0
+>+662>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:7680:7680:3840:3840:0
+>+151>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:11520:7680:3840:3840:0
+>+146>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:15360:7680:3840:3840:0
+>+148>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:19200:7680:3840:3840:0
+>+145>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:3840:3840:3840:3840:0
+>+145>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:0:0:3840:3840:0
+>+142>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:3840:0:3840:3840:0
+>+140>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:7680:0:3840:3840:0
+>+174>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:11520:0:3840:3840:0
+>+142>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:0:3840:3840:3840:0
+>+168>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:0:0:15875:8930:0
+>+255302>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=3 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=3 broadcast=no
+>+753>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=4 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=4 broadcast=no
+>+933>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=5 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=5 broadcast=no
+>+2145>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=6 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=6 broadcast=no
+>+24718>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=7 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=7 broadcast=no
+>+759>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=8 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=8 broadcast=no
+>+2110>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=3:0:0:15875:8930:0
+>+62270>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=4:0:0:15875:8930:0
+>+34039>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=9 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=9 broadcast=no
+>+299>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=10 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=10 broadcast=no
+>+952>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=5:0:0:15875:8930:0
+>+23579>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=6:0:0:15875:8930:0
+>+42837>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=11 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=11 broadcast=no
+>+409>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=12 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=12 broadcast=no
+>+985>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=7:0:0:15875:8930:0
+>+2782>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:0:0:15875:8930:0
+>+19332>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=13 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=13 broadcast=no
+>+1359>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=8:0:0:15875:8930:0
+>+8470>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=9:0:0:15875:8930:0
+>+188810>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:0:15875:8930:0
+>+141>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=-3420 y=4125 count=1 buttons=0 modifier=0
+>+6122>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=12:0:0:15875:8930:0
+>+10269>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=13:0:0:15875:8930:0
+>+190156>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=-3900 y=4500 count=1 buttons=0 modifier=0
+>+1502286>Hq6ISfkfkDmudgtZ>02a>setclientpart part=9
+>+12844>Hq6ISfkfkDmudgtZ>02a>canceltiles
+>+1682>Hq6ISfkfkDmudgtZ>02a>tilecombine nviewid=0 part=9 width=256 height=256 tileposx=0,3840,7680,11520,15360,0,3840,7680,11520,15360,0,3840,7680,11520,15360 tileposy=0,0,0,0,0,3840,3840,3840,3840,3840,7680,7680,7680,7680,7680 tilewidth=3840 tileheight=3840
+>+8251>Hq6ISfkfkDmudgtZ>02a>selectclientpart part=9 how=1
+>+68497>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=9:15360:0:3840:3840:0
+>+1280>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=9:15360:3840:3840:3840:0
+>+1050>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=9:0:7680:3840:3840:0
+>+123>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=9:3840:7680:3840:3840:0
+>+127>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=9:7680:7680:3840:3840:0
+>+3192>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=9:11520:7680:3840:3840:0
+>+204>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=9:15360:7680:3840:3840:0
+>+573>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=9:0:0:3840:3840:0
+>+159>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=9:3840:3840:3840:3840:0
+>+643>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=9:3840:0:3840:3840:0
+>+172>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=9:7680:0:3840:3840:0
+>+156>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=9:11520:0:3840:3840:0
+>+471>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=9:0:3840:3840:3840:0
+>+95>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=9:7680:3840:3840:3840:0
+>+94>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=9:11520:3840:3840:3840:0
+>+1272119>Hq6ISfkfkDmudgtZ>02a>setclientpart part=10
+>+7104>Hq6ISfkfkDmudgtZ>02a>canceltiles
+>+282>Hq6ISfkfkDmudgtZ>02a>tilecombine nviewid=0 part=10 width=256 height=256 tileposx=0,3840,7680,11520,15360,0,3840,7680,11520,15360,0,3840,7680,11520,15360 tileposy=0,0,0,0,0,3840,3840,3840,3840,3840,7680,7680,7680,7680,7680 tilewidth=3840 tileheight=3840
+>+7019>Hq6ISfkfkDmudgtZ>02a>selectclientpart part=10 how=1
+>+74452>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:15360:0:3840:3840:0
+>+1037>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:11520:3840:3840:3840:0
+>+103>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:15360:3840:3840:3840:0
+>+8758>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:7680:3840:3840:0
+>+163>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:3840:7680:3840:3840:0
+>+592>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:7680:7680:3840:3840:0
+>+159>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:11520:7680:3840:3840:0
+>+948>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:15360:7680:3840:3840:0
+>+159>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:0:3840:3840:0
+>+161>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:7680:0:3840:3840:0
+>+161>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:3840:0:3840:3840:0
+>+550>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:3840:3840:3840:3840:0
+>+124>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:11520:0:3840:3840:0
+>+133>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:3840:3840:3840:0
+>+12828>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:7680:3840:3840:3840:0
+>+2480333>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4650 y=5145 count=1 buttons=0 modifier=0
+>+238545>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=4650 y=5145 count=1 buttons=1 modifier=0
+>+2807>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=4650 y=5145 count=1 buttons=1 modifier=0
+>+23841>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+98815>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+631026>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=10635 y=4425 count=1 buttons=0 modifier=0
+>+286164>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=10605 y=4830 count=1 buttons=0 modifier=0
+>+515039>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=10545 y=5145 count=1 buttons=0 modifier=0
+>+138363>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=10530 y=5145 count=1 buttons=0 modifier=0
+>+1205994>Hq6ISfkfkDmudgtZ>02a>uno .uno:TransformDialog  {"TransformPosX":{"type":"long","value":1169},"TransformPosY":{"type":"long","value":2580}}
+>+18252>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+34428>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=11 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=11 broadcast=no
+>+748>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=10 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=10 broadcast=no
+>+6487>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=11:0:0:15875:8930:0
+>+23980>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:0:3840:3840:0
+>+10013>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:7680:0:3840:3840:0
+>+683>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:3840:3840:3840:3840:0
+>+165>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:3840:0:3840:3840:0
+>+987>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:3840:3840:3840:0
+>+172>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:7680:3840:3840:3840:0
+>+22827>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+370657>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:0:15875:8930:0
+>+316031>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=8685 y=4080 count=1 buttons=0 modifier=0
+>+88652>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=8685 y=4080 count=1 buttons=1 modifier=0
+>+1261>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=8685 y=4080 count=1 buttons=1 modifier=0
+>+158025>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=9 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=9 broadcast=no
+>+412>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=10 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=10 broadcast=no
+>+4821>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=9:0:0:15875:8930:0
+>+944>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:0:15875:8930:0
+>+463075>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=3435 y=-1350 count=1 buttons=0 modifier=0
+>+264806>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=3090 y=-1620 count=1 buttons=0 modifier=0
+>+8654074>Hq6ISfkfkDmudgtZ>02a>getchildid
+>+121046>Hq6ISfkfkDmudgtZ>02a>insertfile name=1633985876086 type=graphic
+>+65347>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+100800>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+562405>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:7680:0:3840:3840:0
+>+35314>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:3840:3840:3840:3840:0
+>+245136>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:11520:0:3840:3840:0
+>+207>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:0:3840:3840:0
+>+763>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:3840:0:3840:3840:0
+>+114>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:3840:3840:3840:0
+>+114>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:7680:3840:3840:3840:0
+>+114>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:11520:3840:3840:3840:0
+>+94>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:7680:3840:3840:0
+>+96>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:3840:7680:3840:3840:0
+>+98>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:7680:7680:3840:3840:0
+>+96>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:11520:7680:3840:3840:0
+>+55277>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=10 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=10 broadcast=no
+>+62763>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:0:15875:8930:0
+>+495733>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11925 y=-435 count=1 buttons=0 modifier=0
+>+618131>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11490 y=-420 count=1 buttons=0 modifier=0
+>+1314536>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11595 y=-210 count=1 buttons=0 modifier=0
+>+311854>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11505 y=-390 count=1 buttons=0 modifier=0
+>+131086>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11490 y=-390 count=1 buttons=0 modifier=0
+>+349310>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11625 y=-555 count=1 buttons=0 modifier=0
+>+391737>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11625 y=-420 count=1 buttons=0 modifier=0
+>+754188>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11820 y=3615 count=1 buttons=0 modifier=0
+>+378450>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11685 y=4410 count=1 buttons=0 modifier=0
+>+302711>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11685 y=3975 count=1 buttons=0 modifier=0
+>+548551>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11520 y=4155 count=1 buttons=0 modifier=0
+>+464989>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11520 y=4080 count=1 buttons=0 modifier=0
+>+1691501>Hq6ISfkfkDmudgtZ>02a>uno .uno:TransformDialog  {"TransformPosX":{"type":"long","value":96},"TransformPosY":{"type":"long","value":2}}
+>+47757>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+89492>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+270796>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:3840:3840:3840:3840:0
+>+147>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:0:3840:3840:0
+>+92>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:3840:0:3840:3840:0
+>+88>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:11520:0:3840:3840:0
+>+85>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:7680:0:3840:3840:0
+>+84>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:3840:3840:3840:0
+>+88>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:7680:3840:3840:3840:0
+>+83>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:11520:3840:3840:3840:0
+>+86>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:7680:3840:3840:0
+>+143>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:3840:7680:3840:3840:0
+>+84>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:7680:7680:3840:3840:0
+>+87>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:11520:7680:3840:3840:0
+>+170283>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=14295 y=570 count=1 buttons=0 modifier=0
+>+506692>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=10 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=10 broadcast=no
+>+39874>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=14475 y=135 count=1 buttons=0 modifier=0
+>+16473>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:0:15875:8930:0
+>+217544>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=14505 y=105 count=1 buttons=0 modifier=0
+>+2221402>Hq6ISfkfkDmudgtZ>02a>uno .uno:MoveShapeHandle {"HandleNum":{"type":"long","value":"2"},"NewPosX":{"type":"long","value":4384.26513},"NewPosY":{"type":"long","value":6266.219819999999}}
+>+1251495>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+482374>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+275704>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:11520:3840:3840:3840:0
+>+155>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:7680:7680:3840:3840:0
+>+154>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:11520:7680:3840:3840:0
+>+165>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:7680:0:3840:3840:0
+>+156>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:0:3840:3840:0
+>+159>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:3840:0:3840:3840:0
+>+151>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:3840:3840:3840:3840:0
+>+151>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:11520:0:3840:3840:0
+>+165>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:3840:3840:3840:0
+>+141>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:7680:3840:3840:3840:0
+>+150>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:7680:3840:3840:0
+>+163>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:3840:7680:3840:3840:0
+>+347863>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=10 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=10 broadcast=no
+>+42857>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:0:15875:8930:0
+>+675621>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=1170 y=7515 count=1 buttons=0 modifier=0
+>+1582114>Hq6ISfkfkDmudgtZ>02a>uno .uno:TransformDialog  {"TransformPosX":{"type":"long","value":11241},"TransformPosY":{"type":"long","value":2081}}
+>+20827>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+45457>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:3840:7680:3840:3840:0
+>+2438>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:3840:3840:3840:0
+>+189>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:7680:3840:3840:0
+>+911>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:3840:3840:3840:3840:0
+>+250918>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:7680:0:3840:3840:0
+>+258>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:15360:0:3840:3840:0
+>+278>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:11520:0:3840:3840:0
+>+265>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+516>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=12135 y=3345 count=1 buttons=0 modifier=0
+>+8385>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:7680:3840:3840:3840:0
+>+6286>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:11520:3840:3840:3840:0
+>+107>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:15360:3840:3840:3840:0
+>+712304>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=10 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=10 broadcast=no
+>+20114>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:0:15875:8930:0
+>+378276>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=9795 y=3990 count=1 buttons=0 modifier=0
+>+12891>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=9795 y=3990 count=1 buttons=1 modifier=0
+>+1082>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=9795 y=3990 count=1 buttons=1 modifier=0
+>+33262>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+99211>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+724360>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11010 y=4545 count=1 buttons=0 modifier=0
+>+1882625>Hq6ISfkfkDmudgtZ>02a>uno .uno:MoveShapeHandle {"HandleNum":{"type":"long","value":"6"},"NewPosX":{"type":"long","value":5340},"NewPosY":{"type":"long","value":4605}}
+>+15807>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+69866>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:3840:0:3840:3840:0
+>+7027>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:7680:0:3840:3840:0
+>+167>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:3840:3840:3840:3840:0
+>+184>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:0:3840:3840:0
+>+183>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:3840:3840:3840:0
+>+717>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:7680:3840:3840:3840:0
+>+22523>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+114650>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=5385 y=4890 count=1 buttons=0 modifier=0
+>+751337>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11940 y=3570 count=1 buttons=0 modifier=0
+>+34121>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=10 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=10 broadcast=no
+>+39537>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:0:15875:8930:0
+>+306208>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=12570 y=3585 count=1 buttons=0 modifier=0
+>+158016>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=12570 y=3585 count=1 buttons=1 modifier=0
+>+1483>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=12510 y=3675 count=1 buttons=1 modifier=0
+>+10884>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=12345 y=4005 count=1 buttons=1 modifier=0
+>+18242>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=12135 y=4395 count=1 buttons=1 modifier=0
+>+10738>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+260941>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11685 y=5040 count=1 buttons=1 modifier=0
+>+382>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11685 y=5070 count=1 buttons=1 modifier=0
+>+537>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11655 y=5070 count=1 buttons=1 modifier=0
+>+555>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+558>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11655 y=5115 count=1 buttons=1 modifier=0
+>+374>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11625 y=5115 count=1 buttons=1 modifier=0
+>+432>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11595 y=5115 count=1 buttons=1 modifier=0
+>+462>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11580 y=5115 count=1 buttons=1 modifier=0
+>+378>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11565 y=5115 count=1 buttons=1 modifier=0
+>+365199>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=11565 y=5115 count=1 buttons=1 modifier=0
+>+20619>Hq6ISfkfkDmudgtZ>02a>rendershapeselection mimetype=image/svg+xml
+>+265200>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+311>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=11565 y=5160 count=1 buttons=0 modifier=0
+>+16718>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:15360:0:3840:3840:0
+>+2297>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:7680:0:3840:3840:0
+>+9568>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:11520:0:3840:3840:0
+>+3680>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:7680:3840:3840:3840:0
+>+868>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:11520:3840:3840:3840:0
+>+131>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:15360:3840:3840:3840:0
+>+266361>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=13095 y=3540 count=1 buttons=0 modifier=0
+>+456289>Hq6ISfkfkDmudgtZ>02a>tile nviewid=0 part=10 width=180 height=101 tileposx=0 tileposy=0 tilewidth=15875 tileheight=8930 id=10 broadcast=no
+>+17448>Hq6ISfkfkDmudgtZ>02a>tileprocessed tile=10:0:0:15875:8930:0
+>+311721>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=8130 y=2595 count=1 buttons=0 modifier=0
+>+37635>Hq6ISfkfkDmudgtZ>02a>mouse type=buttondown x=8130 y=2595 count=1 buttons=1 modifier=0
+>+2371>Hq6ISfkfkDmudgtZ>02a>mouse type=buttonup x=8130 y=2595 count=1 buttons=1 modifier=0
+>+116551>Hq6ISfkfkDmudgtZ>02a>gettextselection mimetype=text/html
+>+447744>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=75 y=-1335 count=1 buttons=0 modifier=0
+>+1102996>Hq6ISfkfkDmudgtZ>02a>uno .uno:Save
+>+3650852>Hq6ISfkfkDmudgtZ>02a>mouse type=move x=4560 y=7680 count=1 buttons=0 modifier=0
+~+4880086~Hq6ISfkfkDmudgtZ~02a~EndSession: http://192.168.43.203/index.php/apps/richdocuments/wopi/files/494_oct4ei0irh8v?access_token=L1lgFWznU4tmXTjcOJnNJP8ok7m4SorZ&access_token_ttl=0&reuse_cookies=nc_sameSiteCookielax%3Dtrue%3Anc_sameSiteCookiestrict%3Dtrue%3Anc_username%3Dadmin%3Aoc_sessionPassphrase%3DeXSNPuKoiG54CW5eWXHmAloxPsNJBU7cKXHt8sUVdNan8leNQXAmASgwRf2ioYJaXlkiuV2lGD4Dl7dYI4bINVSbAE%252BEOQw3iFEQehGvfdRXuvd8H03NinxMwPyeFR0B%3Aoct4ei0irh8v%3Db8ddt4h1qsvsa4o6us8vgssft3%3Anc_token%3DUjpBLzndOWf2UpO7ZadvJvHaVIVsEjft%3Anc_session_id%3Db8ddt4h1qsvsa4o6us8vgssft3
+~+3189~Hq6ISfkfkDmudgtZ~02a~EndSession: http://192.168.43.203/index.php/apps/richdocuments/wopi/files/494_oct4ei0irh8v?access_token=L1lgFWznU4tmXTjcOJnNJP8ok7m4SorZ&access_token_ttl=0&reuse_cookies=nc_sameSiteCookielax%3Dtrue%3Anc_sameSiteCookiestrict%3Dtrue%3Anc_username%3Dadmin%3Aoc_sessionPassphrase%3DeXSNPuKoiG54CW5eWXHmAloxPsNJBU7cKXHt8sUVdNan8leNQXAmASgwRf2ioYJaXlkiuV2lGD4Dl7dYI4bINVSbAE%252BEOQw3iFEQehGvfdRXuvd8H03NinxMwPyeFR0B%3Aoct4ei0irh8v%3Db8ddt4h1qsvsa4o6us8vgssft3%3Anc_token%3DUjpBLzndOWf2UpO7ZadvJvHaVIVsEjft%3Anc_session_id%3Db8ddt4h1qsvsa4o6us8vgssft3
