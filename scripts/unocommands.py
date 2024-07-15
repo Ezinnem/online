@@ -138,7 +138,7 @@ def extractToolbarCommands(path):
         if line.find("_UNO(") >= 0:
             commands += commandFromMenuLine(line)
 
-    f = open(path + '/browser/src/control/Control.MobileTopBar.js', 'r', encoding='utf-8')
+    f = open(path + '/browser/src/control/Control.MobileTopBar.ts', 'r', encoding='utf-8')
     for line in f:
         if line.find("_UNO(") >= 0:
             commands += commandFromMenuLine(line)
@@ -185,7 +185,7 @@ def extractToolbarCommands(path):
         if line.find("_UNO(") >= 0:
             commands += commandFromMenuLine(line)
 
-    f = open(path + '/browser/src/control/Control.SearchBar.js', 'r', encoding='utf-8')
+    f = open(path + '/browser/src/control/Control.MobileSearchBar.ts', 'r', encoding='utf-8')
     for line in f:
         if line.find("_UNO(") >= 0:
             commands += commandFromMenuLine(line)
@@ -349,7 +349,7 @@ window._UNO = function(string, component, isContext) {
 window.removeAccessKey = function(text) {
 \t// Remove access key markers from translated strings
 \t// 1. access key in parenthesis in case of non-latin scripts
-\ttext = text.replace(/\(~[A-Za-z]\)/, '');
+\ttext = text.replace(/\\(~[A-Za-z]\\)/, '');
 \t// 2. remove normal access key
 \ttext = text.replace('~', '');
 

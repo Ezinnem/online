@@ -23,187 +23,15 @@
 #include "Kit.hpp"
 #include "Session.hpp"
 #include "Watermark.hpp"
+#include "StateRecorder.hpp"
 
+class Document;
 class ChildSession;
 
 enum class LokEventTargetEnum
 {
     Document,
     Window
-};
-
-// An abstract interface.
-class DocumentManagerInterface
-{
-public:
-    virtual ~DocumentManagerInterface()  {}
-
-    /// Request loading a document, or a new view, if one exists.
-    virtual bool onLoad(const std::string& sessionId,
-                        const std::string& uriAnonym,
-                        const std::string& renderOpts) = 0;
-
-    /// Unload a client session, which unloads the document
-    /// if it is the last and only.
-    virtual void onUnload(const ChildSession& session) = 0;
-
-    /// Access to the Kit instance.
-    virtual std::shared_ptr<lok::Office> getLOKit() = 0;
-
-    /// Access to the document instance.
-    virtual std::shared_ptr<lok::Document> getLOKitDocument() = 0;
-
-    /// Send msg to all active sessions.
-    virtual bool notifyAll(const std::string& msg) = 0;
-
-    /// Send updated view info to all active sessions.
-    virtual void notifyViewInfo() = 0;
-    virtual void updateEditorSpeeds(int id, int speed) = 0;
-
-    virtual int getEditorId() const = 0;
-
-    /// Get a view ID <-> UserInfo map.
-    virtual std::map<int, UserInfo> getViewInfo() = 0;
-
-    virtual std::string getObfuscatedFileId() = 0;
-
-    virtual std::shared_ptr<TileQueue>& getTileQueue() = 0;
-
-    virtual bool sendFrame(const char* buffer, int length, WSOpCode opCode = WSOpCode::Text) = 0;
-
-    virtual void alertAllUsers(const std::string& cmd, const std::string& kind) = 0;
-
-    virtual unsigned getMobileAppDocId() const = 0;
-
-    /// See if we should clear out our memory
-    virtual void trimIfInactive() = 0;
-
-    virtual bool isDocPasswordProtected() const = 0;
-
-    virtual bool haveDocPassword() const = 0;
-
-    virtual std::string getDocPassword() const = 0;
-
-    virtual DocumentPasswordType getDocPasswordType() const = 0;
-};
-
-struct RecordedEvent
-{
-private:
-    int _type = 0;
-    std::string _payload;
-
-public:
-    RecordedEvent()
-    {
-    }
-
-    RecordedEvent(int type, const std::string& payload)
-        : _type(type),
-        _payload(payload)
-    {
-    }
-
-    void setType(int type)
-    {
-        _type = type;
-    }
-
-    int getType() const
-    {
-        return _type;
-    }
-
-    void setPayload(const std::string& payload)
-    {
-        _payload = payload;
-    }
-
-    const std::string& getPayload() const
-    {
-        return _payload;
-    }
-};
-
-/// When the session is inactive, we need to record its state for a replay.
-class StateRecorder
-{
-private:
-    bool _invalidate;
-    std::unordered_map<std::string, std::string> _recordedStates;
-    std::unordered_map<int, std::unordered_map<int, RecordedEvent>> _recordedViewEvents;
-    std::unordered_map<int, RecordedEvent> _recordedEvents;
-    std::vector<RecordedEvent> _recordedEventsVector;
-
-public:
-    StateRecorder() : _invalidate(false) {}
-
-    // TODO Remember the maximal area we need to invalidate - grow it step by step.
-    void recordInvalidate()
-    {
-        _invalidate = true;
-    }
-
-    bool isInvalidate() const
-    {
-        return _invalidate;
-    }
-
-    const std::unordered_map<std::string, std::string>& getRecordedStates() const
-    {
-        return _recordedStates;
-    }
-
-    const std::unordered_map<int, std::unordered_map<int, RecordedEvent>>& getRecordedViewEvents() const
-    {
-        return _recordedViewEvents;
-    }
-
-    const std::unordered_map<int, RecordedEvent>& getRecordedEvents() const
-    {
-        return _recordedEvents;
-    }
-
-    const std::vector<RecordedEvent>& getRecordedEventsVector() const
-    {
-        return _recordedEventsVector;
-    }
-
-    void recordEvent(const int type, const std::string& payload)
-    {
-        _recordedEvents[type] = RecordedEvent(type, payload);
-    }
-
-    void recordViewEvent(const int viewId, const int type, const std::string& payload)
-    {
-        _recordedViewEvents[viewId][type] = {type, payload};
-    }
-
-    void recordState(const std::string& name, const std::string& value)
-    {
-        _recordedStates[name] = value;
-    }
-
-    /// In the case we need to remember all the events that come, not just
-    /// the final state.
-    void recordEventSequence(const int type, const std::string& payload)
-    {
-        _recordedEventsVector.emplace_back(type, payload);
-    }
-
-    void dumpState(std::ostream&)
-    {
-        // TODO: the rest ...
-    }
-
-    void clear()
-    {
-        _invalidate = false;
-        _recordedEvents.clear();
-        _recordedViewEvents.clear();
-        _recordedStates.clear();
-        _recordedEventsVector.clear();
-    }
 };
 
 /// Represents a session to the WSD process, in a Kit process. Note that this is not a singleton.
@@ -220,7 +48,7 @@ public:
         const std::string& id,
         const std::string& jailId,
         const std::string& jailRoot,
-        DocumentManagerInterface& docManager);
+        Document& document);
     virtual ~ChildSession();
 
     bool getStatus();
@@ -272,6 +100,8 @@ public:
         return _docManager->sendFrame(msg.data(), msg.size(), WSOpCode::Binary);
     }
 
+    bool sendProgressFrame(const char* id, const std::string &jsonProps);
+
     using Session::sendTextFrame;
 
     bool getClipboard(const StringVector& tokens);
@@ -299,6 +129,7 @@ public:
 
 private:
     bool loadDocument(const StringVector& tokens);
+    bool saveDocumentBackground(const StringVector &tokens);
 
     bool sendFontRendering(const StringVector& tokens);
     bool getCommandValues(const StringVector& tokens);
@@ -317,7 +148,6 @@ private:
     bool extTextInputEvent(const StringVector& tokens);
     bool dialogKeyEvent(const char* buffer, int length, const std::vector<std::string>& tokens);
     bool mouseEvent(const StringVector& tokens, const LokEventTargetEnum target);
-    bool readOnlyClickEvent(const StringVector& tokens);
     bool gestureEvent(const StringVector& tokens);
     bool dialogEvent(const StringVector& tokens);
     bool completeFunction(const StringVector& tokens);
@@ -348,6 +178,7 @@ private:
     bool setAccessibilityState(bool enable);
     bool getA11yFocusedParagraph();
     bool getA11yCaretPosition();
+    bool getPresentationInfo();
 
     void rememberEventsForInactiveUser(const int type, const std::string& payload);
 
@@ -379,6 +210,20 @@ private:
     }
 
 public:
+    // simple one line for priming
+    std::string getActivityState()
+    {
+        std::stringstream ss;
+        ss << "view: " << _viewId
+           << ", session " << getId()
+           << (isReadOnly() ? ", ro": ", rw")
+           << ", user: '" << getUserNameAnonym() << "'"
+           << ", load" << (_isDocLoaded ? "ed" : "ing")
+           << ", type: " << _docType
+           << ", lang: " << getLang();
+        return ss.str();
+    }
+
     void dumpState(std::ostream& oss) override
     {
         Session::dumpState(oss);
@@ -404,7 +249,7 @@ public:
 private:
     const std::string _jailId;
     const std::string _jailRoot;
-    DocumentManagerInterface* _docManager;
+    Document* _docManager;
 
     std::shared_ptr<Watermark> _docWatermark;
 

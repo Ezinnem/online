@@ -1,13 +1,15 @@
 /* -*- Mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4; fill-column: 100 -*- */
 /*
+ * Copyright the Collabora Online contributors.
+ *
+ * SPDX-License-Identifier: MPL-2.0
+ *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
 #pragma once
-
-#include <config.h>
 
 #include <cassert>
 #include <cerrno>
@@ -18,8 +20,6 @@
 #include <cstring>
 #include <algorithm>
 #include <atomic>
-#include <functional>
-#include <memory>
 #include <mutex>
 #include <set>
 #include <sstream>
@@ -85,6 +85,10 @@ namespace Util
 {
     namespace rng
     {
+        /// Returns a global handle to /dev/urandom - do not close it.
+        int getURandom();
+
+        uint_fast64_t getSeed();
         void reseed();
         unsigned getNext();
 
@@ -93,9 +97,6 @@ namespace Util
 
         /// Generate a string of random characters.
         std::string getHexString(const size_t length);
-
-        /// Generate a hard random string of characters.
-        std::string getHardRandomHexString(const size_t length);
 
         /// Generates a random string suitable for
         /// file/directory names.
@@ -133,16 +134,46 @@ namespace Util
         std::chrono::steady_clock::time_point _startTime;
     };
 
-#if !MOBILEAPP
-    /// Get number of threads in this process or -1 on error
-    int getProcessThreadCount();
+    /// A utility class to time using system metrics
+    class SysStopwatch
+    {
+    public:
+        SysStopwatch();
+        void restart();
+        std::chrono::microseconds elapsedTime() const;
 
-    /// Spawn a process if stdInput is non-NULL it contains a writable descriptor
-    /// to send data to the child.
-    int spawnProcess(const std::string &cmd, const StringVector &args,
-                     const std::vector<int>* fdsToKeep = nullptr, int *stdInput = nullptr);
+    private:
+        static void readTime(uint64_t &cpu, uint64_t &sys);
+        uint64_t _startCPU;
+        uint64_t _startSys;
+    };
 
-#endif
+    class DirectoryCounter
+    {
+        void *_tasks;
+    public:
+        DirectoryCounter(const char *procPath);
+        ~DirectoryCounter();
+        /// Get number of items in this directory or -1 on error
+        int count();
+    };
+
+    /// Needs to open dirent before forking in Kit process
+    class ThreadCounter : public DirectoryCounter
+    {
+    public:
+        ThreadCounter() : DirectoryCounter("/proc/self/task") {}
+    };
+
+    /// Needs to open dirent before forking in Kit process
+    class FDCounter : public DirectoryCounter
+    {
+    public:
+        FDCounter() : DirectoryCounter("/proc/self/fd") {}
+    };
+
+    /// Spawn a process.
+    int spawnProcess(const std::string &cmd, const StringVector &args);
 
     /// Convert unsigned char data to hex.
     /// @buffer can be either std::vector<char> or std::string.
@@ -190,14 +221,20 @@ namespace Util
         return true;
     }
 
+    /// Exception safe scope count/guard
+    struct ReferenceHolder
+    {
+        int &_count;
+        ReferenceHolder(int &count) : _count(count) { _count++; }
+        ~ReferenceHolder() { _count--; }
+    };
+
     /// Encode an integral ID into a string, with padding support.
     std::string encodeId(const std::uint64_t number, const int padding = 5);
     /// Decode an integral ID from a string.
     std::uint64_t decodeId(const std::string& str);
 
     bool windowingAvailable();
-
-#if !defined(BUILDING_TESTS) && !MOBILEAPP
 
     /// Send a message to all clients.
     void alertAllUsers(const std::string& msg);
@@ -208,40 +245,22 @@ namespace Util
     /// coolwsd for redistribution. (This function must be implemented separately in each program
     /// that uses it, it is not in Util.cpp.)
     void alertAllUsers(const std::string& cmd, const std::string& kind);
-#else
-
-    /// No-op implementation in the test programs
-    inline void alertAllUsers(const std::string&)
-    {
-    }
-
-    /// No-op implementation in the test programs
-    inline void alertAllUsers(const std::string&, const std::string&)
-    {
-    }
-#endif
 
     /// Assert that a lock is already taken.
-    template <typename T>
-    void assertIsLocked(const T& lock)
+    template <typename T> void assertIsLocked([[maybe_unused]] const T& lock)
     {
-#ifdef NDEBUG
-        (void) lock;
-#else
+#ifndef NDEBUG
         assert(lock.owns_lock());
 #endif
     }
 
-    inline void assertIsLocked(std::mutex& mtx)
+    inline void assertIsLocked([[maybe_unused]] std::mutex& mtx)
     {
-#ifdef NDEBUG
-        (void) mtx;
-#else
+#ifndef NDEBUG
         assert(!mtx.try_lock());
 #endif
     }
 
-#if !MOBILEAPP
     /// Print given number of bytes in human-understandable form (KB,MB, etc.)
     std::string getHumanizedBytes(unsigned long nBytes);
 
@@ -263,6 +282,9 @@ namespace Util
     /// Returns the process RSS in KB.
     size_t getMemoryUsageRSS(const pid_t pid);
 
+    /// Returns the number of current threads, or zero on error
+    size_t getCurrentThreadCount();
+
     /// Returns the RSS and PSS of the current process in KB.
     /// Example: "procmemstats: pid=123 rss=12400 pss=566"
     std::string getMemoryStats(FILE* file);
@@ -277,7 +299,6 @@ namespace Util
 
     /// Sets priorities for a given pid & the current thread
     void setProcessAndThreadPriorities(const pid_t pid, int prio);
-#endif
 
     /// Replace substring @a in string @s with string @b.
     std::string replace(std::string s, const std::string& a, const std::string& b);
@@ -296,6 +317,8 @@ namespace Util
 #else
     long getThreadId();
 #endif
+
+    void killThreadById(int tid, int signal);
 
     /// Get version information
     void getVersionInfo(std::string& version, std::string& hash);
@@ -615,30 +638,6 @@ namespace Util
     inline std::string trimmed(const char* s)
     {
         return trimmed(std::string(s));
-    }
-
-    /// Return true iff s starts with t.
-    inline bool startsWith(const std::string& s, const std::string& t)
-    {
-        return s.length() >= t.length() && memcmp(s.c_str(), t.c_str(), t.length()) == 0;
-    }
-
-    /// Return true iff s starts with t.
-    inline bool startsWith(const std::string& s, const char* t)
-    {
-        if (t != nullptr && !s.empty())
-        {
-            const size_t len = std::strlen(t);
-            return s.length() >= len && memcmp(s.c_str(), t, len) == 0;
-        }
-
-        return false;
-    }
-
-    /// Return true iff s ends with t.
-    inline bool endsWith(const std::string& s, const std::string& t)
-    {
-        return equal(t.rbegin(), t.rend(), s.rbegin());
     }
 
 #ifdef IOS
@@ -1099,6 +1098,17 @@ int main(int argc, char**argv)
     /// Decode a URI encoded with encodeURIComponent.
     std::string decodeURIComponent(const std::string& uri);
 
+    /// Remove all but scheme://hostname:port/ from a URI.
+    std::string trimURI(const std::string& uri);
+
+    /// Checks whether or not the given string is encoded.
+    /// That is, a string that is identical when encoded
+    /// will return false. Similarly, a string that is
+    /// already encoded will return false.
+    /// Optionally takes a string of reserved characters
+    /// to escape while encoding.
+    bool needsURIEncoding(const std::string& uri, const std::string& reserved = ",/?:@&=+$#");
+
     /// Cleanup a filename replacing anything potentially problematic
     /// either for a URL or for a file path
     std::string cleanupFilename(const std::string &filename);
@@ -1323,6 +1333,8 @@ int main(int argc, char**argv)
      */
     bool isFuzzing();
 
+    bool isMobileApp();
+
     void setKitInProcess(bool value);
     bool isKitInProcess();
 
@@ -1355,10 +1367,8 @@ int main(int argc, char**argv)
      */
     std::map<std::string, std::string> stringVectorToMap(const std::vector<std::string>& strvector, const char delimiter);
 
-#if !MOBILEAPP
     // If OS is not mobile, it must be Linux.
     std::string getLinuxVersion();
-#endif
 
     /// Convert a string to 32-bit signed int.
     /// Returns the parsed value and a boolean indicating success or failure.
@@ -1523,6 +1533,9 @@ int main(int argc, char**argv)
      * Returns std::numeric_limits<int>::min/max() if the result would overflow.
      */
     int safe_atoi(const char* p, int len);
+
+    /// Sleep based on count of seconds in env. var
+    void sleepFromEnvIfSet(const char *domain, const char *envVar);
 
     /// Close logs and forcefully exit with the given exit code.
     /// This calls std::_Exit, which terminates the program without cleaning up

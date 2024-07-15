@@ -20,6 +20,7 @@ export ENABLE_DEBUG
 
 bin_PROGRAMS = \
 	coolforkit \
+	coolforkitns \
 	coolmount \
         coolstress \
 	coolconvert coolconfig
@@ -43,11 +44,12 @@ man_MANS = man/coolwsd.1 \
            man/coolmount.1
 
 
-dist_doc_DATA = wsd/README \
+dist_doc_DATA = wsd/README.md \
                 wsd/README.vars \
                 wsd/protocol.txt \
                 wsd/reference.md \
-                wsd/metrics.txt
+                wsd/metrics.txt \
+                THIRDPARTYLICENSES
 
 coolwsddatadir = @COOLWSD_DATADIR@
 
@@ -108,17 +110,19 @@ shared_sources = common/FileUtil.cpp \
                  common/StringVector.cpp \
                  common/Session.cpp \
                  common/Seccomp.cpp \
-                 common/MessageQueue.cpp \
                  common/MobileApp.cpp \
                  common/TraceEvent.cpp \
                  common/SigUtil.cpp \
                  common/SpookyV2.cpp \
                  common/Unit.cpp \
                  common/Util.cpp \
+                 common/Util-desktop.cpp \
                  common/ConfigUtil.cpp \
                  common/Authorization.cpp \
                  common/CommandControl.cpp \
                  common/Simd.cpp \
+                 common/CoolMount.cpp \
+                 kit/KitQueue.cpp \
                  net/DelaySocket.cpp \
                  net/HttpRequest.cpp \
                  net/HttpHelper.cpp \
@@ -136,6 +140,7 @@ coolwsd_sources = common/Crypto.cpp \
                   wsd/DocumentBroker.cpp \
                   wsd/ProxyProtocol.cpp \
                   wsd/COOLWSD.cpp \
+                  wsd/ClientRequestDispatcher.cpp \
                   wsd/ClientSession.cpp \
                   wsd/FileServer.cpp \
                   wsd/ProxyRequestHandler.cpp \
@@ -143,12 +148,15 @@ coolwsd_sources = common/Crypto.cpp \
                   wsd/RequestDetails.cpp \
                   wsd/RequestVettingStation.cpp \
                   wsd/Storage.cpp \
-                  wsd/StorageConnectionManager.cpp \
                   wsd/HostUtil.cpp \
                   wsd/TileCache.cpp \
                   wsd/ProofKey.cpp \
                   wsd/QuarantineUtil.cpp \
-                  wsd/WopiProxy.cpp
+                  wsd/ServerAuditUtil.cpp \
+                  wsd/wopi/CheckFileInfo.cpp \
+                  wsd/wopi/StorageConnectionManager.cpp \
+                  wsd/wopi/WopiProxy.cpp \
+                  wsd/wopi/WopiStorage.cpp
 
 coolwsd_SOURCES = $(coolwsd_sources) \
                   $(shared_sources) \
@@ -160,6 +168,7 @@ noinst_PROGRAMS = clientnb \
                   connect \
                   lokitclient \
                   coolmap \
+                  coolbench \
                   coolsocketdump
 
 if ENABLE_LIBFUZZER
@@ -175,7 +184,8 @@ connect_SOURCES = tools/Connect.cpp \
                   common/Log.cpp \
                   common/Protocol.cpp \
                   common/StringVector.cpp \
-                  common/Util.cpp
+                  common/Util.cpp \
+                  common/Util-desktop.cpp
 
 lokitclient_SOURCES = common/Log.cpp \
                       common/DummyTraceEventEmitter.cpp \
@@ -183,7 +193,8 @@ lokitclient_SOURCES = common/Log.cpp \
                       common/Protocol.cpp \
                       common/StringVector.cpp \
                       common/TraceEvent.cpp \
-                      common/Util.cpp
+                      common/Util.cpp \
+                      common/Util-desktop.cpp
 
 noinst_LIBRARIES = libsimd.a
 libsimd_a_SOURCES = kit/DeltaSimd.c
@@ -191,13 +202,20 @@ libsimd_a_CFLAGS = @SIMD_CFLAGS@
 
 coolforkit_sources = kit/ChildSession.cpp \
                      kit/ForKit.cpp \
-                     kit/Kit.cpp
+                     kit/Kit.cpp \
+                     kit/KitWebSocket.cpp
 
 coolforkit_SOURCES = $(coolforkit_sources) \
                      $(shared_sources) \
                      kit/forkit-main.cpp
 
 coolforkit_LDADD = libsimd.a
+
+coolforkitns_SOURCES = $(coolforkit_sources) \
+                       $(shared_sources) \
+                       kit/forkit-main.cpp
+
+coolforkitns_LDADD = libsimd.a
 
 if ENABLE_DEBUG
 coolwsd_inproc_SOURCES = $(coolwsd_sources) \
@@ -212,8 +230,11 @@ endif
 if ENABLE_LIBFUZZER
 coolforkit_SOURCES += \
 		       common/DummyTraceEventEmitter.cpp
+coolforkitns_SOURCES += \
+		       common/DummyTraceEventEmitter.cpp
 
 common_fuzzer_sources = \
+		       fuzzer/Common.cpp \
 		       common/DummyTraceEventEmitter.cpp \
 		       $(coolwsd_sources) \
 		       wsd/coolwsd-inproc.cpp \
@@ -259,11 +280,22 @@ clientnb_SOURCES = net/clientnb.cpp \
                    common/DummyTraceEventEmitter.cpp \
                    common/Log.cpp \
                    common/StringVector.cpp \
-                   common/Util.cpp
+                   common/Util.cpp \
+                   common/Util-desktop.cpp
 
-coolmount_SOURCES = tools/mount.cpp
+coolmount_SOURCES = tools/mount.cpp \
+                    common/CoolMount.cpp
 
 coolmap_SOURCES = tools/map.cpp
+
+coolbench_SOURCES = tools/Benchmark.cpp \
+                    common/DummyTraceEventEmitter.cpp \
+		    common/Log.cpp \
+                    common/StringVector.cpp \
+                    common/Util.cpp \
+                    common/Util-desktop.cpp \
+                    common/Simd.cpp
+coolbench_LDADD = libsimd.a
 
 coolconvert_SOURCES = tools/Tool.cpp
 
@@ -275,10 +307,12 @@ coolstress_SOURCES = tools/Stress.cpp \
 coolconfig_SOURCES = tools/Config.cpp \
 		     tools/ConfigMigrationAssistant.cpp \
 		     common/DummyTraceEventEmitter.cpp \
+		     common/ConfigUtil.cpp \
 		     common/Crypto.cpp \
 		     common/Log.cpp \
 		     common/StringVector.cpp \
-		     common/Util.cpp
+		     common/Util.cpp \
+		     common/Util-desktop.cpp
 
 coolsocketdump_SOURCES = tools/WebSocketDump.cpp \
 			 common/DummyTraceEventEmitter.cpp \
@@ -295,20 +329,24 @@ wsd_headers = wsd/Admin.hpp \
               wsd/FileServer.hpp \
               wsd/ProxyRequestHandler.hpp \
               wsd/COOLWSD.hpp \
+              wsd/ClientRequestDispatcher.hpp \
               wsd/ProofKey.hpp \
               wsd/RequestDetails.hpp \
               wsd/RequestVettingStation.hpp \
               wsd/SenderQueue.hpp \
               wsd/ServerURL.hpp \
               wsd/Storage.hpp \
-              wsd/StorageConnectionManager.hpp \
               wsd/TileCache.hpp \
               wsd/TileDesc.hpp \
               wsd/TraceFile.hpp \
               wsd/UserMessages.hpp \
               wsd/QuarantineUtil.hpp \
               wsd/HostUtil.hpp \
-              wsd/WopiProxy.hpp
+              wsd/ServerAuditUtil.hpp \
+              wsd/wopi/CheckFileInfo.hpp \
+              wsd/wopi/StorageConnectionManager.hpp \
+              wsd/wopi/WopiProxy.hpp \
+              wsd/wopi/WopiStorage.hpp
 
 shared_headers = common/Common.hpp \
                  common/Clipboard.hpp \
@@ -327,7 +365,6 @@ shared_headers = common/Common.hpp \
                  common/Util.hpp \
                  common/ConfigUtil.hpp \
                  common/Authorization.hpp \
-                 common/MessageQueue.hpp \
                  common/Message.hpp \
                  common/MobileApp.hpp \
                  common/Png.hpp \
@@ -339,6 +376,10 @@ shared_headers = common/Common.hpp \
                  common/SpookyV2.h \
                  common/CommandControl.hpp \
                  common/Simd.hpp \
+                 common/ThreadPool.hpp \
+                 common/Watchdog.hpp \
+                 kit/KitQueue.hpp \
+                 net/AsyncDNS.hpp \
                  net/Buffer.hpp \
                  net/DelaySocket.hpp \
                  net/FakeSocket.hpp \
@@ -348,8 +389,8 @@ shared_headers = common/Common.hpp \
                  net/ServerSocket.hpp \
                  net/Socket.hpp \
                  net/WebSocketHandler.hpp \
-                 net/WebSocketSession.hpp \
-                 tools/Replay.hpp
+                 tools/Replay.hpp \
+		 wasm/base64.hpp
 if ENABLE_SSL
 shared_headers += net/Ssl.hpp \
                   net/SslSocket.hpp
@@ -361,7 +402,9 @@ kit_headers = kit/ChildSession.hpp \
               kit/DummyLibreOfficeKit.hpp \
               kit/Kit.hpp \
               kit/KitHelper.hpp \
+              kit/KitWebSocket.hpp \
               kit/SetupKitEnvironment.hpp \
+              kit/StateRecorder.hpp \
               kit/Watermark.hpp
 
 noinst_HEADERS = $(wsd_headers) $(shared_headers) $(kit_headers) \
@@ -369,7 +412,7 @@ noinst_HEADERS = $(wsd_headers) $(shared_headers) $(kit_headers) \
                  test/UnitHTTP.hpp \
                  test/HttpTestServer.hpp \
                  test/WopiTestServer.hpp \
-                 test/countcoolkits.hpp \
+                 test/KitPidHelpers.hpp \
                  test/lokassert.hpp \
                  test/test.hpp \
                  test/testlog.hpp \
@@ -394,7 +437,6 @@ dist-hook:
 EXTRA_DIST = discovery.xml \
              favicon.ico \
              coolkitconfig.xcu \
-             coolwsd.init.rhel6 \
              coolwsd.spec \
              coolwsd.xml.in \
              coolwsd.service \
@@ -416,6 +458,7 @@ EXTRA_DIST = discovery.xml \
              scripts/unocommands.py \
              scripts/refresh-git-hooks \
              README.md \
+             THIRDPARTYLICENSES \
              $(man_MANS)
 
 if ENABLE_LIBFUZZER
@@ -424,7 +467,7 @@ else
 # Use coolwsd to cleanup jails, if any. If it fails, we may have a broken/old coolwsd binary, remove it to rebuild.
 # A CI box may switch branches without cleaning up the binaries, if coolwsd from a broken branch is used here
 # it will fail all subsequent builds, until it's rebuilt from the new branch. So removing coolwsd after failing is needed.
-CLEANUP_COMMAND=if test -s ./coolwsd; then echo "Cleaning up..." && ./coolwsd --disable-cool-user-checking --cleanup --o:logging.level=trace || rm ./coolwsd; fi
+CLEANUP_COMMAND=if test -s ./coolwsd; then echo "Cleaning up..." && ./coolwsd --disable-cool-user-checking --cleanup --o:logging.level=trace || rm -f ./coolwsd; fi
 endif
 
 CLEANUP_COVERAGE=rm -rf ${abs_top_srcdir}/gcov; find . -iname "*.gc??" -delete
@@ -436,7 +479,7 @@ CAPABILITIES = $(if @ENABLE_SETCAP@,true,false)
 RUN_GDB = $(if $(GDB_FRONTEND),$(GDB_FRONTEND),gdb --tui --args)
 
 if ENABLE_SETCAP
-SET_CAPS_COMMAND=sudo @SETCAP@ cap_fowner,cap_chown,cap_mknod,cap_sys_chroot=ep coolforkit && sudo @SETCAP@ cap_sys_admin=ep coolmount
+SET_CAPS_COMMAND=sudo @SETCAP@ cap_fowner,cap_chown,cap_sys_chroot=ep coolforkit && sudo @SETCAP@ cap_sys_admin=ep coolmount
 else
 SET_CAPS_COMMAND=echo "Skipping capability setting"
 endif
@@ -444,7 +487,7 @@ endif
 if ENABLE_LIBFUZZER
 CLEANUP_DEPS=
 else
-CLEANUP_DEPS=coolwsd coolmount coolforkit
+CLEANUP_DEPS=coolwsd coolmount coolforkit coolforkitns
 endif
 
 # Build coolwsd and coolmount first, so we can cleanup before updating
@@ -489,6 +532,7 @@ setup-wsd: all @JAILS_PATH@
 	@cp $(abs_top_srcdir)/test/data/hello.odt $(abs_top_srcdir)/test/data/hello-world.odt
 	@cp $(abs_top_srcdir)/test/data/hello.ods $(abs_top_srcdir)/test/data/hello-world.ods
 	@cp $(abs_top_srcdir)/test/data/hello.odp $(abs_top_srcdir)/test/data/hello-world.odp
+	@cp $(abs_top_srcdir)/test/data/hello.odg $(abs_top_srcdir)/test/data/hello-world.odg
 	@echo
 
 COMMON_PARAMS = \
@@ -520,6 +564,12 @@ run-inproc: setup-wsd
 run-massif-inproc: setup-wsd
 	@echo "Launching coolwsd under valgrind for single process"
 	valgrind --tool=massif --num-callers=64 --trace-children=no -v \
+		./coolwsd-inproc $(COMMON_PARAMS) \
+			--o:logging.file[@enable]=false --o:logging.level=trace
+
+run-heaptrack-inproc: setup-wsd
+	@echo "Launching coolwsd under heaptrack for single process"
+	heaptrack \
 		./coolwsd-inproc $(COMMON_PARAMS) \
 			--o:logging.file[@enable]=false --o:logging.level=trace
 endif
@@ -633,12 +683,13 @@ browser/node_modules: browser/package.json browser/archived-packages
 	@cd browser && npm install
 
 eslint: browser/node_modules
-	browser/node_modules/.bin/eslint browser/src browser/js browser/admin/src \
-		--max-warnings 0 \
-		--resolve-plugins-relative-to browser \
-		--ignore-path browser/.eslintignore \
-		--no-eslintrc \
-		--config browser/.eslintrc
+	@make -C browser eslint
+
+prettier: browser/node_modules
+	@make -C browser prettier
+
+prettier-write: browser/node_modules
+	@make -C browser prettier-write
 
 install-exec-hook:
 	cd $(DESTDIR)$(bindir) && \
@@ -681,7 +732,9 @@ check-for-system-nss:
 		fi \
 	fi
 
-check: check-for-system-nss check-recursive eslint
+check-recursive: eslint
+
+check: check-for-system-nss prettier eslint check-recursive
 	$(GEN_COVERAGE_COMMAND)
 
 coverage-report:

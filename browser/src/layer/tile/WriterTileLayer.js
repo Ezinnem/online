@@ -16,13 +16,11 @@
 L.WriterTileLayer = L.CanvasTileLayer.extend({
 
 	newAnnotation: function (comment) {
-		if (this._map._isCursorVisible) {
-			var temp = this._latLngToTwips(this._visibleCursor.getNorthEast());
-			comment.anchorPos = [temp.x, temp.y];
-		} else if (this._graphicSelection && !this._isEmptyRectangle(this._graphicSelection)) {
+		if (app.file.textCursor.visible) {
+			comment.anchorPos = [app.file.textCursor.rectangle.x2, app.file.textCursor.rectangle.y1];
+		} else if (this._graphicSelection) {
 			// An image is selected, then guess the anchor based on the graphic selection.
-			temp = this._latLngToTwips(this._graphicSelection.getSouthWest());
-			comment.anchorPos = [temp.x, temp.y];
+			comment.anchorPos = [this._graphicSelection.x1, this._graphicSelection.y2];
 		}
 
 		var annotation = app.sectionContainer.getSectionWithName(L.CSections.CommentList.name).add(comment);
@@ -94,8 +92,8 @@ L.WriterTileLayer = L.CanvasTileLayer.extend({
 		var topLeftTwips = new L.Point(command.x, command.y);
 		var offset = new L.Point(command.width, command.height);
 		var bottomRightTwips = topLeftTwips.add(offset);
-		if (this._debugTileInvalidations) {
-			this._debugAddInvalidationRectangle(topLeftTwips, bottomRightTwips, textMsg);
+		if (this._debug.tileInvalidationsOn) {
+			this._debug.addTileInvalidationRectangle(topLeftTwips, bottomRightTwips, textMsg);
 		}
 		var invalidBounds = new L.Bounds(topLeftTwips, bottomRightTwips);
 		var visibleTopLeft = this._latLngToTwips(this._map.getBounds().getNorthWest());
@@ -114,9 +112,8 @@ L.WriterTileLayer = L.CanvasTileLayer.extend({
 			}
 		}
 
-		if (needsNewTiles && this._debugTileInvalidations)
-		{
-			this._debugAddInvalidationMessage(textMsg);
+		if (needsNewTiles && this._debug.tileInvalidationsOn) {
+			this._debug.addTileInvalidationMessage(textMsg);
 		}
 
 		this._previewInvalidations.push(invalidBounds);
@@ -145,8 +142,8 @@ L.WriterTileLayer = L.CanvasTileLayer.extend({
 			// of the first paragraph of the document so we want to ignore that
 			// to eliminate document jumping while reconnecting
 			this.persistCursorPositionInWriter = true;
-			this._postMouseEvent('buttondown', this.lastCursorPos.x, this.lastCursorPos.y, 1, 1, 0);
-			this._postMouseEvent('buttonup', this.lastCursorPos.x, this.lastCursorPos.y, 1, 1, 0);
+			this._postMouseEvent('buttondown', this.lastCursorPos.center[0], this.lastCursorPos.center[1], 1, 1, 0);
+			this._postMouseEvent('buttonup', this.lastCursorPos.center[0], this.lastCursorPos.center[1], 1, 1, 0);
 		}
 		if (!command.width || !command.height || this._documentInfo === textMsg)
 			return;

@@ -23,9 +23,14 @@ L.Map.include({
 
 		var docLayer = this._docLayer;
 
+		if (docLayer._selectedPart === part) {
+			return;
+		}
+
 		if (docLayer.isCalc())
 			docLayer._sheetSwitch.save(part /* toPart */);
 
+		docLayer._clearMsgReplayStore(true /* notOtherMsg*/);
 		docLayer._prevSelectedPart = docLayer._selectedPart;
 		docLayer._selectedParts = [];
 		if (part === 'prev') {
@@ -73,7 +78,7 @@ L.Map.include({
 		this.fire('scrolltopart');
 
 		docLayer._selectedParts.push(docLayer._selectedPart);
-		if (docLayer.isCursorVisible()) {
+		if (app.file.textCursor.visible) {
 			// a click outside the slide to clear any selection
 			app.socket.sendMessage('resetselection');
 		}
@@ -87,9 +92,9 @@ L.Map.include({
 			docType: docLayer._docType
 		});
 
-		docLayer.eachView(docLayer._viewCursors, docLayer._onUpdateViewCursor, docLayer);
-		docLayer.eachView(docLayer._cellViewCursors, docLayer._onUpdateCellViewCursor, docLayer);
-		docLayer.eachView(docLayer._graphicViewMarkers, docLayer._onUpdateGraphicViewSelection, docLayer);
+		app.definitions.otherViewCellCursorSection.updateVisibilities();
+		app.definitions.otherViewCursorSection.updateVisibilities();
+		app.definitions.otherViewGraphicSelectionSection.updateVisibilities();
 		docLayer.eachView(docLayer._viewSelections, docLayer._onUpdateTextViewSelection, docLayer);
 		docLayer._clearSelections(calledFromSetPartHandler);
 		docLayer._updateOnChangePart();
@@ -141,7 +146,13 @@ L.Map.include({
 	},
 
 	_processPreviewQueue: function() {
+		if (!this._docLayer)
+			return;
+
 		if (!this._docLayer._canonicalIdInitialized)
+			return;
+
+		if (!this._docLayer._preview)
 			return;
 
 		if (this._previewRequestsOnFly > 1) {
@@ -160,23 +171,30 @@ L.Map.include({
 				this._timeToEmptyQueue = now;
 			}
 		}
+
+		var previewParts = [];
 		// take 3 requests from the queue:
 		while (this._previewRequestsOnFly < 3) {
 			var tile = this._previewQueue.shift();
 			if (!tile)
 				break;
-			var isVisible = this.isPreviewVisible(tile[0], true);
+			var isVisible = this._docLayer._preview._isPreviewVisible(tile[0]);
 			if (isVisible != true)
 				// skip this! we can't see it
 				continue;
 			this._previewRequestsOnFly++;
+			this.fire('beforerequestpreview', { part: tile[0] });
 			app.socket.sendMessage(tile[1]);
+			previewParts.push(tile[0]);
 		}
+
+		if (previewParts.length > 0)
+			window.app.console.debug('PREVIEW: request preview parts : ' + previewParts.join());
 	},
 
 	_addPreviewToQueue: function(part, tileMsg) {
 		for (var tile in this._previewQueue)
-			if (tile[0] === part)
+			if (this._previewQueue[tile][0] === part)
 				// we already have this tile in the queue
 				// no need to ask for it twice
 				return;
@@ -301,6 +319,7 @@ L.Map.include({
 			app.socket.sendMessage('uno .uno:InsertPage');
 		}
 		else if (this.getDocType() === 'spreadsheet') {
+			this._docLayer._sheetSwitch.updateOnSheetInsertion(nPos);
 			var command = {
 				'Name': {
 					'type': 'string',
@@ -361,6 +380,7 @@ L.Map.include({
 			app.socket.sendMessage('uno .uno:DeletePage');
 		}
 		else if (this.getDocType() === 'spreadsheet') {
+			this._docLayer._sheetSwitch.updateOnSheetDeleted(nPos);
 			var command = {
 				'Index': {
 					'type': 'long',

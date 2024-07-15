@@ -1,5 +1,9 @@
 /* -*- Mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4; fill-column: 100 -*- */
 /*
+ * Copyright the Collabora Online contributors.
+ *
+ * SPDX-License-Identifier: MPL-2.0
+ *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -14,12 +18,7 @@
 
 #include "Util.hpp"
 
-#include <csignal>
 #include <poll.h>
-
-#ifdef HAVE_SYS_RANDOM_H
-#  include <sys/random.h>
-#endif
 
 #ifdef __linux__
 #  include <sys/prctl.h>
@@ -38,6 +37,7 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <fcntl.h>
+#include <spawn.h>
 
 #include <atomic>
 #include <cassert>
@@ -62,16 +62,13 @@
 #include <Poco/ConsoleChannel.h>
 #include <Poco/Exception.h>
 #include <Poco/Format.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Object.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/RandomStream.h>
+
 #include <Poco/TemporaryFile.h>
 #include <Poco/Util/Application.h>
 #include <Poco/URI.h>
 
-#include "Common.hpp"
 #include "Log.hpp"
+#include "JsonUtil.hpp"
 #include "Protocol.hpp"
 #include "TraceEvent.hpp"
 
@@ -79,22 +76,25 @@ namespace Util
 {
     namespace rng
     {
-        static std::random_device _rd;
         static std::mutex _rngMutex;
-        static Poco::RandomBuf _randBuf;
 
         // Create the prng with a random-device for seed.
         // If we don't have a hardware random-device, we will get the same seed.
         // In that case we are better off with an arbitrary, but changing, seed.
-        static std::mt19937_64 _rng = std::mt19937_64(_rd.entropy()
-                                                    ? _rd()
-                                                    : (clock() + getpid()));
+        static std::mt19937_64 _rng = std::mt19937_64(rng::getSeed());
+
+        uint_fast64_t getSeed()
+        {
+            std::vector<char> hardRandom = getBytes(16);
+            uint_fast64_t seed = *reinterpret_cast<uint_fast64_t *>(hardRandom.data());
+            return seed;
+        }
 
         // A new seed is used to shuffle the sequence.
         // N.B. Always reseed after getting forked!
         void reseed()
         {
-            _rng.seed(_rd.entropy() ? _rd() : (clock() + getpid()));
+            _rng.seed(rng::getSeed());
         }
 
         // Returns a new random number.
@@ -104,10 +104,46 @@ namespace Util
             return _rng();
         }
 
+        int getURandom()
+        {
+            static int urandom = open("/dev/urandom", O_RDONLY);
+            if (urandom < 0)
+            {
+                LOG_SYS("Failed to source hard random numbers");
+                fprintf(stderr, "No adequate source of randomness");
+                abort();
+                // Potentially dangerous to continue without randomness
+            }
+            return urandom;
+        }
+
+        // Since we have a fd always open to /dev/urandom
+        // 'read' is hopefully no less efficient than getrandom.
         std::vector<char> getBytes(const std::size_t length)
         {
             std::vector<char> v(length);
-            _randBuf.readFromDevice(v.data(), v.size());
+
+            size_t offset;
+            for (offset = 0; offset < length; )
+            {
+                int b = read(getURandom(), v.data() + offset, length - offset);
+                if (b <= 0)
+                {
+                    if (errno == EINTR)
+                        continue;
+                    break;
+                }
+                offset += b;
+            }
+            if (offset < length)
+            {
+                fprintf(stderr, "No adequate source of randomness, "
+                        "failed to read %ld bytes: with error %s\n",
+                        (long int)length, strerror(errno));
+                // Potentially dangerous to continue without randomness
+                abort();
+            }
+
             return v;
         }
 
@@ -118,39 +154,6 @@ namespace Util
             Poco::HexBinaryEncoder hex(ss);
             hex.rdbuf()->setLineLength(0); // Don't insert line breaks.
             hex.write(getBytes(length).data(), length);
-            hex.close(); // Flush.
-            return ss.str().substr(0, length);
-        }
-
-        /// Generate a string of harder random characters.
-        std::string getHardRandomHexString(const std::size_t length)
-        {
-            std::stringstream ss;
-            Poco::HexBinaryEncoder hex(ss);
-
-            // a poor fallback but something.
-            std::vector<char> random = getBytes(length);
-            int len = 0;
-#ifdef HAVE_SYS_RANDOM_H
-            len = getrandom(random.data(), length, GRND_NONBLOCK);
-
-            // if getrandom() fails, we fall back to "/dev/[u]random" approach.
-            if (len != length)
-#endif
-            {
-                const int fd = open("/dev/urandom", O_RDONLY);
-                if (fd < 0 ||
-                    (len = read(fd, random.data(), length)) < 0 ||
-                    std::size_t(len) < length)
-                {
-                    LOG_ERR("failed to read " << length << " hard random bytes, got " << len << " for hash: " << errno);
-                }
-                if (fd >= 0)
-                    close(fd);
-            }
-
-            hex.rdbuf()->setLineLength(0); // Don't insert line breaks.
-            hex.write(random.data(), length);
             hex.close(); // Flush.
             return ss.str().substr(0, length);
         }
@@ -179,131 +182,6 @@ namespace Util
         }
     }
 
-#if !MOBILEAPP
-    int getProcessThreadCount()
-    {
-        DIR *fdDir = opendir("/proc/self/task");
-        if (!fdDir)
-        {
-            LOG_ERR("No proc mounted");
-            return -1;
-        }
-        int tasks = 0;
-        struct dirent *i;
-        while ((i = readdir(fdDir)))
-        {
-            if (i->d_name[0] != '.')
-                tasks++;
-        }
-        closedir(fdDir);
-        return tasks;
-    }
-
-    // close what we have - far faster than going up to a 1m open_max eg.
-    static bool closeFdsFromProc(std::map<int, int> *mapFdsToKeep = nullptr)
-    {
-          DIR *fdDir = opendir("/proc/self/fd");
-          if (!fdDir)
-              return false;
-
-          struct dirent *i;
-
-          while ((i = readdir(fdDir))) {
-              if (i->d_name[0] == '.')
-                  continue;
-
-              char *e = NULL;
-              errno = 0;
-              long fd = strtol(i->d_name, &e, 10);
-              if (errno != 0 || !e || *e)
-                  continue;
-
-              if (fd == dirfd(fdDir))
-                  continue;
-
-              if (fd < 3)
-                  continue;
-
-              if (mapFdsToKeep && mapFdsToKeep->find(fd) != mapFdsToKeep->end())
-                  continue;
-
-              if (close(fd) < 0)
-                  std::cerr << "Unexpected failure to close fd " << fd << std::endl;
-          }
-
-          closedir(fdDir);
-          return true;
-    }
-
-    static void closeFds(std::map<int, int> *mapFdsToKeep = nullptr)
-    {
-        if (!closeFdsFromProc(mapFdsToKeep))
-        {
-            std::cerr << "Couldn't close fds efficiently from /proc" << std::endl;
-            for (int fd = 3; fd < sysconf(_SC_OPEN_MAX); ++fd)
-                if (mapFdsToKeep->find(fd) != mapFdsToKeep->end())
-                    close(fd);
-        }
-    }
-
-    int spawnProcess(const std::string &cmd, const StringVector &args, const std::vector<int>* fdsToKeep, int *stdInput)
-    {
-        int pipeFds[2] = { -1, -1 };
-        if (stdInput)
-        {
-            if (pipe2(pipeFds, O_NONBLOCK) < 0)
-            {
-                LOG_ERR("Out of file descriptors spawning " << cmd);
-                throw Poco::SystemException("Out of file descriptors");
-            }
-        }
-
-        // Create a vector of zero-terminated strings.
-        std::vector<std::string> argStrings;
-        for (const auto& arg : args)
-            argStrings.push_back(args.getParam(arg));
-
-        std::vector<char *> params;
-        params.push_back(const_cast<char *>(cmd.c_str()));
-        for (const auto& i : argStrings)
-            params.push_back(const_cast<char *>(i.c_str()));
-        params.push_back(nullptr);
-
-        std::map<int, int> mapFdsToKeep;
-
-        if (fdsToKeep)
-            for (const auto& i : *fdsToKeep)
-                mapFdsToKeep[i] = i;
-
-        int pid = fork();
-        if (pid < 0)
-        {
-            LOG_ERR("Failed to fork for command '" << cmd);
-            throw Poco::SystemException("Failed to fork for command ", cmd);
-        }
-        else if (pid == 0) // child
-        {
-            if (stdInput)
-                dup2(pipeFds[0], STDIN_FILENO);
-
-            closeFds(&mapFdsToKeep);
-
-            int ret = execvp(params[0], &params[0]);
-            if (ret < 0)
-                LOG_SFL("Failed to exec command '" << cmd << '\'');
-            Util::forcedExit(42);
-        }
-        // else spawning process still
-        if (stdInput)
-        {
-            close(pipeFds[0]);
-            *stdInput = pipeFds[1];
-        }
-        return pid;
-    }
-
-#endif
-
     std::string encodeId(const std::uint64_t number, const int padding)
     {
         std::ostringstream oss;
@@ -327,270 +205,7 @@ namespace Util
 
     bool kitInProcess = false;
     void setKitInProcess(bool value) { kitInProcess = value; }
-    bool isKitInProcess() { return kitInProcess || isFuzzing(); }
-
-#if !MOBILEAPP
-
-    static const char *startsWith(const char *line, const char *tag, std::size_t tagLen)
-    {
-        assert(strlen(tag) == tagLen);
-
-        std::size_t len = tagLen;
-        if (!strncmp(line, tag, len))
-        {
-            while (!isdigit(line[len]) && line[len] != '\0')
-                ++len;
-
-            return line + len;
-        }
-
-        return nullptr;
-    }
-
-    std::string getHumanizedBytes(unsigned long nBytes)
-    {
-        constexpr unsigned factor = 1024;
-        short count = 0;
-        float val = nBytes;
-        while (val >= factor && count < 4) {
-            val /= factor;
-            count++;
-        }
-        std::string unit;
-        switch (count)
-        {
-        case 0: unit = ""; break;
-        case 1: unit = "ki"; break;
-        case 2: unit = "Mi"; break;
-        case 3: unit = "Gi"; break;
-        case 4: unit = "Ti"; break;
-        default: assert(false);
-        }
-
-        unit += 'B';
-        std::stringstream ss;
-        ss << std::fixed << std::setprecision(1) << val << ' ' << unit;
-        return ss.str();
-    }
-
-    std::size_t getTotalSystemMemoryKb()
-    {
-        std::size_t totalMemKb = 0;
-        FILE* file = fopen("/proc/meminfo", "r");
-        if (file != nullptr)
-        {
-            char line[4096] = { 0 };
-            // coverity[tainted_data_argument : FALSE] - we trust the kernel-provided data
-            while (fgets(line, sizeof(line), file))
-            {
-                const char* value;
-                if ((value = startsWith(line, "MemTotal:", 9)))
-                {
-                    totalMemKb = atoll(value);
-                    break;
-                }
-            }
-            fclose(file);
-        }
-
-        return totalMemKb;
-    }
-
-    std::size_t getFromCGroup(const std::string &group, const std::string &key)
-    {
-        std::size_t num = 0;
-
-        std::string groupPath;
-        FILE* cg = fopen("/proc/self/cgroup", "r");
-        if (cg != nullptr)
-        {
-
-            char line[4096] = { 0 };
-            while (fgets(line, sizeof(line), cg))
-            {
-                StringVector bits = StringVector::tokenize(line, strlen (line), ':');
-                if (bits.size() > 2 && bits[1] == group)
-                {
-                    groupPath = "/sys/fs/cgroup/" + group + bits[2];
-                    break;
-                }
-            }
-            LOG_TRC("control group path for " << group << " is " << groupPath);
-            fclose(cg);
-        }
-
-        if (groupPath.empty())
-            return 0;
-
-        std::string path = groupPath + "/" + key;
-        LOG_TRC("Read from " << path);
-        FILE* file = fopen(path.c_str(), "r");
-        if (file != nullptr)
-        {
-            char line[4096] = { 0 };
-            if (fgets(line, sizeof(line), file))
-                num = atoll(line);
-            fclose(file);
-        }
-
-        return num;
-    }
-
-    std::size_t getCGroupMemLimit()
-    {
-#ifdef __linux__
-        return getFromCGroup("memory", "memory.limit_in_bytes");
-#else
-        return 0;
-#endif
-     }
-
-    std::size_t getCGroupMemSoftLimit()
-    {
-#ifdef __linux__
-        return getFromCGroup("memory", "memory.soft_limit_in_bytes");
-#else
-        return 0;
-#endif
-    }
-
-    std::pair<std::size_t, std::size_t> getPssAndDirtyFromSMaps(FILE* file)
-    {
-        std::size_t numPSSKb = 0;
-        std::size_t numDirtyKb = 0;
-        if (file)
-        {
-            rewind(file);
-            char line[4096] = { 0 };
-            while (fgets(line, sizeof (line), file))
-            {
-                if (line[0] != 'P')
-                    continue;
-
-                const char *value;
-
-                // Shared_Dirty is accounted for by forkit's RSS
-                if ((value = startsWith(line, "Private_Dirty:", 14)))
-                {
-                    numDirtyKb += atoi(value);
-                }
-                else if ((value = startsWith(line, "Pss:", 4)))
-                {
-                    numPSSKb += atoi(value);
-                }
-            }
-        }
-
-        return std::make_pair(numPSSKb, numDirtyKb);
-    }
-
-    std::string getMemoryStats(FILE* file)
-    {
-        const std::pair<std::size_t, std::size_t> pssAndDirtyKb = getPssAndDirtyFromSMaps(file);
-        std::ostringstream oss;
-        oss << "procmemstats: pid=" << getpid()
-            << " pss=" << pssAndDirtyKb.first
-            << " dirty=" << pssAndDirtyKb.second;
-        LOG_TRC("Collected " << oss.str());
-        return oss.str();
-    }
-
-    std::size_t getMemoryUsagePSS(const pid_t pid)
-    {
-        if (pid > 0)
-        {
-            // beautifully aggregated data in a single entry:
-            const auto cmd_rollup = "/proc/" + std::to_string(pid) + "/smaps_rollup";
-            FILE* fp = fopen(cmd_rollup.c_str(), "r");
-            if (!fp)
-            {
-                const auto cmd = "/proc/" + std::to_string(pid) + "/smaps";
-                fp = fopen(cmd.c_str(), "r");
-            }
-
-            if (fp != nullptr)
-            {
-                const std::size_t pss = getPssAndDirtyFromSMaps(fp).first;
-                fclose(fp);
-                return pss;
-            }
-        }
-
-        return 0;
-    }
-
-    std::size_t getMemoryUsageRSS(const pid_t pid)
-    {
-        static const int pageSizeBytes = getpagesize();
-        std::size_t rss = 0;
-
-        if (pid > 0)
-        {
-            rss = getStatFromPid(pid, 23);
-            rss *= pageSizeBytes;
-            rss /= 1024;
-            return rss;
-        }
-        return 0;
-    }
-
-    std::size_t getCpuUsage(const pid_t pid)
-    {
-        if (pid > 0)
-        {
-            std::size_t totalJiffies = 0;
-            totalJiffies += getStatFromPid(pid, 13);
-            totalJiffies += getStatFromPid(pid, 14);
-            return totalJiffies;
-        }
-        return 0;
-    }
-
-    std::size_t getStatFromPid(const pid_t pid, int ind)
-    {
-        if (pid > 0)
-        {
-            const auto cmd = "/proc/" + std::to_string(pid) + "/stat";
-            FILE* fp = fopen(cmd.c_str(), "r");
-            if (fp != nullptr)
-            {
-                char line[4096] = { 0 };
-                if (fgets(line, sizeof (line), fp))
-                {
-                    const std::string s(line);
-                    int index = 1;
-                    std::size_t pos = s.find(' ');
-                    while (pos != std::string::npos)
-                    {
-                        if (index == ind)
-                        {
-                            fclose(fp);
-                            return strtol(&s[pos], nullptr, 10);
-                        }
-                        ++index;
-                        pos = s.find(' ', pos + 1);
-                    }
-                }
-                fclose(fp);
-            }
-        }
-        return 0;
-    }
-
-    void setProcessAndThreadPriorities(const pid_t pid, int prio)
-    {
-        int res = setpriority(PRIO_PROCESS, pid, prio);
-        LOG_TRC("Lowered kit [" << (int)pid << "] priority: " << prio << " with result: " << res);
-
-#ifdef __linux__
-        // rely on Linux thread-id priority setting to drop this thread' priority
-        pid_t tid = getThreadId();
-        res = setpriority(PRIO_PROCESS, tid, prio);
-        LOG_TRC("Lowered own thread [" << (int)tid << "] priority: " << prio << " with result: " << res);
-#endif
-    }
-
-#endif // !MOBILEAPP
+    bool isKitInProcess() { return kitInProcess || isFuzzing() || isMobileApp(); }
 
     std::string replace(std::string result, const std::string& a, const std::string& b)
     {
@@ -648,6 +263,42 @@ namespace Util
         return replace(r, "\n", " / ");
     }
 
+#if defined __linux__
+    static thread_local pid_t ThreadTid = 0;
+
+    pid_t getThreadId()
+#else
+    static thread_local long ThreadTid = 0;
+
+    long getThreadId()
+#endif
+    {
+        // Avoid so many redundant system calls
+#if defined __linux__
+        if (!ThreadTid)
+            ThreadTid = ::syscall(SYS_gettid);
+        return ThreadTid;
+#elif defined __FreeBSD__
+        if (!ThreadTid)
+            thr_self(&ThreadTid);
+        return ThreadTid;
+#else
+        static long threadCounter = 1;
+        if (!ThreadTid)
+            ThreadTid = threadCounter++;
+        return ThreadTid;
+#endif
+    }
+
+    void killThreadById(int tid, int signal)
+    {
+#if defined __linux__
+        ::syscall(SYS_tgkill, getpid(), tid, signal);
+#else
+        LOG_WRN("No tgkill for thread " << tid);
+#endif
+    }
+
     // prctl(2) supports names of up to 16 characters, including null-termination.
     // Although in practice on linux more than 16 chars is supported.
     static thread_local char ThreadName[32] = {0};
@@ -655,6 +306,9 @@ namespace Util
 
     void setThreadName(const std::string& s)
     {
+        // Clear the cache - perhaps we forked
+        ThreadTid = 0;
+
         // Copy the current name.
         const std::string knownAs
             = ThreadName[0] ? "known as [" + std::string(ThreadName) + ']' : "unnamed";
@@ -706,33 +360,6 @@ namespace Util
 
         // Avoid so many redundant system calls
         return ThreadName;
-    }
-
-#if defined __linux__
-    static thread_local pid_t ThreadTid = 0;
-
-    pid_t getThreadId()
-#else
-    static thread_local long ThreadTid = 0;
-
-    long getThreadId()
-#endif
-    {
-        // Avoid so many redundant system calls
-#if defined __linux__
-        if (!ThreadTid)
-            ThreadTid = ::syscall(SYS_gettid);
-        return ThreadTid;
-#elif defined __FreeBSD__
-        if (!ThreadTid)
-            thr_self(&ThreadTid);
-        return ThreadTid;
-#else
-        static long threadCounter = 1;
-        if (!ThreadTid)
-            ThreadTid = threadCounter++;
-        return ThreadTid;
-#endif
     }
 
     void getVersionInfo(std::string& version, std::string& hash)
@@ -829,6 +456,32 @@ namespace Util
         std::string decoded;
         Poco::URI::decode(uri, decoded);
         return decoded;
+    }
+
+    std::string trimURI(const std::string &uriStr)
+    {
+        Poco::URI uri(uriStr);
+        uri.setUserInfo("");
+        uri.setPath("");
+        uri.setQuery("");
+        uri.setFragment("");
+        return uri.toString();
+    }
+
+    bool needsURIEncoding(const std::string& uri, const std::string& reserved)
+    {
+        const std::string decoded = decodeURIComponent(uri);
+        if (decoded != uri)
+        {
+            // We could decode it; must have been encoded already.
+            return false;
+        }
+
+        // Identical when decoded, might need encoding.
+        const std::string encoded = encodeURIComponent(uri, reserved);
+
+        // If identical, then doesn't need encoding.
+        return encoded != uri;
     }
 
     /// Split a string in two at the delimiter and give the delimiter to the first.
@@ -1138,50 +791,6 @@ namespace Util
         return ApplicationPath;
     }
 
-    #if !MOBILEAPP
-        // If OS is not mobile, it must be Linux.
-        std::string getLinuxVersion(){
-            // Read operating system info. We can read "os-release" file, located in /etc.
-            std::ifstream ifs("/etc/os-release");
-            std::string str(std::istreambuf_iterator<char>{ifs}, {});
-            std::vector<std::string> infoList = Util::splitStringToVector(str, '\n');
-            std::map<std::string, std::string> releaseInfo = Util::stringVectorToMap(infoList, '=');
-
-            auto it = releaseInfo.find("PRETTY_NAME");
-            if (it != releaseInfo.end())
-            {
-                std::string name = it->second;
-
-                // See os-release(5). It says that the lines are "environment-like shell-compatible
-                // variable assignments". What that means, *exactly*, is up for debate, but probably
-                // of mainly academic interest. (It does say that variable expansion at least is not
-                // supported, that is a relief.)
-
-                // The value of PRETTY_NAME might be quoted with double-quotes or
-                // single-quotes.
-
-                // FIXME: In addition, it might contain backslash-escaped special
-                // characters, but we ignore that possibility for now.
-
-                // FIXME: In addition, if it really does support shell syntax (except variable
-                // expansion), it could for instance consist of multiple concatenated quoted strings (with no
-                // whitespace inbetween), as in:
-                // PRETTY_NAME="Foo "'bar'" mumble"
-                // But I guess that is a pretty remote possibility and surely no other code that
-                // reads /etc/os-release handles that like a proper shell, either.
-
-                if (name.length() >= 2 && ((name[0] == '"' && name[name.length()-1] == '"') ||
-                                           (name[0] == '\'' && name[name.length()-1] == '\'')))
-                    name = name.substr(1, name.length()-2);
-                return name;
-            }
-            else
-            {
-                return "unknown";
-            }
-        }
-    #endif
-
     int safe_atoi(const char* p, int len)
     {
         long ret{};
@@ -1357,6 +966,24 @@ namespace Util
 
         assert(sameThread);
     }
-}
+
+    void sleepFromEnvIfSet(const char *domain, const char *envVar)
+    {
+        const char *value;
+        if ((value = std::getenv(envVar)))
+        {
+            const size_t delaySecs = std::stoul(value);
+            if (delaySecs > 0)
+            {
+                std::cerr << domain << ": Sleeping " << delaySecs
+                          << " seconds to give you time to attach debugger to process "
+                          << getpid() << std::endl
+                          << "sudo gdb --pid=" << getpid() << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(delaySecs));
+            }
+        }
+    }
+
+} // namespace Util
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

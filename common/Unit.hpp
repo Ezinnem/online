@@ -17,6 +17,7 @@
 #include <common/StateEnum.hpp>
 #include "Util.hpp"
 #include "net/Socket.hpp"
+#include <Poco/Exception.h>
 
 #include <test/testlog.hpp>
 
@@ -29,6 +30,7 @@ class ChildProcess;
 class WebSocketHandler;
 class ClientSession;
 class Message;
+
 
 // Forward declaration to avoid pulling the world here.
 namespace Poco
@@ -52,11 +54,13 @@ class StorageBase;
 
 typedef UnitBase *(CreateUnitHooksFunction)();
 typedef UnitBase**(CreateUnitHooksFunctionMulti)();
-extern "C" { UnitBase *unit_create_wsd(void); }
-extern "C" { UnitBase** unit_create_wsd_multi(void); }
-extern "C" { UnitBase *unit_create_kit(void); }
-extern "C" { typedef struct _LibreOfficeKit LibreOfficeKit; }
-
+extern "C" {
+    UnitBase *unit_create_wsd(void);
+    UnitBase** unit_create_wsd_multi(void);
+    UnitBase *unit_create_kit(void);
+    typedef struct _LibreOfficeKit LibreOfficeKit;
+    typedef LibreOfficeKit *(LokHookFunction2)( const char *install_path, const char *user_profile_url );
+}
 /// Derive your WSD unit test / hooks from me.
 class UnitBase
 {
@@ -102,7 +106,7 @@ protected:
     STATE_ENUM(TestResult, Failed, Ok, TimedOut);
 
     /// Encourages the process to exit with this value (unless hooked)
-    void exitTest(TestResult result, const std::string& reason = std::string());
+    virtual void exitTest(TestResult result, const std::string& reason = std::string());
 
     /// Fail the test with the given reason.
     void failTest(const std::string& reason)
@@ -116,7 +120,7 @@ protected:
         exitTest(TestResult::Ok, reason);
     }
 
-    /// Called when a test has eneded, to clean up.
+    /// Called when a test has ended, to clean up.
     virtual void endTest(const std::string& reason);
 
     /// Construct a UnitBase instance with a default name.
@@ -126,7 +130,7 @@ protected:
         , _timeoutMilliSeconds(std::chrono::seconds(30))
         , _startTimeMilliSeconds(std::chrono::milliseconds::zero())
         , _type(type)
-        , _socketPoll(std::make_shared<SocketPoll>(name))
+        , _socketPoll(nullptr)
         , testname(name)
     {
     }
@@ -272,7 +276,7 @@ public:
     const std::string& getTestname() const { return testname; }
     void setTestname(const std::string& name) { testname = name; }
 
-    std::shared_ptr<SocketPoll> socketPoll() { return _socketPoll; }
+    std::shared_ptr<SocketPoll> socketPoll();
 
 private:
     /// Initialize the test.
@@ -322,8 +326,11 @@ private:
     static TestOptions GlobalTestOptions; //< The test options for this Test Suite.
     static TestResult GlobalResult; //< The result of all tests. Latches at first failure.
 
+    /// Did we set the result of the test yet ?
     bool _setRetValue;
     TestResult _result;
+    std::string _reason;
+
     std::chrono::milliseconds _timeoutMilliSeconds;
     /// The time at which this particular test started, relative to the start of the Test Suite.
     std::chrono::milliseconds _startTimeMilliSeconds;
@@ -340,10 +347,18 @@ protected:
 
 struct TileData;
 
+/// Abstract helper methods from WSD for unit tests
+class UnitWSDInterface {
+public:
+    virtual ~UnitWSDInterface() {}
+    virtual std::string getJailRoot(int pid) = 0;
+};
+
 /// Derive your WSD unit test / hooks from me.
 class UnitWSD : public UnitBase
 {
     bool _hasKitHooks;
+    UnitWSDInterface *_wsd;
 
 public:
     UnitWSD(const std::string& testname);
@@ -403,8 +418,31 @@ public:
         }
     }
 
+    /// set the concrete wsd implementation
+    void setWSD(UnitWSDInterface *wsd)
+    {
+        _wsd = wsd;
+    }
+
+    /// Locate the path of a document jail by pid (or -1 for the first jail)
+    std::string getJailRoot(int pid = -1)
+    {
+        return _wsd ? _wsd->getJailRoot(pid) : std::string();
+    }
+
+    /// Process result message from kit
+    void processUnitResult(const StringVector &tokens);
+
     /// When a new child kit process reports
     virtual void newChild(const std::shared_ptr<ChildProcess>& /*child*/) {}
+
+    /// When we get a segfault message from forkit; override to test crashes ...
+    virtual void kitSegfault(int /* count */)
+    {
+        if (get().isUnitTesting())
+            exitTest(TestResult::Failed, "kit segfault");
+    }
+
     /// Intercept createStorage
     virtual bool createStorage(const Poco::URI& /* uri */,
                                const std::string& /* jailRoot */,
@@ -521,8 +559,24 @@ public:
 
     // ---------------- Kit hooks ----------------
 
+    /// Build message with test result to send from kit -> wsd
+    std::string getResultMessage() const;
+
     /// Post fork hook - just before we init the child kit
-    virtual void postFork() {}
+    virtual void postFork();
+
+    // pre non background save
+    virtual void preSaveHook() {}
+
+    /// Called just after and before bg save process events
+    virtual void postBackgroundSaveFork() {}
+    virtual void preBackgroundSaveExit() {}
+
+    /// Kit hit drainQueue
+    virtual bool filterDrainQueue()
+    {
+        return false;
+    }
 
     /// Kit got a message
     virtual bool filterKitMessage(WebSocketHandler *, std::string &/* message */ )
@@ -538,7 +592,8 @@ public:
 
     /// Allow a custom LibreOfficeKit wrapper
     virtual LibreOfficeKit *lok_init(const char * /* instdir */,
-                                     const char * /* userdir */)
+                                     const char * /* userdir */,
+                                     LokHookFunction2 /* fn */)
     {
         return nullptr;
     }

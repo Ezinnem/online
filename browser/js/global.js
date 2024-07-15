@@ -80,7 +80,20 @@ window.app = {
 
 	global.setLogging(global.coolLogging != '');
 
-	global.coolParams = new URLSearchParams(global.location.search);
+	var gls = global.location.search;
+	var coolParams = {
+		p: new URLSearchParams(gls.slice(gls.lastIndexOf('?') + 1)),
+	};
+	/* We need to return an empty string instead of `null` */
+	coolParams.get = function(name) {
+		var value = this.p.get(name);
+		return value === null ? '' : value;
+	}.bind(coolParams);
+	coolParams.set = function(name, value) {
+		this.p.set(name, value);
+	}.bind(coolParams);
+	global.coolParams = coolParams;
+
 	var ua = navigator.userAgent.toLowerCase(),
 	    uv = navigator.vendor.toLowerCase(),
 	    doc = document.documentElement,
@@ -88,6 +101,11 @@ window.app = {
 	    ie = 'ActiveXObject' in global,
 
 	    cypressTest = ua.indexOf('cypress') !== -1,
+	    // Firefox has undefined navigator.clipboard.read and navigator.clipboard.write,
+	    // unsecure contexts (such as http + non-localhost) has the entire navigator.clipboard
+	    // undefined.
+	    hasNavigatorClipboardRead = navigator.clipboard && navigator.clipboard.read,
+	    hasNavigatorClipboardWrite = navigator.clipboard && navigator.clipboard.write,
 	    webkit    = ua.indexOf('webkit') !== -1,
 	    phantomjs = ua.indexOf('phantom') !== -1,
 	    android23 = ua.search('android [23]') !== -1,
@@ -107,6 +125,7 @@ window.app = {
 	    gecko3d = 'MozPerspective' in doc.style,
 	    opera12 = 'OTransition' in doc.style;
 
+	var mac = navigator.appVersion.indexOf('Mac') != -1 || navigator.userAgent.indexOf('Mac') != -1;
 	var chromebook = global.ThisIsTheAndroidApp && global.COOLMessageHandler.isChromeOS();
 
 	var isInternetExplorer = (navigator.userAgent.toLowerCase().indexOf('msie') != -1 ||
@@ -184,6 +203,10 @@ window.app = {
 		// `true` when the browser is running in a Windows platform
 		win: win,
 
+		// @property mac: Boolean
+		// `true` when the browser is running in a Mac platform
+		mac: mac,
+
 		// @property ie3d: Boolean
 		// `true` for all Internet Explorer versions supporting CSS transforms.
 		ie3d: ie3d,
@@ -233,6 +256,14 @@ window.app = {
 		// `true` when the browser run by cypress
 		cypressTest: cypressTest,
 
+		// @property hasNavigatorClipboardRead: Boolean
+		// `true` when permission-based clipboard paste is available.
+		hasNavigatorClipboardRead: hasNavigatorClipboardRead,
+
+		// @property hasNavigatorClipboardWrite: Boolean
+		// `true` when permission-based clipboard copy is available.
+		hasNavigatorClipboardWrite: hasNavigatorClipboardWrite,
+
 		// @property msPointer: Boolean
 		// `true` for browsers implementing the Microsoft touch events model (notably IE10).
 		msPointer: !!msPointer,
@@ -249,6 +280,155 @@ window.app = {
 		// browser language locale
 		lang: navigatorLang
 	};
+
+	global.prefs = {
+		_localStorageChanges: {}, // TODO: change this to new Map() when JS version allows
+		canPersist: (function() {
+			var str = 'localstorage_test';
+			try {
+				global.localStorage.setItem(str, str);
+				global.localStorage.removeItem(str);
+				return true;
+			} catch (e) {
+				return false;
+			}
+		})(),
+
+		_renameLocalStoragePref: function(oldName, newName) {
+			if (!global.prefs.canPersist) {
+				return;
+			}
+
+			const oldValue = global.localStorage.getItem(oldName);
+			const newValue = global.localStorage.getItem(newName);
+
+			if (oldValue === null || newValue !== null) {
+				return;
+			}
+
+			// we do not remove the old value, both for downgrades and incase we split an old global preference to a per-app one
+			global.localStorage.setItem(newName, oldValue);
+		},
+
+		/// Similar to using window.uiDefaults directly, but this can handle dotted keys like "presentation.ShowSidebar" and does not allow partially referencing a value (like just "presentation")
+		_getUIDefault: function(key, defaultValue = undefined) {
+			const parts = key.split('.');
+			let result = global.uiDefaults;
+
+			for (const part of parts) {
+				if (!Object.prototype.hasOwnProperty.call(result, part)) {
+					return defaultValue;
+				}
+
+				if (typeof result === 'string') {
+					return defaultValue;
+				}
+
+				result = result[part];
+			}
+
+			if (typeof result !== 'string') {
+				return defaultValue;
+			}
+
+			return result;
+		},
+
+		get: function(key, defaultValue = undefined) {
+			if (key in global.prefs._localStorageChanges) {
+				return global.prefs._localStorageChanges[key];
+			}
+
+			const uiDefault = global.prefs._getUIDefault(key);
+			if (
+				!global.savedUIState &&
+				uiDefault !== undefined
+			) {
+				return uiDefault;
+			}
+
+			if (global.prefs.canPersist) {
+				const localStorageItem = global.localStorage.getItem(key);
+
+				if (localStorageItem) {
+					return localStorageItem;
+				}
+			}
+
+			if (uiDefault !== undefined) {
+				return uiDefault;
+			}
+
+			return defaultValue;
+		},
+
+		set: function(key, value) {
+			value = String(value); // NOT "new String(...)". We cannot use .toString here because value could be null/undefined
+			if (global.prefs.canPersist) {
+				global.localStorage.setItem(key, value);
+			}
+			global.prefs._localStorageChanges[key] = value;
+		},
+
+		remove: function(key) {
+			if (global.prefs.canPersist) {
+				global.localStorage.removeItem(key);
+			}
+			global.prefs._localStorageChanges[key] = undefined;
+		},
+
+		getBoolean: function(key, defaultValue = false) {
+			const value = global.prefs.get(key, '').toLowerCase();
+
+			if (value === 'false') {
+				return false;
+			}
+
+			if (value === 'true') {
+				return true;
+			}
+
+			return defaultValue;
+		},
+
+		getNumber: function(key, defaultValue = NaN) {
+			const value = global.prefs.get(key, '').toLowerCase();
+
+			const parsedValue = parseFloat(value);
+
+			if (isNaN(parsedValue)) {
+				return defaultValue;
+			}
+
+			return parsedValue;
+		},
+	};
+
+	// Renamed in 24.04.4.1
+	const prefDocTypes = ['text', 'spreadsheet', 'presentation', 'drawing'];
+	for (const docType of prefDocTypes) {
+		global.prefs._renameLocalStoragePref(`UIDefaults_${docType}_darkTheme`, 'darkTheme');
+	}
+
+	const oldDocTypePrefs = [
+		"A11yCheckDeck",
+		"NavigatorDeck",
+		"PropertyDeck",
+		"SdCustomAnimationDeck",
+		"SdMasterPagesDeck",
+		"SdSlideTransitionDeck",
+		"ShowResolved",
+		"ShowRuler",
+		"ShowSidebar",
+		"ShowStatusbar",
+		"ShowToolbar",
+	];
+	for (const pref of oldDocTypePrefs) {
+		for (const docType of prefDocTypes) {
+			global.prefs._renameLocalStoragePref(`UIDefaults_${docType}_${pref}`, `${docType}.${pref}`);
+		}
+	}
+	// End 24.04.4.1 renames
 
 	global.keyboard = {
 		onscreenKeyboardHint: global.uiDefaults['onscreenKeyboardHint'],
@@ -428,16 +608,10 @@ window.app = {
 		}
 	};
 
-	global.isLocalStorageAllowed = (function() {
-		var str = 'localstorage_test';
-		try {
-			global.localStorage.setItem(str, str);
-			global.localStorage.removeItem(str);
-			return true;
-		} catch (e) {
-			return false;
-		}
-	})();
+	if (!global.prefs.getBoolean('hasNavigatorClipboardWrite', true)) {
+		// navigator.clipboard.write failed on us once, don't even try it.
+		global.L.Browser.hasNavigatorClipboardWrite = false;
+	}
 
 	global.deviceFormFactor = global.mode.getDeviceFormFactor();
 
@@ -808,59 +982,68 @@ window.app = {
 		this.getSessionId();
 	};
 
+	global.iterateCSSImages = function(visitor) {
+		var visitUrls = function(rules, visitor, base) {
+			if (!rules)
+				return;
+
+			for (var r = 0; r < rules.length; ++r) {
+				// check subset of rules like @media or @import
+				if (rules[r] && rules[r].type != 1) {
+					visitUrls(rules[r].cssRules || rules[r].rules, visitor, base);
+					continue;
+				}
+				if (!rules[r] || !rules[r].style)
+					continue;
+				var img = rules[r].style.backgroundImage;
+				if (img === '' || img === undefined)
+					continue;
+
+				if (img.startsWith('url("images/'))
+				{
+					visitor(rules[r].style, img,
+						img.replace('url("images/', base + '/images/'));
+				}
+				if (img.startsWith('url("remote/'))
+				{
+					visitor(rules[r].style, img,
+						img.replace('url("remote/', base + '/remote/'));
+				}
+			}
+		};
+		var sheets = document.styleSheets;
+		for (var i = 0; i < sheets.length; ++i) {
+			var relBases;
+			try {
+				relBases = sheets[i].href.split('/');
+			} catch (err) {
+				global.app.console.log('Missing href from CSS number ' + i);
+				continue;
+			}
+			relBases.pop(); // bin last - css name.
+			var base = 'url("' + relBases.join('/');
+
+			var rules;
+			try {
+				rules = sheets[i].cssRules || sheets[i].rules;
+			} catch (err) {
+				global.app.console.log('Missing CSS from ' + sheets[i].href);
+				continue;
+			}
+			visitUrls(rules, visitor, base);
+		}
+	};
+
 	if (global.socketProxy)
 	{
 		// re-write relative URLs in CSS - somewhat grim.
 		global.addEventListener('load', function() {
-			var replaceUrls = function(rules, replaceBase) {
-				if (!rules)
-					return;
-
-				for (var r = 0; r < rules.length; ++r) {
-					// check subset of rules like @media or @import
-					if (rules[r] && rules[r].type != 1) {
-						replaceUrls(rules[r].cssRules || rules[r].rules, replaceBase);
-						continue;
-					}
-					if (!rules[r] || !rules[r].style)
-						continue;
-					var img = rules[r].style.backgroundImage;
-					if (img === '' || img === undefined)
-						continue;
-					if (img.startsWith('url("images/'))
-					{
-						rules[r].style.backgroundImage =
-							img.replace('url("images/', replaceBase + '/images/');
-					}
-					if (img.startsWith('url("remote/'))
-					{
-						rules[r].style.backgroundImage =
-							img.replace('url("remote/', replaceBase + '/remote/');
-					}
-				}
-			};
-			var sheets = document.styleSheets;
-			for (var i = 0; i < sheets.length; ++i) {
-				var relBases;
-				try {
-					relBases = sheets[i].href.split('/');
-				} catch (err) {
-					global.app.console.log('Missing href from CSS number ' + i);
-					continue;
-				}
-				relBases.pop(); // bin last - css name.
-				var replaceBase = 'url("' + relBases.join('/');
-
-				var rules;
-				try {
-					rules = sheets[i].cssRules || sheets[i].rules;
-				} catch (err) {
-					global.app.console.log('Missing CSS from ' + sheets[i].href);
-					continue;
-				}
-				replaceUrls(rules, replaceBase);
-			}
-		}, false);
+			global.iterateCSSImages(
+				function(style, img, fullUrl)
+				{
+					style.backgroundImage = fullUrl;
+				});
+		} , false);
 	}
 
 	// indirect socket to wrap the asyncness around fetching the routetoken from indirection url endpoint
@@ -942,7 +1125,9 @@ window.app = {
 					that.onmessage(e);
 				};
 			} else if (this.status === 202) {
-				that.sendPostMsg(http.response.errorCode);
+				if (!(window.app && window.app.socket && window.app.socket._reconnecting)) {
+						that.sendPostMsg(http.response.errorCode);
+				}
 				var timeoutFn = function (indirectionUrl, uri) {
 					console.warn('Requesting again for routeToken');
 					this.open('GET', indirectionUrl + '?Uri=' + encodeURIComponent(uri), true);
@@ -1040,7 +1225,7 @@ window.app = {
 	global.makeDocAndWopiSrcUrl = function (root, docUrlParams, suffix, wopiSrcParam) {
 		var wopiSrc = '';
 		if (global.wopiSrc != '') {
-			wopiSrc = '?WOPISrc=' + global.wopiSrc;
+			wopiSrc = '?WOPISrc=' + encodeURIComponent(global.wopiSrc);
 			if (global.routeToken != '')
 				wopiSrc += '&RouteToken=' + global.routeToken;
 			wopiSrc += '&compat=';
@@ -1113,6 +1298,21 @@ window.app = {
 		}
 	}
 
+	var isRandomUser = global.coolParams.get('randomUser');
+	if (isRandomUser) {
+		// List of languages supported in core
+		var randomUserLangs = [
+			'ar', 'bg', 'ca', 'cs', 'da', 'de', 'el', 'en-US',
+			'en-GB', 'eo', 'es', 'eu', 'fi', 'fr', 'gl', 'he',
+			'hr', 'hu', 'id', 'is', 'it', 'ja', 'ko', 'lo',
+			'nb', 'nl', 'oc', 'pl', 'pt', 'pt-BR', 'sq', 'ru',
+			'sk', 'sl', 'sv', 'tr', 'uk', 'vi', 'zh-CN', 'zh-TW'];
+		var randomUserLang = randomUserLangs[Math.floor(Math.random() * randomUserLangs.length)];
+		window.app.console.log('Randomize Settings: Set language to: ',randomUserLang);
+		global.coolParams.set('lang', randomUserLang);
+		global.coolParams.set('debug',true);
+	}
+
 	var lang = global.coolParams.get('lang');
 	if (lang)
 		global.langParam = encodeURIComponent(lang);
@@ -1127,6 +1327,8 @@ window.app = {
 		global.LANG = lang;
 	if (global.socket && global.socket.readyState !== 3) {
 		global.socket.onopen = function () {
+			// Note there are two socket "onopen" handlers, this one and the other in browser/src/core/Socket.js.
+			// See the notes there for explanation.
 			if (global.socket.readyState === 1) {
 				var ProtocolVersionNumber = '0.1';
 				var timestamp = encodeURIComponent(global.coolParams.get('timestamp'));
@@ -1146,7 +1348,7 @@ window.app = {
 				if (L.Browser.cypressTest && isCalcTest)
 					global.enableAccessibility = false;
 
-				var accessibilityState = global.localStorage.getItem('accessibilityState') === 'true';
+				var accessibilityState = global.prefs.getBoolean('accessibilityState');
 				accessibilityState = accessibilityState || (L.Browser.cypressTest && !isCalcTest);
 				msg += ' accessibilityState=' + accessibilityState;
 
@@ -1166,13 +1368,13 @@ window.app = {
 				if (global.deviceFormFactor) {
 					msg += ' deviceFormFactor=' + global.deviceFormFactor;
 				}
-				if (global.isLocalStorageAllowed) {
-					var spellOnline = global.localStorage.getItem('SpellOnline');
-					if (spellOnline) {
-						msg += ' spellOnline=' + spellOnline;
-					}
-
+				var spellOnline = window.prefs.get('SpellOnline');
+				if (spellOnline) {
+					msg += ' spellOnline=' + spellOnline;
 				}
+
+				const darkTheme = window.prefs.getBoolean('darkTheme');
+				msg += ' darkTheme=' + darkTheme;
 
 				msg += ' timezone=' + Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -1209,5 +1411,17 @@ window.app = {
 			// A FakeWebSocket is immediately open.
 			this.socket.onopen();
 		}
+	}
+
+	function handleViewportChange(event) {
+		var visualViewport = event.target;
+
+		window.scroll(0, 0);
+		document.body.style.height = visualViewport.height + 'px';
+	}
+
+	if (window.visualViewport !== undefined) {
+		window.visualViewport.addEventListener('scroll', handleViewportChange);
+		window.visualViewport.addEventListener('resize', handleViewportChange);
 	}
 }(window));

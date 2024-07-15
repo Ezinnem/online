@@ -1,4 +1,4 @@
-/* global describe it cy beforeEach require afterEach */
+/* global describe it cy beforeEach require */
 
 var helper = require('../../common/helper');
 var desktopHelper = require('../../common/desktop_helper');
@@ -6,15 +6,10 @@ var ceHelper = require('../../common/contenteditable_helper');
 // var repairHelper = require('../../common/repair_document_helper');
 
 describe(['taga11ydisabled'], 'Editable area [a11y disabled] - Empty paragraph', function() {
-	var testFileName = 'undo_redo.odt';
 
 	beforeEach(function () {
-		helper.beforeAll(testFileName, 'writer');
+		helper.setupAndLoadDocument('writer/undo_redo.odt');
 		cy.cGet('div.clipboard').as('clipboard');
-	});
-
-	afterEach(function () {
-		helper.afterAll(testFileName, this.currentTest.state);
 	});
 
 	it('Typing in an empty paragraph', function () {
@@ -48,15 +43,10 @@ describe(['taga11ydisabled'], 'Editable area [a11y disabled] - Empty paragraph',
 });
 
 describe(['taga11ydisabled'], 'Editable area [a11y disabled] - Basic typing', function() {
-	var testFileName = 'undo_redo.odt';
 
 	beforeEach(function () {
-		helper.beforeAll(testFileName, 'writer');
+		helper.setupAndLoadDocument('writer/undo_redo.odt');
 		cy.cGet('div.clipboard').as('clipboard');
-	});
-
-	afterEach(function () {
-		helper.afterAll(testFileName, this.currentTest.state);
 	});
 
 	it('Typing at paragraph beginning', function () {
@@ -128,15 +118,10 @@ describe(['taga11ydisabled'], 'Editable area [a11y disabled] - Basic typing', fu
 });
 
 describe(['taga11yenabled'], 'Editable area - Empty paragraph', function() {
-	var testFileName = 'undo_redo.odt';
 
 	beforeEach(function () {
-		helper.beforeAll(testFileName, 'writer');
+		helper.setupAndLoadDocument('writer/undo_redo.odt');
 		cy.cGet('div.clipboard').as('clipboard');
-	});
-
-	afterEach(function () {
-		helper.afterAll(testFileName, this.currentTest.state);
 	});
 
 	it('Typing in an empty paragraph', function () {
@@ -175,15 +160,10 @@ describe(['taga11yenabled'], 'Editable area - Empty paragraph', function() {
 });
 
 describe(['taga11yenabled'], 'Editable area - Basic typing and caret moving', function() {
-	var testFileName = 'undo_redo.odt';
 
 	beforeEach(function () {
-		helper.beforeAll(testFileName, 'writer');
+		helper.setupAndLoadDocument('writer/undo_redo.odt');
 		cy.cGet('div.clipboard').as('clipboard');
-	});
-
-	afterEach(function () {
-		helper.afterAll(testFileName, this.currentTest.state);
 	});
 
 	it('Moving inside paragraph', function () {
@@ -230,6 +210,9 @@ describe(['taga11yenabled'], 'Editable area - Basic typing and caret moving', fu
 		// typing paragraph 4
 		ceHelper.type('{enter}');
 		ceHelper.type('green red');
+		// Need to wait here after typing paragraph in
+		// order for caret position to stick later
+		cy.wait(200);
 		ceHelper.checkPlainContent('green red');
 		ceHelper.moveCaret('left', '', 4);
 		ceHelper.checkCaretPosition(5);
@@ -249,6 +232,8 @@ describe(['taga11yenabled'], 'Editable area - Basic typing and caret moving', fu
 		helper.clickAt('P1');
 		ceHelper.checkPlainContent('');
 		ceHelper.checkCaretPosition(0);
+		// Need to wait between clicks
+		cy.wait(200);
 		// click on paragraph 4
 		helper.clickAt('P2');
 		ceHelper.checkPlainContent('green red');
@@ -486,15 +471,10 @@ describe(['taga11yenabled'], 'Editable area - Basic typing and caret moving', fu
 });
 
 describe(['taga11yenabled'], 'Editable area - Inner selection', function() {
-	var testFileName = 'undo_redo.odt';
 
 	beforeEach(function () {
-		helper.beforeAll(testFileName, 'writer');
+		helper.setupAndLoadDocument('writer/undo_redo.odt');
 		cy.cGet('div.clipboard').as('clipboard');
-	});
-
-	afterEach(function () {
-		helper.afterAll(testFileName, this.currentTest.state);
 	});
 
 	it('Selecting inside paragraph', function () {
@@ -645,15 +625,10 @@ describe(['taga11yenabled'], 'Editable area - Inner selection', function() {
 });
 
 describe(['taga11yenabled'], 'Editable area - Multi-paragraph selection', function() {
-	var testFileName = 'undo_redo.odt';
 
 	beforeEach(function () {
-		helper.beforeAll(testFileName, 'writer');
+		helper.setupAndLoadDocument('writer/undo_redo.odt');
 		cy.cGet('div.clipboard').as('clipboard');
-	});
-
-	afterEach(function () {
-		helper.afterAll(testFileName, this.currentTest.state);
 	});
 
 	it('Selection starts in previous paragraph', function () {
@@ -800,15 +775,10 @@ describe(['taga11yenabled'], 'Editable area - Multi-paragraph selection', functi
 });
 
 describe(['taga11yenabled'], 'Editable area - Empty selection', function() {
-	var testFileName = 'undo_redo.odt';
 
 	beforeEach(function () {
-		helper.beforeAll(testFileName, 'writer');
+		helper.setupAndLoadDocument('writer/undo_redo.odt');
 		cy.cGet('div.clipboard').as('clipboard');
-	});
-
-	afterEach(function () {
-		helper.afterAll(testFileName, this.currentTest.state);
 	});
 
 	it('Typing <backspace> with empty selection', function () {
@@ -886,15 +856,10 @@ describe(['taga11yenabled'], 'Editable area - Empty selection', function() {
 });
 
 describe(['taga11yenabled'], 'Editable area - Undo/Redo', function() {
-	var testFileName = 'undo_redo.odt';
 
 	beforeEach(function () {
-		helper.beforeAll(testFileName, 'writer');
+		helper.setupAndLoadDocument('writer/undo_redo.odt');
 		cy.cGet('div.clipboard').as('clipboard');
-	});
-
-	afterEach(function () {
-		helper.afterAll(testFileName, this.currentTest.state);
 	});
 
 	it('Undo/Redo after typing', function () {
@@ -966,15 +931,10 @@ describe(['taga11yenabled'], 'Editable area - Undo/Redo', function() {
 });
 
 describe(['taga11yenabled'], 'Editable area - More typing', function() {
-	var testFileName = 'undo_redo.odt';
 
 	beforeEach(function() {
-		helper.beforeAll(testFileName, 'writer');
+		helper.setupAndLoadDocument('writer/undo_redo.odt');
 		cy.cGet('div.clipboard').as('clipboard');
-	});
-
-	afterEach(function() {
-		helper.afterAll(testFileName, this.currentTest.state);
 	});
 
 	it('Typing after undo command', function() {
@@ -1058,15 +1018,10 @@ describe(['taga11yenabled'], 'Editable area - More typing', function() {
 // • Item 2
 // • Item 3
 describe(['taga11yenabled'], 'Editable area - Unordered lists', function() {
-	var testFileName = 'unordered_list.odt';
 
 	beforeEach(function () {
-		helper.beforeAll(testFileName, 'writer');
+		helper.setupAndLoadDocument('writer/unordered_list.odt');
 		cy.cGet('div.clipboard').as('clipboard');
-	});
-
-	afterEach(function () {
-		helper.afterAll(testFileName, this.currentTest.state);
 	});
 
 	it('Check content', function () {
@@ -1246,20 +1201,16 @@ describe(['taga11yenabled'], 'Editable area - Unordered lists', function() {
 });
 
 describe(['tagdesktop', 'tagnextcloud', 'tagproxy'], 'Editing - Basic typing', function() {
-	var testFileName = 'undo_redo.odt';
 
 	beforeEach(function () {
-		helper.beforeAll(testFileName, 'writer');
+		helper.setupAndLoadDocument('writer/undo_redo.odt');
 		cy.cGet('div.clipboard').as('clipboard');
-	});
-
-	afterEach(function () {
-		helper.afterAll(testFileName, this.currentTest.state);
 	});
 
 	function selectAndCheckText(upTo, expectedText) {
 		var backTo = upTo === 'home' ? 'end' : 'home';
 		ceHelper.moveCaret(upTo, 'shift');
+		helper.copy();
 		cy.wait(500);
 		helper.expectTextForClipboard(expectedText);
 		ceHelper.moveCaret(backTo);
@@ -1267,6 +1218,7 @@ describe(['tagdesktop', 'tagnextcloud', 'tagproxy'], 'Editing - Basic typing', f
 	}
 
 	it('Typing', function () {
+		helper.setDummyClipboardForCopy();
 		// typing paragraph 1
 		ceHelper.type('Hello World');
 		selectAndCheckText('home', 'Hello World');
@@ -1285,6 +1237,7 @@ describe(['tagdesktop', 'tagnextcloud', 'tagproxy'], 'Editing - Basic typing', f
 	});
 
 	it('Typing <delete> at paragraph beginning', function () {
+		helper.setDummyClipboardForCopy();
 		ceHelper.type('Hello World');
 		ceHelper.moveCaret('home');
 		ceHelper.type('{del}');
@@ -1292,6 +1245,7 @@ describe(['tagdesktop', 'tagnextcloud', 'tagproxy'], 'Editing - Basic typing', f
 	});
 
 	it('Typing <enter>', function () {
+		helper.setDummyClipboardForCopy();
 		// typing 4 paragraphs
 		ceHelper.type('Hello World');
 		ceHelper.type('{enter}');
@@ -1311,6 +1265,7 @@ describe(['tagdesktop', 'tagnextcloud', 'tagproxy'], 'Editing - Basic typing', f
 	});
 
 	it('Typing <backspace>', function () {
+		helper.setDummyClipboardForCopy();
 		ceHelper.type('Hello World');
 		ceHelper.moveCaret('left','',5);
 		ceHelper.type('{backspace}');
@@ -1343,6 +1298,7 @@ describe(['tagdesktop', 'tagnextcloud', 'tagproxy'], 'Editing - Basic typing', f
 	});
 
 	it('Typing <delete>', function () {
+		helper.setDummyClipboardForCopy();
 		ceHelper.type('Hello World');
 		ceHelper.moveCaret('left','',6);
 		ceHelper.type('{del}');

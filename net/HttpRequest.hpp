@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include <config_version.h>
-
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -326,6 +324,9 @@ static inline const char* getReasonPhraseForCode(StatusCode statusCode)
     return getReasonPhraseForCode(static_cast<unsigned>(statusCode));
 }
 
+std::string getAgentString();
+std::string getServerString();
+
 /// The callback signature for handling IO writes.
 /// Returns the number of bytes read from the buffer,
 /// -1 for error (terminates the transfer).
@@ -439,8 +440,11 @@ public:
     /// Return true iff Transfer-Encoding is set to chunked (the last entry).
     bool getChunkedTransferEncoding() const { return _chunked; }
 
-    /// Adds a new "Cookie" header entry with the given cookies.
-    void addCookies(const Container& pairs)
+    /// Adds a new "Cookie" header entry with the given content.
+    void addCookie(const std::string& cookie) { add(COOKIE, cookie); }
+
+    /// Adds a new "Cookie" header entry with the given pairs.
+    void addCookie(const Container& pairs)
     {
         std::string s;
         s.reserve(256);
@@ -602,6 +606,8 @@ public:
     {
         if (!body.empty()) // Type is only meaningful if there is a body.
             _header.setContentType(std::move(contentType));
+
+        _header.add("Content-Length", std::to_string(body.size()));
 
         auto iss = std::make_shared<std::istringstream>(body, std::ios::binary);
 
@@ -822,7 +828,7 @@ public:
         , _fd(fd)
     {
         _header.add("Date", Util::getHttpTimeNow());
-        _header.add("Server", HTTP_SERVER_STRING);
+        _header.add("Server", http::getServerString());
     }
 
     /// A response sent from a server.
@@ -852,6 +858,7 @@ public:
 
     const StatusLine& statusLine() const { return _statusLine; }
 
+    Header& header() { return _header; }
     const Header& header() const { return _header; }
 
     /// Add an HTTP header field.
@@ -933,6 +940,10 @@ public:
     /// Serializes the Server Response into the given buffer.
     bool writeData(Buffer& out) const
     {
+        assert(!get("Date").empty() && "Date is always set in http::Response ctor");
+        assert(get("Server") == http::getServerString() &&
+               "Server Agent is always set in http::Response ctor");
+
         _statusLine.writeData(out);
         _header.writeData(out);
         out.append("\r\n"); // End of header.
@@ -1013,6 +1024,7 @@ private:
         , _port(std::to_string(portNumber))
         , _protocol(protocolType)
         , _fd(-1)
+        , _handshakeSslVerifyFailure(0)
         , _timeout(getDefaultTimeout())
         , _connected(false)
     {
@@ -1122,7 +1134,7 @@ public:
     /// Get the timeout, in microseconds.
     std::chrono::microseconds getTimeout() const { return _timeout; }
 
-    std::shared_ptr<Response> response() { return _response; }
+    /// The response we _got_ for our request. Do *not* use this to _send_ a response!
     const std::shared_ptr<Response>& response() const { return _response; }
     const std::string& getUrl() const { return _request.getUrl(); }
 
@@ -1252,6 +1264,30 @@ public:
         }
     }
 
+    std::string getSslVerifyMessage()
+    {
+#if ENABLE_SSL
+        std::shared_ptr<StreamSocket> socket = _socket.lock();
+        if (socket)
+            return SslStreamSocket::getSslVerifyString(socket->getSslVerifyResult());
+        return SslStreamSocket::getSslVerifyString(_handshakeSslVerifyFailure);
+#else
+        return std::string();
+#endif
+    }
+
+    std::string getSslCert(std::string& subjectHash)
+    {
+#if ENABLE_SSL
+        std::shared_ptr<StreamSocket> socket = _socket.lock();
+        if (socket)
+            return socket->getSslCert(subjectHash);
+#else
+        (void) subjectHash;
+#endif
+        return std::string();
+    }
+
     void disconnect()
     {
         LOG_TRC("disconnect");
@@ -1262,6 +1298,8 @@ public:
         }
     }
 
+    /// Returns the socket FD, for logging/informational purposes.
+    int getFD() const { return _fd; }
 
 private:
     inline void logPrefix(std::ostream& os) const { os << '#' << _fd << ": "; }
@@ -1358,7 +1396,7 @@ private:
         }
         _request.set("Host", host); // Make sure the host is set.
         _request.set("Date", Util::getHttpTimeNow());
-        _request.set("User-Agent", HTTP_AGENT_STRING);
+        _request.set("User-Agent", http::getAgentString());
     }
 
     void onConnect(const std::shared_ptr<StreamSocket>& socket) override
@@ -1374,6 +1412,7 @@ private:
         {
             LOG_DBG("Error: onConnect without a valid socket");
             _fd = -1;
+            _handshakeSslVerifyFailure = 0;
             _connected = false;
         }
     }
@@ -1460,6 +1499,18 @@ private:
         }
     }
 
+    // on failure the stream will be discarded, so save the ssl verification
+    // result while it is still available
+    void onHandshakeFail() override
+    {
+        std::shared_ptr<StreamSocket> socket = _socket.lock();
+        if (socket)
+        {
+            LOG_TRC("onHandshakeFail");
+            _handshakeSslVerifyFailure = socket->getSslVerifyResult();
+        }
+    }
+
     void onDisconnect() override
     {
         // Make sure the socket is disconnected and released.
@@ -1467,7 +1518,6 @@ private:
         if (socket)
         {
             LOG_TRC("onDisconnect");
-
             socket->shutdown(); // Flag for shutdown for housekeeping in SocketPoll.
             socket->closeConnection(); // Immediately disconnect.
             _socket.reset();
@@ -1525,6 +1575,7 @@ private:
     const std::string _port;
     const Protocol _protocol;
     int _fd; //< The socket file-descriptor.
+    long _handshakeSslVerifyFailure; //< Save SslVerityResult at onHandshakeFail
     std::chrono::microseconds _timeout;
     std::chrono::steady_clock::time_point _startTime;
     bool _connected;
@@ -1641,7 +1692,7 @@ public:
     /// Start an asynchronous upload of a whole file
     bool asyncUpload(std::string fromFile, std::string mimeType)
     {
-        return asyncUpload(fromFile, mimeType, 0, -1, false);
+        return asyncUpload(std::move(fromFile), std::move(mimeType), 0, -1, false);
     }
 
     /// Start a partial asynchronous upload from a file based on the contents of a "Range" header

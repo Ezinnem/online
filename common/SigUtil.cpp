@@ -24,6 +24,10 @@
 #include <sys/uio.h>
 #include <unistd.h>
 
+#if !defined(ANDROID) && !defined(IOS) && !defined(__FreeBSD__)
+#  include <sys/prctl.h>
+#endif
+
 #include <atomic>
 #include <cassert>
 #include <chrono>
@@ -64,12 +68,14 @@ static std::atomic<bool> ForwardSigUsr2Flag(false); //< Flags to forward SIG_USR
 #endif
 
 static size_t ActivityStringIndex = 0;
-static std::array<std::string, 8> ActivityStrings;
+static std::string ActivityHeader;
+static std::array<std::string, 16> ActivityStrings;
 static bool UnattendedRun = false;
 #if !MOBILEAPP
 static int SignalLogFD = STDERR_FILENO; //< The FD where signalLogs are dumped.
 static char* VersionInfo = nullptr;
 static char FatalGdbString[256] = { '\0' };
+static SigUtil::SigChildHandler SigChildHandle;
 #endif
 
 } // namespace
@@ -86,10 +92,11 @@ void setTerminationFlag()
     // Set the forced-termination flag.
     RunStateFlag = RunState::Terminate;
 
-#if !MOBILEAPP
+    if (!Util::isMobileApp())
+    {
         // And wake-up the thread.
         SocketPoll::wakeupWorld();
-#endif
+    }
 }
 
 void requestShutdown()
@@ -104,7 +111,7 @@ void requestShutdown()
 #endif
 #endif // !IOS
 
-    void checkDumpGlobalState(GlobalDumpStateFn dumpState)
+    void checkDumpGlobalState([[maybe_unused]] GlobalDumpStateFn dumpState)
     {
 #if !MOBILEAPP
         assert(dumpState && "Invalid callback for checkDumpGlobalState");
@@ -113,12 +120,10 @@ void requestShutdown()
             DumpGlobalState = false;
             dumpState();
         }
-#else
-        (void) dumpState;
 #endif
     }
 
-    void checkForwardSigUsr2(ForwardSigUsr2Fn forwardSigUsr2)
+    void checkForwardSigUsr2([[maybe_unused]] ForwardSigUsr2Fn forwardSigUsr2)
     {
 #if !MOBILEAPP
         assert(forwardSigUsr2 && "Invalid callback for checkForwardSigUsr2");
@@ -127,14 +132,22 @@ void requestShutdown()
             ForwardSigUsr2Flag = false;
             forwardSigUsr2();
         }
-#else
-        (void) forwardSigUsr2;
 #endif
+    }
+
+    void setActivityHeader(const std::string &message)
+    {
+        ActivityHeader = message;
     }
 
     void addActivity(const std::string &message)
     {
         ActivityStrings[ActivityStringIndex++ % ActivityStrings.size()] = message;
+    }
+
+    void addActivity(const std::string &viewId, const std::string &message)
+    {
+        addActivity("session: " + viewId + ": " + message);
     }
 
     void setUnattended()
@@ -388,6 +401,7 @@ void requestShutdown()
         signalLog("\n");
 
         signalLog("Recent activity:\n");
+        signalLog(ActivityHeader.c_str());
         for (size_t i = 0; i < ActivityStrings.size(); ++i)
         {
             size_t idx = (ActivityStringIndex + i) % ActivityStrings.size();
@@ -506,6 +520,41 @@ void requestShutdown()
         assert (sizeof (FatalGdbString) > strlen(streamStr.c_str()) + 1);
         strncpy(FatalGdbString, streamStr.c_str(), sizeof(FatalGdbString)-1);
         FatalGdbString[sizeof(FatalGdbString)-1] = '\0';
+    }
+
+    static
+    void handleSigChild(const int /* signal */, siginfo_t *info, void * /* uctxt */)
+    {
+        SigChildHandle(info ? info->si_pid : -1);
+    }
+
+    void setSigChildHandler(SigChildHandler fn)
+    {
+        struct sigaction action;
+
+        SigChildHandle = fn;
+        sigemptyset(&action.sa_mask);
+
+        if (fn)
+        {
+            action.sa_flags = SA_SIGINFO;
+            action.sa_sigaction = handleSigChild;
+        }
+        else
+        {
+            action.sa_flags = 0;
+            action.sa_handler = SIG_DFL;
+        }
+
+        sigaction(SIGCHLD, &action, nullptr);
+
+    }
+
+    void dieOnParentDeath()
+    {
+#if !defined(ANDROID) && !defined(IOS) && !defined(__FreeBSD__)
+        prctl(PR_SET_PDEATHSIG, SIGKILL);
+#endif
     }
 
     static

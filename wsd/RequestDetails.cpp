@@ -11,13 +11,16 @@
 
 #include <config.h>
 
-#include "COOLWSD.hpp"
 #include "RequestDetails.hpp"
 #include "Util.hpp"
 #include "common/Log.hpp"
-#include "HostUtil.hpp"
+#if !MOBILEAPP
+#include <HostUtil.hpp>
+#endif // !MOBILEAPP
 
 #include <Poco/URI.h>
+#include <sstream>
+#include <stdexcept>
 #include "Exceptions.hpp"
 
 namespace
@@ -28,6 +31,16 @@ std::map<std::string, std::string> getParams(const std::string& uri)
     std::map<std::string, std::string> result;
     for (const auto& param : Poco::URI(uri).getQueryParameters())
     {
+        // getQueryParameters() decodes the values. Compare with the URI.
+        if (param.first == "WOPISrc" && uri.find(param.second) != std::string::npos)
+        {
+            LOG_WRN("WOPISrc validation error: unencoded WOPISrc [" << param.second
+                                                                    << "] in URL: " << uri);
+#if ENABLE_DEBUG
+            throw std::runtime_error("WOPISrc must be URI-encoded");
+#endif // ENABLE_DEBUG
+        }
+
         std::string key = Util::decodeURIComponent(param.first);
         std::string value = Util::decodeURIComponent(param.second);
         LOG_TRC("Decoding param [" << param.first << "] = [" << param.second << "] -> [" << key
@@ -43,7 +56,7 @@ std::map<std::string, std::string> getParams(const std::string& uri)
 RequestDetails::RequestDetails(Poco::Net::HTTPRequest &request, const std::string& serviceRoot)
 {
     // Check and remove the ServiceRoot from the request.getURI()
-    if (!Util::startsWith(request.getURI(), serviceRoot))
+    if (!request.getURI().starts_with(serviceRoot))
         throw BadRequestException("The request does not start with prefix: " + serviceRoot);
 
     // re-writes ServiceRoot out of request
@@ -54,16 +67,14 @@ RequestDetails::RequestDetails(Poco::Net::HTTPRequest &request, const std::strin
     _isGet = method == "GET";
     _isHead = method == "HEAD";
     auto it = request.find("ProxyPrefix");
-	_isProxy = it != request.end();
+    _isProxy = it != request.end();
     if (_isProxy)
         _proxyPrefix = it->second;
     it = request.find("Upgrade");
     _isWebSocket = it != request.end() && Util::iequal(it->second, "websocket");
-#if MOBILEAPP
     // request.getHost fires an exception on mobile.
-#else
-	_hostUntrusted = request.getHost();
-#endif
+    if (!Util::isMobileApp())
+        _hostUntrusted = request.getHost();
 
     processURI();
 }
@@ -76,6 +87,41 @@ RequestDetails::RequestDetails(const std::string &mobileURI)
 {
     _uriString = mobileURI;
     dehexify();
+    processURI();
+}
+
+RequestDetails::RequestDetails(const std::string& wopiSrc, const std::vector<std::string>& options,
+                               const std::string& compat)
+    : _isGet(true)
+    , _isHead(false)
+    , _isProxy(false)
+    , _isWebSocket(false)
+{
+    // /cool/<encoded-document-URI+options>/ws?WOPISrc=<encoded-document-URI>&compat=/ws[/<sessionId>/<command>/<serial>]
+
+    const std::string decodedWopiSrc = Util::decodeURIComponent(wopiSrc);
+    std::string wopiSrcWithOptions = decodedWopiSrc;
+    if (!options.empty())
+    {
+        wopiSrcWithOptions += '?';
+    }
+
+    for (const std::string& option : options)
+    {
+        wopiSrcWithOptions += option;
+        wopiSrcWithOptions += '&';
+    }
+
+    // To avoid duplicating the complex logic in processURI(),
+    // and to have a single canonical implementation, we
+    // create a valid URI and let it parse and set the various
+    // members, as necessary.
+    std::ostringstream oss;
+    oss << "/cool/" << Util::encodeURIComponent(wopiSrcWithOptions);
+    oss << "/ws?WOPISrc=" << Util::encodeURIComponent(decodedWopiSrc);
+    oss << "&compat=/ws" << compat;
+    _uriString = oss.str();
+
     processURI();
 }
 
@@ -212,11 +258,7 @@ void RequestDetails::processURI()
 Poco::URI RequestDetails::sanitizeURI(const std::string& uri)
 {
     // The URI of the document should be url-encoded.
-#if !MOBILEAPP
-    Poco::URI uriPublic(Util::decodeURIComponent(uri));
-#else
-    Poco::URI uriPublic(uri);
-#endif
+    Poco::URI uriPublic((Util::isMobileApp() ? uri : Util::decodeURIComponent(uri)));
 
     if (uriPublic.isRelative() || uriPublic.getScheme() == "file")
     {
@@ -265,7 +307,7 @@ std::string RequestDetails::getDocKey(const Poco::URI& uri)
 #if !MOBILEAPP
     const std::string newUri = HostUtil::getNewUri(uri);
 #else
-    const std::string newUri = uri.getPath();
+    const std::string& newUri = uri.getPath();
 #endif
 
     std::string docKey = Util::encodeURIComponent(newUri);

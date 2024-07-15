@@ -30,7 +30,7 @@ if (window.ThisIsTheEmscriptenApp)
 else
 	var filePath = global.coolParams.get('file_path');
 
-app.file.permission = global.coolParams.get('permission') || 'edit';
+app.setPermission(global.coolParams.get('permission') || 'edit');
 
 var timestamp = global.coolParams.get('timestamp');
 var target = global.coolParams.get('target') || '';
@@ -81,9 +81,6 @@ if (wopiSrc === '' && filePath === '' && !window.ThisIsAMobileApp) {
 if (host === '' && !window.ThisIsAMobileApp) {
 	map.uiManager.showInfoModal('empty-host-url-modal', '', errorMessages.emptyhosturl, '', _('OK'), null, false);
 }
-
-if (L.Map.versionBar)
-	map.addControl(L.Map.versionBar);
 
 L.Map.THIS = map;
 app.map = map;

@@ -12,28 +12,11 @@
  * Collabora Online toolbar
  */
 
-/* global app $ w2ui _ JSDialog */
+/* global app $ _ JSDialog */
 /*eslint indent: [error, "tab", { "outerIIFEBody": 0 }]*/
 (function(global) {
 
 var map;
-
-function _cancelSearch() {
-	var toolbar = window.mode.isMobile() ? w2ui['searchbar'] : w2ui['actionbar'];
-	var searchInput = L.DomUtil.get('search-input');
-	map.resetSelection();
-	toolbar.hide('cancelsearch');
-	toolbar.disable('searchprev');
-	toolbar.disable('searchnext');
-	searchInput.value = '';
-	if (window.mode.isMobile()) {
-		searchInput.focus();
-		// odd, but on mobile we need to invoke it twice
-		toolbar.hide('cancelsearch');
-	}
-
-	map._onGotFocus();
-}
 
 function getUNOCommand(unoData) {
 	if (typeof unoData !== 'object')
@@ -59,114 +42,6 @@ function onClose() {
 	}
 	if (!map._disableDefaultAction['UI_Close']) {
 		map.remove();
-	}
-}
-
-function getToolbarItemById(id) {
-	var item;
-	if (w2ui['editbar'].get(id) !== null) {
-		var toolbar = w2ui['editbar'];
-		item = toolbar.get(id);
-	}
-	else if ('actionbar' in w2ui && w2ui['actionbar'].get(id) !== null) {
-		toolbar = w2ui['actionbar'];
-		item = toolbar.get(id);
-	}
-	else if (w2ui['searchbar'].get(id) !== null) {
-		toolbar = w2ui['searchbar'];
-		item = toolbar.get(id);
-	}
-	else {
-		throw new Error('unknown id: ' + id);
-	}
-	return item;
-}
-
-function onClick(e, id, item) {
-	// dont reassign the item if we already have it
-	item = item || getToolbarItemById(id);
-
-	map.preventKeyboardPopup(id);
-
-	if (item.disabled) {
-		return;
-	}
-
-	if (item.postmessage && item.type === 'button') {
-		map.fire('postMessage', {msgId: 'Clicked_Button', args: {Id: item.id} });
-	}
-	else if (item.uno) {
-		if (id === 'save') {
-			map.fire('postMessage', {msgId: 'UI_Save', args: { source: 'toolbar' }});
-		}
-
-		map.executeUnoAction(item);
-	}
-	else if (item.id === 'print-active-sheet' || item.id === 'print-all-sheets') {
-		map.dispatch(item.id);
-	}
-	else if (id === 'print') {
-		map.print();
-	}
-	else if (id === 'save') {
-		// Save only when not read-only.
-		if (!map.isReadOnlyMode()) {
-			map.fire('postMessage', {msgId: 'UI_Save', args: { source: 'toolbar' }});
-			if (!map._disableDefaultAction['UI_Save']) {
-				map.save(false /* An explicit save should terminate cell edit */, false /* An explicit save should save it again */);
-			}
-		}
-	}
-	else if (id === 'repair') {
-		app.socket.sendMessage('commandvalues command=.uno:DocumentRepair');
-	}
-	else if (id === 'showsearchbar') {
-		$('#toolbar-down').hide();
-		$('#tb_editbar_item_showsearchbar .w2ui-button').removeClass('over');
-		$('#toolbar-search').show();
-		L.DomUtil.get('search-input').focus();
-	}
-	else if ((id === 'presentation' || id === 'fullscreen-presentation') && map.getDocType() === 'presentation') {
-		map.fire('fullscreen');
-	}
-	else if (id === 'present-in-window') {
-		map.fire('presentinwindow');
-	}
-	else if (id === 'insertannotation') {
-		map.insertComment();
-	}
-	else if (id === 'insertgraphic' || item.id === 'localgraphic') {
-		L.DomUtil.get('insertgraphic').click();
-	}
-	else if (item.id === 'remotegraphic' || item.id === 'insertremotegraphic') {
-		map.fire('postMessage', {msgId: 'UI_InsertGraphic'});
-	}
-	else if (id === 'fontcolor' && typeof e.color === 'undefined') {
-		map.fire('mobilewizard', {data: getColorPickerData('Font Color')});
-	}
-	else if (id === 'backcolor' && typeof e.color === 'undefined') {
-		map.fire('mobilewizard', {data: getColorPickerData('Highlight Color')});
-	}
-	else if (id === 'fontcolor' && typeof e.color !== 'undefined') {
-		onColorPick(id, e.color, e.themeData);
-	}
-	else if (id === 'backcolor' && typeof e.color !== 'undefined') {
-		onColorPick(id, e.color, e.themeData);
-	}
-	else if (id === 'backgroundcolor' && typeof e.color !== 'undefined') {
-		onColorPick(id, e.color, e.themeData);
-	}
-	else if (id === 'fold' || id === 'hamburger-tablet') {
-		map.uiManager.toggleMenubar();
-	}
-	else if (id === 'close' || id === 'closemobile') {
-		map.uiManager.enterReadonlyOrClose();
-	}
-	else if (id === 'link') {
-		if (map.getDocType() == 'spreadsheet')
-			map.sendUnoCommand('.uno:HyperlinkDialog');
-		else
-			map.showHyperlinkDialog();
 	}
 }
 
@@ -200,9 +75,13 @@ function _setBorders(left, right, bottom, top, horiz, vert, color) {
 }
 
 // close the popup
+
+var lastClosePopupCallback = undefined;
+
 function closePopup() {
-	if ($('#w2ui-overlay-editbar').length > 0) {
-		$('#w2ui-overlay-editbar').removeData('keepOpen')[0].hide();
+	if (lastClosePopupCallback) {
+		lastClosePopupCallback();
+		lastClosePopupCallback = undefined;
 	}
 	map.focus();
 }
@@ -241,7 +120,8 @@ function setBorderStyle(num, color) {
 
 global.setBorderStyle = setBorderStyle;
 
-function getBorderStyleMenuHtml() {
+function getBorderStyleMenuHtml(closeCallback) {
+	lastClosePopupCallback = closeCallback;
 	return '<table id="setborderstyle-grid"><tr><td class="w2ui-tb-image w2ui-icon frame01" onclick="setBorderStyle(1)"></td>' +
 	'<td class="w2ui-tb-image w2ui-icon frame02" onclick="setBorderStyle(2)"></td><td class="w2ui-tb-image w2ui-icon frame03" onclick="setBorderStyle(3)"></td>' +
 	'<td class="w2ui-tb-image w2ui-icon frame04" onclick="setBorderStyle(4)"></td></tr><tr><td class="w2ui-tb-image w2ui-icon frame05" onclick="setBorderStyle(5)"></td>' +
@@ -323,114 +203,59 @@ function getConditionalDataBarMenuHtml(more, jsdialogDropdown) {
 
 global.getConditionalDataBarMenuHtml = getConditionalDataBarMenuHtml;
 
-function getInsertTablePopupHtml() {
-	return '<div id="inserttable-wrapper">\
-					<div id="inserttable-popup" class="inserttable-pop ui-widget ui-corner-all" tabIndex=0>\
-						<div class="inserttable-grid"></div>\
-						<div id="inserttable-status" class="cool-font" style="padding: 5px;"><br/></div>\
-					</div>\
-				</div>';
+var sendInsertTableFunction = function(event) {
+	var col = $(event.target).index() + 1;
+	var row = $(event.target).parent().index() + 1;
+	$('.col').removeClass('bright');
+	var status = $('#inserttable-status')
+	status.html('<br/>');
+	var msg = 'uno .uno:InsertTable {' +
+		' "Columns": { "type": "long","value": '
+		+ col +
+		' }, "Rows": { "type": "long","value": '
+		+ row + ' }}';
+
+	app.socket.sendMessage(msg);
+	closePopup();
+};
+
+var highlightTableFunction = function(event) {
+	var col = $(event.target).index() + 1;
+	var row = $(event.target).parent().index() + 1;
+	$('.col').removeClass('bright');
+	$('.row:nth-child(-n+' + row + ') .col:nth-child(-n+' + col + ')')
+		.addClass('bright');
+	var status = $('#inserttable-status')
+	status.html(col + 'x' + row);
+};
+
+function getInsertTablePopupHtml(closeCallback) {
+	lastClosePopupCallback = closeCallback;
+	var grid = $('<div><div class="inserttable-grid" onmouseover="highlightTableFunction(event)" \
+		onclick="sendInsertTableFunction(event)"></div>\
+		<div id="inserttable-status" class="cool-font" style="padding: 5px;"><br/></div></div>');
+
+	insertTable(grid.children('.inserttable-grid'));
+
+	var wrapper = $('<div><div id="inserttable-wrapper">\
+		<div id="inserttable-popup" class="inserttable-pop ui-widget ui-corner-all" tabIndex=0>\
+		' + grid.html() + '</div></div></div>');
+
+	return wrapper.html();
 }
 
-function insertTable() {
+function insertTable($grid = $('.inserttable-grid')) {
 	var rows = 10;
 	var cols = 10;
-	var $grid = $('.inserttable-grid');
-	var $status = $('#inserttable-status');
 
-	var selectedRow = 1;
-	var selectedColumn = 1;
-
-	// init
 	for (var r = 0; r < rows; r++) {
 		var $row = $('<div/>').addClass('row');
 		$grid.append($row);
 		for (var c = 0; c < cols; c++) {
-			var $col = $('<div/>').addClass('col');
+			var $col = $('<button aria-label="' + (1+r) + 'x' + (1+c) + '"\
+				onfocusin="highlightTableFunction(event)"/>').addClass('col');
 			$row.append($col);
 		}
-	}
-
-	var sendInsertMessageFunction = function(col, row) {
-		$('.col').removeClass('bright');
-		$status.html('<br/>');
-		var msg = 'uno .uno:InsertTable {' +
-			' "Columns": { "type": "long","value": '
-			+ col +
-			' }, "Rows": { "type": "long","value": '
-			+ row + ' }}';
-
-		app.socket.sendMessage(msg);
-		closePopup();
-	};
-
-	var highlightFunction = function(col, row) {
-		$('.col').removeClass('bright');
-		$('.row:nth-child(-n+' + row + ') .col:nth-child(-n+' + col + ')')
-			.addClass('bright');
-		$status.html(col + 'x' + row);
-	};
-
-	if (document.getElementById('inserttable-popup')) {
-		document.getElementById('inserttable-popup').addEventListener('keydown', function(event) {
-			if (event.code === 'ArrowLeft') {
-				if (selectedColumn > 1)
-					selectedColumn--;
-
-				highlightFunction(selectedColumn, selectedRow);
-			}
-			else if (event.code === 'ArrowRight') {
-				if (selectedColumn < 10)
-					selectedColumn++;
-
-				highlightFunction(selectedColumn, selectedRow);
-			}
-			else if (event.code === 'ArrowUp') {
-				if (selectedRow > 1)
-					selectedRow--;
-
-				highlightFunction(selectedColumn, selectedRow);
-			}
-			else if (event.code === 'ArrowDown') {
-				if (selectedRow < 10)
-					selectedRow++;
-
-				highlightFunction(selectedColumn, selectedRow);
-			}
-			else if (event.code === 'Escape' || event.code === 'Tab') {
-				event.preventDefault();
-				event.stopPropagation();
-				var popUp = document.getElementById('w2ui-overlay');
-				popUp.remove();
-				app.map.focus();
-			}
-			else if (event.code === 'Enter') {
-				sendInsertMessageFunction(selectedColumn, selectedRow);
-			}
-			else if (event.code === 'Space') {
-				sendInsertMessageFunction(selectedColumn, selectedRow);
-			}
-		});
-	}
-
-	// events
-	$grid.on({
-		mouseover: function () {
-			var col = $(this).index() + 1;
-			var row = $(this).parent().index() + 1;
-			highlightFunction(col, row);
-		},
-		click: function() {
-			var col = $(this).index() + 1;
-			var row = $(this).parent().index() + 1;
-			sendInsertMessageFunction(col, row);
-		}
-	}, '.col');
-
-	if (document.getElementById('inserttable-popup')) {
-		setTimeout(function() {
-			document.getElementById('inserttable-popup').focus();
-		}, 100);
 	}
 }
 
@@ -625,9 +450,31 @@ function createShapesPanel(shapeType) {
 	return $grid.get(0);
 }
 
-function insertShapes(shapeType) {
+var onShapeClickFunction = function(e) {
+	app.map.sendUnoCommand('.uno:' + $(e.target).data().uno);
+	closePopup();
+	e.stopPropagation();
+};
+
+var onShapeKeyUpFunction = function(event) {
+	if (event.code === 'Enter' || event.code === 'Space') {
+		app.map.sendUnoCommand('.uno:' + event.target.dataset.uno);
+		closePopup();
+	}
+	event.stopPropagation();
+};
+
+var onShapeKeyDownFunction = function(event) {
+	if (event.code === 'Escape') {
+		closePopup();
+		app.map.focus();
+	}
+	event.stopPropagation();
+};
+
+function insertShapes(shapeType, $grid = $('.insertshape-grid')) {
+
 	var width = 10;
-	var $grid = $('.insertshape-grid');
 	$grid.addClass(shapeType);
 
 	if (window.mode.isDesktop() || window.mode.isTablet())
@@ -637,45 +484,6 @@ function insertShapes(shapeType) {
 		return;
 
 	var collection = shapes[shapeType];
-
-	if (app.map && app.map.uiManager && app.map.uiManager.getCurrentMode() === 'notebookbar') {
-		var tabCatherIdList = ['shapes-popup-tab-catcher-start', 'shapes-popup-tab-catcher-end'];
-
-		var focusFirstItemFunction = function() {
-			var container = document.getElementById('insertshape-popup');
-			if (container && container.children[0])
-				container = container.children[0];
-			else
-				return;
-
-			var counter = 0;
-
-			while (counter < container.children.length && (container.children[counter].className.includes('row-header') || tabCatherIdList.includes(container.children[counter].id)))
-				counter++;
-
-			if (counter < container.children.length)
-				container.children[counter].children[0].focus();
-		};
-
-		var focusLastItemFunction = function() {
-			var container = document.getElementById('insertshape-popup').children[0];
-			var counter = container.children.length - 1;
-
-			while (counter > -1 && (container.children[counter].className.includes('row-header') || tabCatherIdList.includes(container.children[counter].id)))
-				counter--;
-
-			if (counter > -1)
-				container.children[counter].children[container.children[counter].children.length - 1].focus();
-		};
-
-		var tabCatcher = document.createElement('div');
-		tabCatcher.id = tabCatherIdList[0];
-		tabCatcher.tabIndex = 0;
-		$grid.append(tabCatcher);
-		tabCatcher.onfocus = function() {
-			focusLastItemFunction();
-		};
-	}
 
 	for (var s in collection) {
 		var $rowHeader = $('<div/>').addClass('row-header cool-font').append(_(s));
@@ -702,139 +510,36 @@ function insertShapes(shapeType) {
 				break;
 		}
 	}
-
-	if (app.map && app.map.uiManager && app.map.uiManager.getCurrentMode() === 'notebookbar') {
-		tabCatcher = document.createElement('div');
-		tabCatcher.id = tabCatherIdList[1];
-		tabCatcher.tabIndex = 0;
-		$grid.append(tabCatcher);
-		tabCatcher.onfocus = function() {
-			focusFirstItemFunction();
-		};
-
-		var findIndexFunction = function(item) {
-			for (var i = 0; i < item.parentNode.children.length; i++) {
-				if (item.parentNode.children[i] == item) {
-					return i;
-				}
-			}
-			return -1;
-		};
-
-		var focusOnIndexFunction = function(row, index) {
-			if (row.children[index])
-				row.children[index].focus();
-			else {
-				while (!row.children[index] && index > -1)
-					index--;
-
-				if (index > -1)
-					row.children[index].focus();
-			}
-		};
-
-		var arrowUpFunction = function(event, index) {
-			if (event.target.parentNode.previousElementSibling.className.includes('row-header')) {
-				if (event.target.parentNode.previousElementSibling.previousElementSibling.children.length > 0) {
-					focusOnIndexFunction(event.target.parentNode.previousElementSibling.previousElementSibling, index);
-				}
-				else {
-					event.target.parentNode.previousElementSibling.previousElementSibling.focus();
-				}
-			}
-			else if (event.target.parentNode.previousElementSibling.children.length > 0) {
-				focusOnIndexFunction(event.target.parentNode.previousElementSibling, index);
-			}
-			else {
-				event.target.parentNode.previousElementSibling.focus(); // Tab cathcer.
-			}
-		};
-
-		var arrowDownFunction = function(event, index) {
-			if (event.target.parentNode.nextElementSibling.className.includes('row-header')) {
-				event.target.parentNode.nextElementSibling.nextElementSibling.children[index].focus(); // Header.
-			}
-			else if (event.target.parentNode.nextElementSibling.children.length > 0) {
-				focusOnIndexFunction(event.target.parentNode.nextElementSibling, index);
-			}
-			else {
-				event.target.parentNode.nextElementSibling.focus(); // Tab cathcer.
-			}
-		};
-
-		focusFirstItemFunction();
-
-		var keyPressInitiatedInsidePopUp = false;
-	}
-
-	$grid.on({
-		click: function(e) {
-			map.sendUnoCommand('.uno:' + $(e.target).data().uno);
-			closePopup();
-		},
-		keyup: function(event) {
-			if (app.map.uiManager.getCurrentMode() === 'notebookbar') {
-				if ((event.code === 'Enter' || event.code === 'Space') && keyPressInitiatedInsidePopUp) {
-					map.sendUnoCommand('.uno:' + event.target.dataset.uno);
-					closePopup();
-				}
-			}
-		},
-		keydown: function(event) {
-			if (app.map.uiManager.getCurrentMode() === 'notebookbar') {
-				var index = findIndexFunction(event.target);
-				if (index === -1)
-					return;
-
-				if (event.code === 'ArrowDown') {
-					arrowDownFunction(event, index);
-				}
-				else if (event.code == 'ArrowUp') {
-					arrowUpFunction(event, index);
-				}
-				else if (event.code === 'ArrowLeft') {
-					if (index === 0)
-						arrowUpFunction(event, 1000);
-					else
-						focusOnIndexFunction(event.target.parentNode, index - 1);
-				}
-				else if (event.code === 'ArrowRight') {
-					if (index === event.target.parentNode.children.length - 1)
-						arrowDownFunction(event, 0);
-					else
-						focusOnIndexFunction(event.target.parentNode, index + 1);
-				}
-				else if (event.code === 'Escape') {
-					document.getElementById('insertshape-wrapper').remove();
-					app.map.focus();
-				}
-				else if (event.code === 'Enter' || event.code === 'Space') {
-					keyPressInitiatedInsidePopUp = true;
-				}
-			}
-		}
-	});
 }
 
-function getShapesPopupHtml() {
-	return '<div id="insertshape-wrapper">\
-				<div id="insertshape-popup" tabIndex=0 class="insertshape-pop ui-widget ui-corner-all">\
-					<div class="insertshape-grid"></div>\
-				</div>\
-			</div>';
+function getShapesPopupHtml(closeCallback) {
+	lastClosePopupCallback = closeCallback;
+	var grid = $('<div><div class="insertshape-grid" onclick="onShapeClickFunction(event)" \
+		onkeyup="onShapeKeyUpFunction(event)" onkeydown="onShapeKeyDownFunction(event)"></div></div>');
+
+	insertShapes('insertshapes', grid.children('.insertshape-grid'));
+
+	var wrapper = $('<div><div id="insertshape-wrapper">\
+		<div id="insertshape-popup" tabIndex=0 class="insertshape-pop ui-widget ui-corner-all">\
+		' + grid.html() + ' \
+		</div></div></div>');
+
+	return wrapper.html();
 }
 
-function showColorPicker(id) {
-	var it = w2ui['editbar'].get(id);
-	var obj = w2ui['editbar'];
-	var el = '#tb_editbar_item_' + id;
-	if (it.transparent == null && id !== 'fontcolor') it.transparent = true;
-	$(el).w2color({ color: it.color, transparent: it.transparent }, function (color, themeData) {
-		if (color != null) {
-			obj.colorClick({ name: obj.name, item: it, color: color, themeData: themeData });
-		}
-		closePopup();
-	});
+function getConnectorsPopupHtml(closeCallback) {
+	lastClosePopupCallback = closeCallback;
+	var grid = $('<div><div class="insertshape-grid" onclick="onShapeClickFunction(event)" \
+		onkeyup="onShapeKeyUpFunction(event)" onkeydown="onShapeKeyDownFunction(event)"></div></div>');
+
+	insertShapes('insertconnectors', grid.children('.insertshape-grid'));
+
+	var wrapper = $('<div><div id="insertshape-wrapper">\
+		<div id="insertshape-popup" tabIndex=0 class="insertshape-pop ui-widget ui-corner-all">\
+		' + grid.html() + ' \
+		</div></div></div>');
+
+	return wrapper.html();
 }
 
 function getColorPickerHTML(id) {
@@ -853,10 +558,8 @@ function getColorPickerData(type) {
 	} else if (type === 'Highlight Color') {
 		if (map.getDocType() === 'spreadsheet')
 			uno = '.uno:BackgroundColor';
-		else if (map.getDocType() === 'presentation')
-			uno = '.uno:CharBackColor';
 		else
-			uno = '.uno:BackColor';
+			uno = '.uno:CharBackColor';
 	}
 	var data = {
 		id: 'colorpicker',
@@ -874,66 +577,6 @@ function getColorPickerData(type) {
 		vertical: 'true'
 	};
 	return data;
-}
-
-function onColorPick(id, color, themeData) {
-	if (!map.isEditMode()) {
-		return;
-	}
-	// no fill or automatic color is -1
-	if (color === '') {
-		color = -1;
-	}
-	// transform from #FFFFFF to an Int
-	else {
-		color = parseInt(color.replace('#', ''), 16);
-	}
-	var command = {};
-
-	if (id === 'fontcolor') {
-		var commandId = {'text': 'FontColor',
-			     'spreadsheet': 'Color',
-			     'presentation': 'Color'}[map.getDocType()];
-	}
-	// "backcolor" can be used in Writer and Impress and translates to "Highlighting" while
-	// "backgroundcolor" can be used in Writer and Calc and translates to "Background color".
-	else if (id === 'backcolor') {
-		commandId = {'text': 'BackColor',
-			     'presentation': 'CharBackColor'}[map.getDocType()];
-	}
-	else if (id === 'backgroundcolor') {
-		commandId = {'text': 'BackgroundColor',
-			     'spreadsheet': 'BackgroundColor'}[map.getDocType()];
-	}
-
-	var uno = '.uno:' + commandId;
-	var colorParameterID = commandId + '.Color';
-	var themeParameterID = commandId + '.ComplexColorJSON';
-
-	command[colorParameterID] = {
-		type : 'long',
-		value : color
-	};
-
-	if (themeData != null)
-	{
-		command[themeParameterID] = {
-			type : 'string',
-			value : themeData
-		};
-	}
-
-	map.sendUnoCommand(uno, command);
-	map.focus();
-}
-
-function hideTooltip(toolbar, id) {
-	if (toolbar.touchStarted) {
-		setTimeout(function() {
-			toolbar.tooltipHide(id, {});
-		}, 5000);
-		toolbar.touchStarted = false;
-	}
 }
 
 function setupSearchInput() {
@@ -998,17 +641,21 @@ function unoCmdToToolbarId(commandname)
 }
 
 function updateSearchButtons() {
-	var toolbar = window.mode.isMobile() ? w2ui['searchbar'] : w2ui['actionbar'];
+	var toolbar = window.mode.isMobile() ? app.map.mobileSearchBar: app.map.statusBar;
+	if (!toolbar) {
+		console.debug('Cannot find search bar');
+		return;
+	}
+
 	// conditionally disabling until, we find a solution for tdf#108577
 	if (L.DomUtil.get('search-input').value === '') {
-		toolbar.disable('searchprev');
-		toolbar.disable('searchnext');
-		toolbar.hide('cancelsearch');
-	}
-	else {
-		toolbar.enable('searchprev');
-		toolbar.enable('searchnext');
-		toolbar.show('cancelsearch');
+		toolbar.enableItem('searchprev', false);
+		toolbar.enableItem('searchnext', false);
+		toolbar.showItem('cancelsearch', false);
+	} else {
+		toolbar.enableItem('searchprev', true);
+		toolbar.enableItem('searchnext', true);
+		toolbar.showItem('cancelsearch', true);
 	}
 }
 
@@ -1034,7 +681,7 @@ function onSearchKeyDown(e) {
 		entry.select();
 		e.originalEvent.preventDefault();
 	} else if (e.keyCode === 27) {
-		_cancelSearch();
+		map.cancelSearch();
 	}
 }
 
@@ -1081,14 +728,17 @@ function onInsertBackground() {
 
 function onWopiProps(e) {
 	if (e.DisableCopy) {
-		$('input#addressInput').bind('copy', function(evt) {
+		$('input#addressInput-input').bind('copy', function(evt) {
 			evt.preventDefault();
 		});
 	}
 }
 
 function processStateChangedCommand(commandName, state) {
-	var toolbar = w2ui['editbar'];
+	var toolbar = window.mode.isMobile() ? app.map.mobileBottomBar : app.map.topToolbar;
+	if (!toolbar)
+		return;
+
 	var color, div;
 
 	if (!commandName)
@@ -1098,6 +748,7 @@ function processStateChangedCommand(commandName, state) {
 		$('.styles-select').val(state).trigger('change');
 	}
 	else if (commandName === '.uno:FontColor' || commandName === '.uno:Color') {
+		if (!toolbar) return;
 		// confusingly, the .uno: command is named differently in Writer, Calc and Impress
 		color = parseInt(state);
 		if (color === -1) {
@@ -1107,15 +758,16 @@ function processStateChangedCommand(commandName, state) {
 			color = color.toString(16);
 			color = '#' + Array(7 - color.length).join('0') + color;
 		}
-		$('#tb_editbar_item_fontcolor table.w2ui-button .selected-color-classic').css('background-color', color);
-		$('#tb_editbar_item_fontcolor .w2ui-tb-caption').css('display', 'none');
+		// $('#fontcolor table.w2ui-button .selected-color-classic').css('background-color', color);
+		// $('#fontcolor .w2ui-tb-caption').css('display', 'none');
 
 		div = L.DomUtil.get('fontcolorindicator');
 		if (div) {
 			L.DomUtil.setStyle(div, 'background', color);
 		}
 	}
-	else if (commandName === '.uno:BackColor' || commandName === '.uno:BackgroundColor' || commandName === '.uno:CharBackColor') {
+	else if (commandName === '.uno:BackgroundColor' || commandName === '.uno:CharBackColor') {
+		if (!toolbar) return;
 		// confusingly, the .uno: command is named differently in Writer, Calc and Impress
 		color = parseInt(state);
 		if (color === -1) {
@@ -1126,12 +778,12 @@ function processStateChangedCommand(commandName, state) {
 			color = '#' + Array(7 - color.length).join('0') + color;
 		}
 		//writer
-		$('#tb_editbar_item_backcolor table.w2ui-button .selected-color-classic').css('background-color', color);
-		$('#tb_editbar_item_backcolor .w2ui-tb-caption').css('display', 'none');
+		// $('#tb_editbar_item_backcolor table.w2ui-button .selected-color-classic').css('background-color', color);
+		// $('#tb_editbar_item_backcolor .w2ui-tb-caption').css('display', 'none');
 
-		//calc?
-		$('#tb_editbar_item_backgroundcolor table.w2ui-button .selected-color-classic').css('background-color', color);
-		$('#tb_editbar_item_backgroundcolor .w2ui-tb-caption').css('display', 'none');
+		// //calc?
+		// $('#tb_editbar_item_backgroundcolor table.w2ui-button .selected-color-classic').css('background-color', color);
+		// $('#tb_editbar_item_backgroundcolor .w2ui-tb-caption').css('display', 'none');
 
 		div = L.DomUtil.get('backcolorindicator');
 		if (div) {
@@ -1139,24 +791,26 @@ function processStateChangedCommand(commandName, state) {
 		}
 	}
 	else if (commandName === '.uno:ModifiedStatus') {
-		if (state === 'true') {
-			w2ui['editbar'].set('save', {img:'savemodified'});
+		if (document.getElementById('save')) {
+			if (state === 'true')
+				document.getElementById('save').classList.add('savemodified');
+			else
+				document.getElementById('save').classList.remove('savemodified');
 		}
-		else {
-			w2ui['editbar'].set('save', {img:'save'});
-		}
+		state = ''; // stop processing below
 	}
 	else if (commandName === '.uno:DocumentRepair') {
 		if (state === 'true') {
-			toolbar.enable('repair');
+			toolbar.enableItem('repair', true);
 		} else {
-			toolbar.disable('repair');
+			toolbar.enableItem('repair', false);
 		}
 	}
 
 	if (commandName === '.uno:SpacePara1' || commandName === '.uno:SpacePara15'
 		|| commandName === '.uno:SpacePara2') {
-		toolbar.refresh();
+		// TODO
+		//if (toolbar) toolbar.refresh();
 	}
 
 	var id = unoCmdToToolbarId(commandName);
@@ -1166,25 +820,24 @@ function processStateChangedCommand(commandName, state) {
 
 	if (state === 'true') {
 		if (map.isEditMode()) {
-			toolbar.enable(id);
+			toolbar.enableItem(id, true);
 		}
-		toolbar.check(id);
+		// TODO: toolbar.check(id);
 	}
 	else if (state === 'false') {
 		if (map.isEditMode()) {
-			toolbar.enable(id);
+			toolbar.enableItem(id, true);
 		}
-		toolbar.uncheck(id);
+		// TODO: toolbar.uncheck(id);
 	}
 	// Change the toolbar button states if we are in editmode
 	// If in non-edit mode, will be taken care of when permission is changed to 'edit'
 	else if (map.isEditMode() && (state === 'enabled' || state === 'disabled')) {
-		var toolbarUp = toolbar;
 		if (state === 'enabled') {
-			toolbarUp.enable(id);
+			toolbar.enableItem(id, true);
 		} else {
-			toolbarUp.uncheck(id);
-			toolbarUp.disable(id);
+			// TODO: toolbar.uncheck(id);
+			toolbar.enableItem(id, false);
 		}
 	}
 }
@@ -1204,43 +857,45 @@ function onUpdateParts(e) {
 		count = e.parts;
 	}
 
-	var toolbar = w2ui['actionbar'];
+	// TODO
+	var toolbar = null;
 	if (!toolbar) {
 		return;
 	}
 
 	if (!window.mode.isMobile()) {
 		if (e.docType === 'presentation') {
-			toolbar.set('prev', {hint: _('Previous slide')});
-			toolbar.set('next', {hint: _('Next slide')});
+			// TODO
+			//toolbar.set('prev', {hint: _('Previous slide')});
+			//toolbar.set('next', {hint: _('Next slide')});
 		}
 		else {
-			toolbar.hide('presentation');
-			toolbar.hide('insertpage');
-			toolbar.hide('duplicatepage');
-			toolbar.hide('deletepage');
+			toolbar.showItem('presentation', false);
+			toolbar.showItem('insertpage', false);
+			toolbar.showItem('duplicatepage', false);
+			toolbar.showItem('deletepage', false);
 		}
 	}
 
 	if (app.file.fileBasedView) {
-		toolbar.enable('prev');
-		toolbar.enable('next');
+		toolbar.enableItem('prev', true);
+		toolbar.enableItem('next', true);
 		return;
 	}
 
 	if (e.docType !== 'spreadsheet') {
 		if (current === 0) {
-			toolbar.disable('prev');
+			toolbar.enableItem('prev', false);
 		}
 		else {
-			toolbar.enable('prev');
+			toolbar.enableItem('prev', true);
 		}
 
 		if (current === count - 1) {
-			toolbar.disable('next');
+			toolbar.enableItem('next', false);
 		}
 		else {
-			toolbar.enable('next');
+			toolbar.enableItem('next', true);
 		}
 	}
 }
@@ -1272,8 +927,12 @@ function onCommandResult(e) {
 	}
 	else if ((commandName === '.uno:Undo' || commandName === '.uno:Redo') &&
 		e.success === true && e.result.value && !isNaN(e.result.value)) { /*UNDO_CONFLICT*/
-		$('#tb_editbar_item_repair').w2overlay({ html: '<div style="padding: 10px; line-height: 150%">' +
-		_('Conflict Undo/Redo with multiple users. Please use document repair to resolve') + '</div>'});
+		var alertOptions = {
+			messages: [
+				_('Conflict Undo/Redo with multiple users. Please use document repair to resolve')
+			],
+		};
+		JSDialog.showInfoModalWithOptions('undo-conflict-error', alertOptions);
 	} else if (map.zotero &&
 		((commandName === '.uno:DeleteTextFormField' && e.result.DeleteTextFormField.startsWith('ADDIN ZOTERO_')) ||
 		(commandName === '.uno:DeleteField' && e.result.DeleteField.startsWith('ZOTERO_')) ||
@@ -1287,19 +946,19 @@ function onCommandResult(e) {
 	} else if (commandName === '.uno:OpenHyperlink') {
 		// allow to process other incoming messages first
 		setTimeout(function () {
-			map._docLayer.scrollToPos(map._docLayer._visibleCursor.getNorthWest());
+			map._docLayer.scrollToPos(new app.definitions.simplePoint(app.file.textCursor.rectangle.x1, app.file.textCursor.rectangle.y1));
 		}, 0);
 	}
 }
 
 function onUpdatePermission(e) {
-	var toolbar = w2ui['editbar'];
+	var toolbar = window.mode.isMobile() ? app.map.mobileBottomBar : app.map.topToolbar;
 	if (toolbar) {
 		// always enabled items
 		var enabledButtons = ['closemobile', 'undo', 'redo', 'hamburger-tablet'];
 
 		// copy the first array
-		var items = toolbar.items.slice();
+		var items = toolbar.getToolItems(app.map.getDocType()).slice();
 		for (var idx in items) {
 			var found = enabledButtons.filter(function(id) { return id === items[idx].id; });
 			var alwaysEnable = found.length !== 0;
@@ -1307,27 +966,26 @@ function onUpdatePermission(e) {
 			if (e.perm === 'edit') {
 				var unoCmd = map.getDocType() === 'spreadsheet' ? items[idx].unosheet : getUNOCommand(items[idx].uno);
 				var keepDisabled = map['stateChangeHandler'].getItemValue(unoCmd) === 'disabled';
-				if (!keepDisabled || alwaysEnable) {
-					toolbar.enable(items[idx].id);
-				}
+				if (!keepDisabled || alwaysEnable)
+					toolbar.enableItem(items[idx].id, true);
 				$('.main-nav').removeClass('readonly');
 				$('#toolbar-down').removeClass('readonly');
 			} else if (!alwaysEnable) {
 				$('.main-nav').addClass('readonly');
 				$('#toolbar-down').addClass('readonly');
-				toolbar.disable(items[idx].id);
+				toolbar.enableItem(items[idx].id, false);
 			}
 		}
+
 		if (e.perm === 'edit') {
 			$('#toolbar-mobile-back').removeClass('editmode-off');
 			$('#toolbar-mobile-back').addClass('editmode-on');
-			toolbar.set('closemobile', {img: 'editmode'});
+			toolbar.updateItem({id: 'closemobile', type: 'customtoolitem', w2icon: 'editmode'});
 		} else {
 			$('#toolbar-mobile-back').removeClass('editmode-on');
 			$('#toolbar-mobile-back').addClass('editmode-off');
-			toolbar.set('closemobile', {img: 'closemobile'});
+			toolbar.updateItem({id: 'closemobile', type: 'customtoolitem', w2icon: 'closemobile'});
 		}
-
 	}
 }
 
@@ -1336,25 +994,14 @@ function editorUpdate(e) { // eslint-disable-line no-unused-vars
 
 	if (e.target.checked) {
 		var editorId = docLayer._editorId;
-
-		docLayer._followUser = false;
-		docLayer._followEditor = true;
-		if (editorId !== -1 && editorId !== docLayer._viewId) {
+		app.setFollowingEditor(editorId);
+		if (editorId !== -1 && editorId !== docLayer._viewId)
 			map._goToViewId(editorId);
-			docLayer._followThis = editorId;
-		}
+	}
+	else
+		app.setFollowingOff();
 
-		var userlistItem = w2ui['actionbar'].get('userlist');
-		if (userlistItem !== null) {
-			$('.selected-user').removeClass('selected-user');
-		}
-	}
-	else {
-		docLayer._followEditor = false;
-		docLayer._followThis = -1;
-	}
-	$('#tb_actionbar_item_userlist').w2overlay('');
-	$('#userListPopover').hide();
+	map.userList.hideTooltip();
 }
 
 global.editorUpdate = editorUpdate;
@@ -1376,11 +1023,15 @@ function setupToolbar(e) {
 
 	map.on('search', function (e) {
 		var searchInput = L.DomUtil.get('search-input');
-		var toolbar = w2ui['actionbar'];
+		var toolbar = window.mode.isMobile() ? app.map.mobileSearchBar: app.map.statusBar;
+		if (!toolbar) {
+			console.debug('Cannot find search bar');
+			return;
+		}
 		if (e.count === 0) {
-			toolbar.disable('searchprev');
-			toolbar.disable('searchnext');
-			toolbar.hide('cancelsearch');
+			toolbar.enableItem('searchprev', false);
+			toolbar.enableItem('searchnext', false);
+			toolbar.showItem('cancelsearch', false);
 			L.DomUtil.addClass(searchInput, 'search-not-found');
 			$('#findthis').addClass('search-not-found');
 			map.resetSelection();
@@ -1394,17 +1045,15 @@ function setupToolbar(e) {
 	map.on('hyperlinkclicked', function (e) {
 		if (e.url) {
 			if (e.coordinates) {
+				// Coordinates contains a list of numbers, 0-1 top-left of the cell with the hyperlink
+				// 2-3 size of the cell, 4-5 number of th cell, 6-7 are the position of the click
 				var strTwips = e.coordinates.match(/\d+/g);
-				var topLeftTwips = new L.Point(parseInt(strTwips[6]), parseInt(strTwips[1]));
-				var offset = new L.Point(parseInt(strTwips[2]), parseInt(strTwips[3]));
-				var bottomRightTwips = topLeftTwips.add(offset);
-				var cellCursor = new L.LatLngBounds(
-					map._docLayer._twipsToLatLng(topLeftTwips, map.getZoom()),
-					map._docLayer._twipsToLatLng(bottomRightTwips, map.getZoom()));
-				//click pos tweak
-				cellCursor._northEast.lng = cellCursor._southWest.lng;
-				map._docLayer._closeURLPopUp();
-				map._docLayer._showURLPopUp(cellCursor._northEast, e.url);
+				app.definitions.urlPopUpSection.closeURLPopUp();
+				var linkPosition;
+				if (strTwips.length > 7) {
+					linkPosition = new app.definitions.simplePoint(parseInt(strTwips[6]), parseInt(strTwips[7]));
+				}
+				app.definitions.urlPopUpSection.showURLPopUP(e.url, new app.definitions.simplePoint(parseInt(strTwips[6]), parseInt(strTwips[1])), linkPosition);
 			} else {
 				map.fire('warn', {url: e.url, map: map, cmd: 'openlink'});
 			}
@@ -1418,9 +1067,11 @@ function setupToolbar(e) {
 
 	if (map.options.wopi && L.Params.closeButtonEnabled && !window.mode.isMobile()) {
 		$('#closebuttonwrapper').css('display', 'block');
-		$('#closebuttonwrapper').prop('title', _('Close document'));
+		$('#closebutton').prop('title', _('Close document'));
+		map.uiManager.enableTooltip($('#closebutton'));
 	} else if (!L.Params.closeButtonEnabled) {
 		$('#closebuttonwrapper').hide();
+		$('#closebuttonwrapperseparator').hide();
 	} else if (L.Params.closeButtonEnabled && !window.mode.isMobile()) {
 		$('#closebuttonwrapper').css('display', 'block');
 	}
@@ -1428,52 +1079,17 @@ function setupToolbar(e) {
 	$('#closebutton').click(onClose);
 }
 
-function updateVisibilityForToolbar(toolbar, context) {
-	if (!toolbar)
-		return;
-
-	var toShow = [];
-	var toHide = [];
-
-	toolbar.items.forEach(function(item) {
-		if (window.ThisIsTheiOSApp && window.mode.isTablet() && item.iosapptablet === false) {
-			toHide.push(item.id);
-		}
-		else if (((window.mode.isMobile() && item.mobile === false) || (window.mode.isTablet() && item.tablet === false) || (window.mode.isDesktop() && item.desktop === false) || (!window.ThisIsAMobileApp && item.mobilebrowser === false)) && !item.hidden) {
-			toHide.push(item.id);
-		}
-		else if (((window.mode.isMobile() && item.mobile === true) || (window.mode.isTablet() && item.tablet === true) || (window.mode.isDesktop() && item.desktop === true) || (window.ThisIsAMobileApp && item.mobilebrowser === true)) && item.hidden) {
-			toShow.push(item.id);
-		}
-
-		if (context && item.context) {
-			if (item.context.indexOf(context) >= 0)
-				toShow.push(item.id);
-			else
-				toHide.push(item.id);
-		} else if (!context && item.context) {
-			if (item.context.indexOf('default') >= 0)
-				toShow.push(item.id);
-			else
-				toHide.push(item.id);
-		}
-	});
-
-	window.app.console.log('explicitly hiding: ' + toHide);
-	window.app.console.log('explicitly showing: ' + toShow);
-
-	toHide.forEach(function(item) { toolbar.hide(item); });
-	toShow.forEach(function(item) { toolbar.show(item); });
-}
-
 global.onClose = onClose;
 global.setupToolbar = setupToolbar;
-global.onClick = onClick;
-global.hideTooltip = hideTooltip;
 global.insertTable = insertTable;
 global.getInsertTablePopupHtml = getInsertTablePopupHtml;
+global.sendInsertTableFunction = sendInsertTableFunction;
+global.highlightTableFunction = highlightTableFunction;
 global.getShapesPopupHtml = getShapesPopupHtml;
-global.insertShapes = insertShapes;
+global.getConnectorsPopupHtml = getConnectorsPopupHtml;
+global.onShapeClickFunction = onShapeClickFunction;
+global.onShapeKeyUpFunction = onShapeKeyUpFunction;
+global.onShapeKeyDownFunction = onShapeKeyDownFunction;
 global.createShapesPanel = createShapesPanel;
 global.onUpdatePermission = onUpdatePermission;
 global.setupSearchInput = setupSearchInput;
@@ -1481,8 +1097,7 @@ global.getUNOCommand = getUNOCommand;
 global.unoCmdToToolbarId = unoCmdToToolbarId;
 global.onCommandStateChanged = onCommandStateChanged;
 global.processStateChangedCommand = processStateChangedCommand;
-global.showColorPicker = showColorPicker;
 global.getColorPickerHTML = getColorPickerHTML;
-global.updateVisibilityForToolbar = updateVisibilityForToolbar;
 global.onUpdateParts = onUpdateParts;
+global.getColorPickerData = getColorPickerData;
 }(window));

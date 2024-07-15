@@ -19,12 +19,10 @@
 
 #include <Poco/URI.h>
 #include <Poco/Util/Application.h>
-#include <Poco/JSON/Object.h>
 
 #include "HttpRequest.hpp"
 #include "COOLWSD.hpp"
 #include "Log.hpp"
-#include "Util.hpp"
 #include <common/Authorization.hpp>
 #include <net/HttpRequest.hpp>
 
@@ -89,15 +87,18 @@ public:
     class FileInfo
     {
     public:
-        FileInfo(std::string filename, std::string ownerId, std::string modifiedTime)
-            : _filename(std::move(filename))
+        FileInfo(std::size_t size, std::string filename, std::string ownerId,
+                 std::string modifiedTime)
+            : _size(size)
+            , _filename(std::move(filename))
             , _ownerId(std::move(ownerId))
             , _modifiedTime(std::move(modifiedTime))
         {
         }
 
         FileInfo(const FileInfo& fileInfo)
-            : _filename(fileInfo._filename)
+            : _size(fileInfo._size)
+            , _filename(fileInfo._filename)
             , _ownerId(fileInfo._ownerId)
             , _modifiedTime(fileInfo._modifiedTime)
         {
@@ -121,6 +122,8 @@ public:
             return !_filename.empty();
         }
 
+        std::size_t getSize() const { return _size; }
+
         const std::string& getFilename() const { return _filename; }
 
         const std::string& getOwnerId() const { return _ownerId; }
@@ -128,10 +131,17 @@ public:
         /// Set the last modified time as reported to the WOPI host.
         void setLastModifiedTime(const std::string& modifiedTime) { _modifiedTime = modifiedTime; }
 
-        /// Get the last modified time as reported by the WOPI host.
+        /// Get the last modified time as reported by the WOPI host, empty if unsafe to rely on
         const std::string& getLastModifiedTime() const { return _modifiedTime; }
 
+        /// Sometimes an up-load fails, leaving our timestamp in an unknown state
+        bool isLastModifiedTimeSafe() const { return !_modifiedTime.empty(); }
+
+        /// Set last modified time as unsafe
+        void setLastModifiedTimeUnSafe() { _modifiedTime.clear(); }
+
     private:
+        std::size_t _size;
         std::string _filename;
         std::string _ownerId;
         std::string _modifiedTime; //< Opaque modified timestamp as received from the server.
@@ -312,13 +322,13 @@ public:
 
     /// localStorePath the absolute root path of the chroot.
     /// jailPath the path within the jail that the child uses.
-    StorageBase(const Poco::URI& uri,
-                const std::string& localStorePath,
-                const std::string& jailPath) :
-        _localStorePath(localStorePath),
-        _jailPath(jailPath),
-        _fileInfo(std::string(), "cool", std::string()),
-        _isDownloaded(false)
+    StorageBase(const Poco::URI& uri, const std::string& localStorePath,
+                const std::string& jailPath)
+        : _localStorePath(localStorePath)
+        , _jailPath(jailPath)
+        , _fileInfo(/*size=*/0, /*filename=*/std::string(), /*ownerId=*/"cool",
+                    /*modifiledTime=*/std::string())
+        , _isDownloaded(false)
     {
         setUri(uri);
         LOG_DBG("Storage ctor: " << COOLWSD::anonymizeUrl(_uri.toString()));
@@ -367,10 +377,9 @@ public:
     const FileInfo& getFileInfo() const { return _fileInfo; }
 
     const std::string& getLastModifiedTime() const { return _fileInfo.getLastModifiedTime(); }
-    void setLastModifiedTime(const std::string& modifiedTime)
-    {
-        _fileInfo.setLastModifiedTime(modifiedTime);
-    }
+    void setLastModifiedTime(const std::string& modifiedTime) { _fileInfo.setLastModifiedTime(modifiedTime); }
+    bool isLastModifiedTimeSafe() const { return _fileInfo.isLastModifiedTimeSafe(); }
+    void setLastModifiedTimeUnSafe() { _fileInfo.setLastModifiedTimeUnSafe(); }
 
     std::string getFileExtension() const { return Poco::Path(_fileInfo.getFilename()).getExtension(); }
 
@@ -422,7 +431,9 @@ public:
                Unsupported, //< An unsupported type.
                Unauthorized, //< The host is not allowed by the admin.
                FileSystem, //< File-System storage. Only for testing.
+#if !MOBILEAPP
                Wopi //< WOPI-like storage.
+#endif //!MOBILEAPP
     );
 
     /// Validates the given URI.
@@ -489,18 +500,16 @@ class LocalStorage : public StorageBase
 {
 public:
     LocalStorage(const Poco::URI& uri, const std::string& localStorePath,
-                 const std::string& jailPath, bool isTemporaryFile)
+                 const std::string& jailPath, [[maybe_unused]] bool isTemporaryFile)
         : StorageBase(uri, localStorePath, jailPath)
 #if !MOBILEAPP
         , _isTemporaryFile(isTemporaryFile)
 #endif
         , _isCopy(false)
     {
-        LOG_INF("LocalStorage ctor with localStorePath: [" << localStorePath <<
-                "], jailPath: [" << jailPath << "], uri: [" << COOLWSD::anonymizeUrl(uri.toString()) << "].");
-#if MOBILEAPP
-        (void) isTemporaryFile;
-#endif
+        LOG_INF("LocalStorage ctor with localStorePath: ["
+                << localStorePath << "], jailPath: [" << jailPath << "], uri: ["
+                << COOLWSD::anonymizeUrl(uri.toString()) << "].");
     }
 
     class LocalFileInfo
@@ -550,227 +559,6 @@ private:
     /// True if the jailed file is not linked but copied.
     bool _isCopy;
     static std::atomic<unsigned> LastLocalStorageId;
-};
-
-/// WOPI protocol backed storage.
-class WopiStorage : public StorageBase
-{
-public:
-    WopiStorage(const Poco::URI& uri, const std::string& localStorePath,
-                const std::string& jailPath)
-        : StorageBase(uri, localStorePath, jailPath)
-        , _wopiSaveDuration(std::chrono::milliseconds::zero())
-    {
-        LOG_INF("WopiStorage ctor with localStorePath: ["
-                << localStorePath << "], jailPath: [" << jailPath << "], uri: ["
-                << COOLWSD::anonymizeUrl(uri.toString()) << ']');
-    }
-
-    class WOPIFileInfo : public FileInfo
-    {
-        void init();
-    public:
-        enum class TriState
-        {
-            False,
-            True,
-            Unset
-        };
-
-        /// warning - removes items from object.
-        WOPIFileInfo(const FileInfo& fileInfo, Poco::JSON::Object::Ptr& object,
-                     const Poco::URI& uriObject);
-
-        const std::string& getUserId() const { return _userId; }
-        const std::string& getUsername() const { return _username; }
-        const std::string& getUserExtraInfo() const { return _userExtraInfo; }
-        const std::string& getUserPrivateInfo() const { return _userPrivateInfo; }
-        const std::string& getWatermarkText() const { return _watermarkText; }
-        const std::string& getTemplateSaveAs() const { return _templateSaveAs; }
-        const std::string& getTemplateSource() const { return _templateSource; }
-        const std::string& getBreadcrumbDocName() const { return _breadcrumbDocName; }
-        const std::string& getFileUrl() const { return _fileUrl; }
-        const std::string& getPostMessageOrigin() { return _postMessageOrigin; }
-        const std::string& getHideUserList() { return _hideUserList; }
-
-        bool getUserCanWrite() const { return _userCanWrite; }
-        void setHidePrintOption(bool hidePrintOption) { _hidePrintOption = hidePrintOption; }
-        bool getHidePrintOption() const { return _hidePrintOption; }
-        bool getHideSaveOption() const { return _hideSaveOption; }
-        void setHideExportOption(bool hideExportOption) { _hideExportOption = hideExportOption; }
-        bool getHideExportOption() const { return _hideExportOption; }
-        void setHideRepairOption(bool hideRepairOption) { _hideRepairOption = hideRepairOption; }
-        bool getHideRepairOption() const { return _hideRepairOption; }
-        bool getEnableOwnerTermination() const { return _enableOwnerTermination; }
-        bool getDisablePrint() const { return _disablePrint; }
-        bool getDisableExport() const { return _disableExport; }
-        bool getDisableCopy() const { return _disableCopy; }
-        bool getDisableInactiveMessages() const { return _disableInactiveMessages; }
-        bool getDownloadAsPostMessage() const { return _downloadAsPostMessage; }
-        bool getUserCanNotWriteRelative() const { return _userCanNotWriteRelative; }
-        bool getEnableInsertRemoteImage() const { return _enableInsertRemoteImage; }
-        bool getDisableInsertLocalImage() const { return _disableInsertLocalImage; }
-        bool getEnableRemoteLinkPicker() const { return _enableRemoteLinkPicker; }
-        bool getEnableShare() const { return _enableShare; }
-        bool getSupportsRename() const { return _supportsRename; }
-        bool getSupportsLocks() const { return _supportsLocks; }
-        bool getUserCanRename() const { return _userCanRename; }
-
-        TriState getDisableChangeTrackingShow() const { return _disableChangeTrackingShow; }
-        TriState getDisableChangeTrackingRecord() const { return _disableChangeTrackingRecord; }
-        TriState getHideChangeTrackingControls() const { return _hideChangeTrackingControls; }
-
-    private:
-        /// User id of the user accessing the file
-        std::string _userId;
-        /// Obfuscated User id used for logging the UserId.
-        std::string _obfuscatedUserId;
-        /// Display Name of user accessing the file
-        std::string _username;
-        /// Extra public info per user, typically mail and other links, as json, shared with everyone.
-        std::string _userExtraInfo;
-        /// Private info per user, for API keys and other non-public information.
-        std::string _userPrivateInfo;
-        /// In case a watermark has to be rendered on each tile.
-        std::string _watermarkText;
-        /// In case we want to use this file as a template, it should be first re-saved under this name (using PutRelativeFile).
-        std::string _templateSaveAs;
-        /// In case we want to use this file as a template.
-        std::string _templateSource;
-        /// User readable string of document name to show in UI, if present.
-        std::string _breadcrumbDocName;
-        /// The optional FileUrl, used to download the document if provided.
-        std::string _fileUrl;
-        /// WOPI Post message property
-        std::string _postMessageOrigin;
-        /// If set to "true", user list on the status bar will be hidden
-        /// If set to "mobile" | "tablet" | "desktop", will be hidden on a specified device
-        /// (may be joint, delimited by commas eg. "mobile,tablet")
-        std::string _hideUserList;
-        /// If we should disable change-tracking visibility by default (meaningful at loading).
-        TriState _disableChangeTrackingShow = WOPIFileInfo::TriState::Unset;
-        /// If we should disable change-tracking ability by default (meaningful at loading).
-        TriState _disableChangeTrackingRecord = WOPIFileInfo::TriState::Unset;
-        /// If we should hide change-tracking commands for this user.
-        TriState _hideChangeTrackingControls = WOPIFileInfo::TriState::Unset;
-        /// If user accessing the file has write permission
-        bool _userCanWrite = false;
-        /// Hide print button from UI
-        bool _hidePrintOption = false;
-        /// Hide save button from UI
-        bool _hideSaveOption = false;
-        /// Hide 'Download as' button/menubar item from UI
-        bool _hideExportOption = false;
-        /// Hide the 'Repair' button/item from the UI
-        bool _hideRepairOption = false;
-        /// If WOPI host has enabled owner termination feature on
-        bool _enableOwnerTermination = false;
-        /// If WOPI host has allowed the user to print the document
-        bool _disablePrint = false;
-        /// If WOPI host has allowed the user to export the document
-        bool _disableExport = false;
-        /// If WOPI host has allowed the user to copy to/from the document
-        bool _disableCopy = false;
-        /// If WOPI host has allowed the cool to show texts on the overlay informing about
-        /// inactivity, or if the integration is handling that.
-        bool _disableInactiveMessages = false;
-        /// For the (mobile) integrations, to indicate that the downloading for printing, exporting,
-        /// or slideshows should be intercepted and sent as a postMessage instead of handling directly.
-        bool _downloadAsPostMessage = false;
-        /// If set to false, users can access the save-as functionality
-        bool _userCanNotWriteRelative = true;
-        /// If set to true, users can access the insert remote image functionality
-        bool _enableInsertRemoteImage = false;
-        /// If set to true, users can't insert an image from the local machine
-        bool _disableInsertLocalImage = false;
-        /// If set to true, users can access the remote link picker functionality
-        bool _enableRemoteLinkPicker = false;
-        /// If set to true, users can access the file share functionality
-        bool _enableShare = false;
-        /// If WOPI host supports locking
-        bool _supportsLocks = false;
-        /// If WOPI host supports rename
-        bool _supportsRename = false;
-        /// If user is allowed to rename the document
-        bool _userCanRename = false;
-    };
-
-    /// Returns the response of CheckFileInfo WOPI call for URI that was
-    /// provided during the initial creation of the WOPI storage.
-    /// Also extracts the basic file information from the response
-    /// which can then be obtained using getFileInfo()
-    /// Also sets up the locking context for future operations.
-    std::unique_ptr<WOPIFileInfo> getWOPIFileInfo(const Authorization& auth, LockContext& lockCtx);
-    /// Implementation of getWOPIFileInfo for specific URI
-    std::unique_ptr<WOPIFileInfo> getWOPIFileInfoForUri(Poco::URI uriObject,
-                                                        const Authorization& auth,
-                                                        LockContext& lockCtx,
-                                                        unsigned redirectLimit);
-
-    /// Update the locking state (check-in/out) of the associated file
-    LockUpdateResult updateLockState(const Authorization& auth, LockContext& lockCtx, bool lock,
-                                     const Attributes& attribs) override;
-
-    /// uri format: http://server/<...>/wopi*/files/<id>/content
-    std::string downloadStorageFileToLocal(const Authorization& auth, LockContext& lockCtx,
-                                           const std::string& templateUri) override;
-
-    void uploadLocalFileToStorageAsync(const Authorization& auth, LockContext& lockCtx,
-                                       const std::string& saveAsPath,
-                                       const std::string& saveAsFilename, const bool isRename,
-                                       const Attributes&, SocketPoll& socketPoll,
-                                       const AsyncUploadCallback& asyncUploadCallback) override;
-
-    /// Total time taken for making WOPI calls during uploading.
-    std::chrono::milliseconds getWopiSaveDuration() const { return _wopiSaveDuration; }
-
-    virtual AsyncUpload queryLocalFileToStorageAsyncUploadState() override
-    {
-        if (_uploadHttpSession)
-            return AsyncUpload(AsyncUpload::State::Running, UploadResult(UploadResult::Result::OK));
-        else
-            return AsyncUpload(AsyncUpload::State::None, UploadResult(UploadResult::Result::OK));
-    }
-
-protected:
-    struct WopiUploadDetails
-    {
-        const std::string filePathAnonym;
-        const std::string uriAnonym;
-        const std::string httpResponseReason;
-        const http::StatusCode httpResponseCode;
-        const std::size_t size;
-        const bool isSaveAs;
-        const bool isRename;
-    };
-
-    /// Handles the response from the server when uploading the document.
-    UploadResult handleUploadToStorageResponse(const WopiUploadDetails& details,
-                                             std::string responseString);
-
-private:
-    /// Initialize an HTTPRequest instance with the common settings and headers.
-    /// Older Poco versions don't support copying HTTPRequest objects, so we can't generate them.
-    void initHttpRequest(Poco::Net::HTTPRequest& request, const Poco::URI& uri,
-                         const Authorization& auth) const;
-
-    /// Create an http::Request with the common headers.
-    http::Request initHttpRequest(const Poco::URI& uri, const Authorization& auth) const;
-
-    /// Download the document from the given URI.
-    /// Does not add authorization tokens or any other logic.
-    std::string downloadDocument(const Poco::URI& uriObject, const std::string& uriAnonym,
-                                 const Authorization& auth, unsigned redirectLimit);
-
-private:
-    /// A URl provided by the WOPI host to use for GetFile.
-    std::string _fileUrl;
-
-    // Time spend in saving the file from storage
-    std::chrono::milliseconds _wopiSaveDuration;
-
-    /// The http::Session used for uploading asynchronously.
-    std::shared_ptr<http::Session> _uploadHttpSession;
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

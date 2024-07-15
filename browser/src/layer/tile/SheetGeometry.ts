@@ -254,12 +254,16 @@ export class SheetGeometry {
 			this._rows.getTileTwipsPosFromPrint(point.y));
 	}
 
+	public convertToTileTwips(simplePoint: cool.SimplePoint): void {
+		simplePoint.x = this._columns.getTileTwipsPosFromPrint(simplePoint.x);
+		simplePoint.y = this._rows.getTileTwipsPosFromPrint(simplePoint.y);
+	}
+
 	// accepts a point in tile-twips coordinates and returns the equivalent point
 	// in print-twips.
 	public getPrintTwipsPointFromTile(point: Point): Point {
 		if (!(point instanceof L.Point)) {
-			console.error('Bad argument type, expected L.Point');
-			return point;
+			console.warn('Bad argument type, expected L.Point');
 		}
 
 		return new L.Point(this._columns.getPrintTwipsPosFromTile(point.x),

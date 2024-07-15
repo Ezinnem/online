@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include "config.h"
-
 #include "Protocol.hpp"
 #include "HttpRequest.hpp"
 #include "helpers.hpp"
@@ -23,7 +21,7 @@
 #include "StringVector.hpp"
 #include "lokassert.hpp"
 
-#include <Poco/JSON/Object.h>
+#include <JsonUtil.hpp>
 #include <Poco/URI.h>
 #include <Poco/Util/LayeredConfiguration.h>
 
@@ -110,7 +108,7 @@ protected:
             LOG_TST("WopiTestServer created with " << data.size() << " bytes from file ["
                                                    << filenameOrContents << "]");
             _filename = filenameOrContents; // Capture the real filename.
-            setFileContent(Util::toString(data));
+            setFileContent(std::string(data.begin(), data.end()));
         }
         else
         {
@@ -221,7 +219,7 @@ protected:
     /// Given a wopi URI, extracts the filename.
     static std::string extractFilenameFromWopiUri(const std::string& uriPath)
     {
-        if (Util::startsWith(uriPath, getURIRootPath()))
+        if (uriPath.starts_with(getURIRootPath()))
         {
             const auto first = getURIRootPath().size();
             const auto it = uriPath.find_first_of('/', first);
@@ -234,13 +232,13 @@ protected:
     /// Returns true iff @uriPath is a Wopi path but not to the contents.
     static bool isWopiInfoRequest(const std::string& uriPath)
     {
-        return Util::startsWith(uriPath, getURIRootPath()) && !Util::endsWith(uriPath, "/contents");
+        return uriPath.starts_with(getURIRootPath()) && !uriPath.ends_with("/contents");
     }
 
     /// Returns true iff @uriPath is a Wopi path to the contents of a file.
     static bool isWopiContentRequest(const std::string& uriPath)
     {
-        return Util::startsWith(uriPath, getURIRootPath()) && Util::endsWith(uriPath, "/contents");
+        return uriPath.starts_with(getURIRootPath()) && uriPath.ends_with("/contents");
     }
 
     void configure(Poco::Util::LayeredConfiguration& config) override
@@ -248,6 +246,9 @@ protected:
         UnitWSD::configure(config);
         // we're still internally confused as to https vs. http in places.
         config.setBool("storage.ssl.as_scheme", false);
+
+        // Reset to default.
+        config.setBool("storage.wopi.is_legacy_server", false);
     }
 
     /// Returns the default CheckFileInfo json.
@@ -449,28 +450,38 @@ protected:
             LOG_TST("FakeWOPIHost: Handling PutFile (#" << _countPutFile
                                                         << "): " << uriReq.getPath());
 
-            const std::string wopiTimestamp = request.get("X-COOL-WOPI-Timestamp", std::string());
-            if (!wopiTimestamp.empty())
+            return handleWopiUpload(request, message, socket);
+        }
+
+        return false;
+    }
+
+    /// Handles the uploading of a document to wopi.
+    virtual bool handleWopiUpload(const Poco::Net::HTTPRequest& request,
+                                  Poco::MemoryInputStream& message,
+                                  std::shared_ptr<StreamSocket>& socket)
+    {
+        const std::string wopiTimestamp = request.get("X-COOL-WOPI-Timestamp", std::string());
+        if (!wopiTimestamp.empty())
+        {
+            const std::string fileModifiedTime =
+                Util::getIso8601FracformatTime(getFileLastModifiedTime());
+            if (wopiTimestamp != fileModifiedTime)
             {
-                const std::string fileModifiedTime =
-                    Util::getIso8601FracformatTime(getFileLastModifiedTime());
-                if (wopiTimestamp != fileModifiedTime)
-                {
-                    LOG_TST("FakeWOPIHost: Document conflict detected, Stored ModifiedTime: ["
-                            << fileModifiedTime << "], Upload ModifiedTime: [" << wopiTimestamp
-                            << ']');
-                    http::Response httpResponse(http::StatusCode::Conflict);
-                    httpResponse.setBody(
-                        "{\"COOLStatusCode\":" +
-                        std::to_string(static_cast<int>(COOLStatusCode::DocChanged)) + '}');
-                    socket->sendAndShutdown(httpResponse);
-                    return true;
-                }
+                LOG_TST("FakeWOPIHost: Document conflict detected, Stored ModifiedTime: ["
+                        << fileModifiedTime << "], Upload ModifiedTime: [" << wopiTimestamp << ']');
+                http::Response httpResponse(http::StatusCode::Conflict);
+                httpResponse.setBody("{\"COOLStatusCode\":" +
+                                     std::to_string(static_cast<int>(COOLStatusCode::DocChanged)) +
+                                     '}');
+                socket->sendAndShutdown(httpResponse);
+                return true;
             }
-            else
-            {
-                LOG_TST("FakeWOPIHost: Forced document upload");
-            }
+        }
+        else
+        {
+            LOG_TST("FakeWOPIHost: Forced document upload");
+        }
 
             std::unique_ptr<http::Response> response = assertPutFileRequest(request);
             if (!response || response->statusLine().statusCategory() ==
@@ -483,6 +494,7 @@ protected:
                 setFileContent(Util::toString(buffer));
             }
 
+            const Poco::URI uriReq(request.getURI());
             if (response)
             {
                 LOG_TST("FakeWOPIHost: Response to POST "
@@ -505,9 +517,6 @@ protected:
 
             return true;
         }
-
-        return false;
-    }
 
     /// In some very rare cases we may get requests from other tests.
     /// This asserts that the URI in question is for our test.
@@ -556,7 +565,7 @@ protected:
         {
             return handleHttpPostRequest(request, message, socket);
         }
-        else if (!Util::startsWith(uriReq.getPath(), "/cool/")) // Skip requests to the websrv.
+        else if (!uriReq.getPath().starts_with("/cool/")) // Skip requests to the websrv.
         {
             // Complain if we are expected to handle something that we don't.
             LOG_TST("ERROR: FakeWOPIHost: Request, cannot handle request: " << uriReq.getPath());

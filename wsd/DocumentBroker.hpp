@@ -21,6 +21,7 @@
 #include <string>
 #include <utility>
 
+#include <Poco/SharedPtr.h>
 #include <Poco/URI.h>
 
 #include "Log.hpp"
@@ -30,13 +31,17 @@
 #include "net/Socket.hpp"
 #include "net/WebSocketHandler.hpp"
 #include "Storage.hpp"
+#include "ServerAuditUtil.hpp"
 
 #include "common/SigUtil.hpp"
 #include "common/Session.hpp"
 
 #if !MOBILEAPP
 #include "Admin.hpp"
-#endif
+#include <wopi/WopiStorage.hpp>
+#else // MOBILEAPP
+#include <MobileApp.hpp>
+#endif // MOBILEAPP
 
 // Forwards.
 class PrisonerRequestDispatcher;
@@ -44,6 +49,13 @@ class DocumentBroker;
 struct LockContext;
 class TileCache;
 class Message;
+
+namespace Poco {
+    namespace JSON {
+        class Object;
+    };
+};
+
 
 class UrpHandler : public SimpleSocketHandler
 {
@@ -130,6 +142,11 @@ public:
     const std::string& getJailId() const { return _jailId; }
     void setSMapsFD(int smapsFD) { _smapsFD = smapsFD;}
     int getSMapsFD(){ return _smapsFD; }
+
+    void moveSocketFromTo(const std::shared_ptr<SocketPoll> &from, SocketPoll &to)
+    {
+        to.takeSocket(from, getSocket());
+    }
 
 private:
     const std::string _jailId;
@@ -288,15 +305,20 @@ public:
         Interactive, Batch
     };
 
-    /// Dummy document broker that is marked to destroy.
-    DocumentBroker();
+    DocumentBroker(ChildType type, const std::string& uri, const Poco::URI& uriPublic,
+                   const std::string& docKey, unsigned mobileAppDocId,
+                   std::unique_ptr<WopiStorage::WOPIFileInfo> wopiFileInfo);
 
-    DocumentBroker(ChildType type,
-                   const std::string& uri,
-                   const Poco::URI& uriPublic,
-                   const std::string& docKey,
-                   unsigned mobileAppDocId = 0);
+protected:
+    /// Used by derived classes.
+    DocumentBroker(ChildType type, const std::string& uri, const Poco::URI& uriPublic,
+                   const std::string& docKey)
+        : DocumentBroker(type, uri, uriPublic, docKey, /*mobileAppDocId=*/0,
+                         /*wopiFileInfo=*/nullptr)
+    {
+    }
 
+public:
     virtual ~DocumentBroker();
 
     /// Called when removed from the DocBrokers list
@@ -353,7 +375,7 @@ public:
     /// Handle the save response from Core and upload to storage as necessary.
     /// Also notifies clients of the result.
     void handleSaveResponse(const std::shared_ptr<ClientSession>& session,
-                            const Poco::JSON::Object::Ptr& json);
+                            const Poco::SharedPtr<Poco::JSON::Object>& json);
 
     /// Check if uploading is needed, and start uploading.
     /// The current state of uploading must be introspected separately.
@@ -381,9 +403,10 @@ public:
     /// @param force when true, will force saving if there
     /// has been any recent activity after the last save.
     /// @param dontSaveIfUnmodified when true, save will fail if the document is not modified.
+    /// @param finalWrite this is our last write before exit, lets make it synchronous
     /// @return true if attempts to save or it also waits
     /// and receives save notification. Otherwise, false.
-    bool autoSave(const bool force, const bool dontSaveIfUnmodified);
+    bool autoSave(const bool force, const bool dontSaveIfUnmodified, const bool finalWrite = false);
 
     /// Saves the document and stops if there was nothing to autosave.
     void autoSaveAndStop(const std::string& reason);
@@ -420,6 +443,8 @@ public:
     /// Transfer this socket into our polling thread / loop.
     void addSocketToPoll(const std::shared_ptr<StreamSocket>& socket);
 
+    SocketPoll& getPoll();
+
     void alertAllUsers(const std::string& msg);
 
     void alertAllUsers(const std::string& cmd, const std::string& kind)
@@ -455,7 +480,8 @@ public:
     enum ClipboardRequest {
         CLIP_REQUEST_SET,
         CLIP_REQUEST_GET,
-        CLIP_REQUEST_GET_RICH_HTML_ONLY
+        CLIP_REQUEST_GET_RICH_HTML_ONLY,
+        CLIP_REQUEST_GET_HTML_PLAIN_ONLY,
     };
     void handleClipboardRequest(ClipboardRequest type,  const std::shared_ptr<StreamSocket> &socket,
                                 const std::string &viewId, const std::string &tag,
@@ -470,6 +496,13 @@ public:
     {
         return _docState.isMarkedToDestroy() || _stop || _docState.isUnloadRequested() ||
                _docState.isCloseRequested() || SigUtil::getShutdownRequestFlag();
+    }
+
+    /// True if any flag to unload or terminate is set.
+    bool isUnloadingUnrecoverably() const
+    {
+        return _docState.isMarkedToDestroy() || _stop || _docState.isCloseRequested() ||
+               SigUtil::getShutdownRequestFlag();
     }
 
     bool isMarkedToDestroy() const { return _docState.isMarkedToDestroy() || _stop; }
@@ -490,8 +523,6 @@ public:
 
     /// Get the PID of the associated child process
     pid_t getPid() const { return _childProcess ? _childProcess->getPid() : 0; }
-
-    std::unique_lock<std::mutex> getLock() { return std::unique_lock<std::mutex>(_mutex); }
 
     /// Update the last activity time to now.
     /// Best to be inlined as it's called frequently.
@@ -562,7 +593,17 @@ public:
 
     void onUrpMessage(const char* data, size_t len);
 
+    void setMigrationMsgReceived() { _migrateMsgReceived = true; }
+
 #if !MOBILEAPP && !WASMAPP
+    /// Get server audit util
+    const ServerAuditUtil& getServerAudit() const { return _serverAudit; }
+
+    void setCertAuditWarning()
+    {
+        _serverAudit.set("certwarning", "sslverifyfail");
+    }
+
     /// Switch between Online and Offline modes.
     void switchMode(const std::shared_ptr<ClientSession>& session, const std::string& mode);
 #endif // !MOBILEAPP && !WASMAPP
@@ -574,15 +615,44 @@ private:
 
     void refreshLock();
 
+    /// Downloads the document ahead-of-time.
+    bool downloadAdvance(const std::string& jailId, const Poco::URI& uriPublic,
+                         std::unique_ptr<WopiStorage::WOPIFileInfo> wopiFileInfo);
+
     /// Loads a document from the public URI into the jail.
     bool download(const std::shared_ptr<ClientSession>& session, const std::string& jailId,
+                  const Poco::URI& uriPublic,
                   std::unique_ptr<WopiStorage::WOPIFileInfo> wopiFileInfo);
+
+    /// Actual document download and post-download processing.
+    /// Must be called only when creating the storage for the first time.
+    bool doDownloadDocument(const Authorization& auth, const std::string& templateSource,
+                            const std::string& filename,
+                            std::chrono::milliseconds& getFileCallDurationMs);
+
+#if !MOBILEAPP
+    /// Updates the Session with the wopiFileInfo given.
+    /// Returns the templateSource, if any.
+    std::string updateSessionWithWopiInfo(const std::shared_ptr<ClientSession>& session,
+                                          WopiStorage* wopiStorage,
+                                          std::unique_ptr<WopiStorage::WOPIFileInfo> wopiFileInfo);
+
+    /// Process the configured plugins, if any, after downloading the document file.
+    bool processPlugins(std::string& localPath);
+#endif //!MOBILEAPP
+
     bool isLoaded() const { return _docState.hadLoaded(); }
     bool isInteractive() const { return _docState.isInteractive(); }
+
+    void lockIfEditing(const std::shared_ptr<ClientSession>& session, const Poco::URI& uriPublic,
+                       bool userCanWrite);
 
     /// Updates the document's lock in storage to either locked or unlocked.
     /// Returns true iff the operation was successful.
     bool updateStorageLockState(ClientSession& session, bool lock, std::string& error);
+
+    /// Take the lock before loading the first session, if we know we can edit.
+    bool updateStorageLockState(const Authorization& auth, std::string& error);
 
     std::size_t getIdleTimeSecs() const
     {
@@ -693,7 +763,7 @@ private:
 
     /// Sends the .uno:Save command to LoKit.
     bool sendUnoSave(const std::shared_ptr<ClientSession>& session, bool dontTerminateEdit = true,
-                     bool dontSaveIfUnmodified = true, bool isAutosave = false,
+                     bool dontSaveIfUnmodified = true, bool isAutosave = false, bool finalWrite = false,
                      const std::string& extendedData = std::string());
 
     /**
@@ -1331,6 +1401,11 @@ private:
     std::string _uriJailedAnonym;
     std::string _jailId;
     std::string _filename;
+    std::atomic<bool> _migrateMsgReceived = false;
+
+    /// The WopiFileInfo of the initial request loading the document for the first time.
+    /// This has a single-use, and then it's reset.
+    std::unique_ptr<WopiStorage::WOPIFileInfo> _initialWopiFileInfo;
 
     /// The state of the document.
     /// This regulates all other primary operations.
@@ -1428,6 +1503,7 @@ private:
 
         /// Flag to unload the document. Irreversible.
         void setUnloadRequested() { _unloadRequested = true; }
+        void resetUnloadRequested() { _unloadRequested = false; }
         bool isUnloadRequested() const { return _unloadRequested; }
 
         /// Flag that we are disconnected from the Kit. Irreversible.
@@ -1533,13 +1609,16 @@ private:
     /// The Quarantine manager.
     std::unique_ptr<Quarantine> _quarantine;
 
+#if !MOBILEAPP && !WASMAPP
+    ServerAuditUtil _serverAudit;
+#endif
+
     std::unique_ptr<TileCache> _tileCache;
     std::atomic<bool> _isModified;
     int _cursorPosX;
     int _cursorPosY;
     int _cursorWidth;
     int _cursorHeight;
-    mutable std::mutex _mutex;
     std::unique_ptr<DocumentBrokerPoll> _poll;
     std::atomic<bool> _stop;
     std::string _closeReason;
@@ -1579,7 +1658,12 @@ private:
     std::map<std::string, std::string> _embeddedMedia;
 
     /// True iff the config per_document.always_save_on_exit is true.
-    const bool _alwaysSaveOnExit;
+    const bool _alwaysSaveOnExit : 1;
+
+    /// True iff the config per_document.background_autosave is true.
+    const bool _backgroundAutoSave : 1;
+
+    const bool _backgroundManualSave : 1;
 
 #if !MOBILEAPP
     Admin& _admin;
@@ -1646,6 +1730,8 @@ public:
 protected:
     bool isConvertTo() const override { return true; }
 
+    virtual bool isReadOnly() const { return true; }
+
     virtual bool isGetThumbnail() const { return false; }
 
     virtual void sendStartMessage(const std::shared_ptr<ClientSession>& clientSession,
@@ -1664,6 +1750,48 @@ public:
                     {}
 
 private:
+    void sendStartMessage(const std::shared_ptr<ClientSession>& clientSession,
+                          const std::string& encodedFrom) override;
+};
+
+class ExtractDocumentStructureBroker final : public ConvertToBroker
+{
+public:
+    const std::string _filter;
+    /// Construct DocumentBroker with URI and docKey
+    ExtractDocumentStructureBroker(const std::string& uri,
+                    const Poco::URI& uriPublic,
+                    const std::string& docKey,
+                    const std::string& lang,
+                    const std::string& filter)
+                    : ConvertToBroker(uri, uriPublic, docKey, Poco::Path(uri).getExtension(), "",
+                                      lang)
+                    , _filter(filter)
+                    {}
+
+private:
+    void sendStartMessage(const std::shared_ptr<ClientSession>& clientSession,
+                          const std::string& encodedFrom) override;
+};
+
+class TransformDocumentStructureBroker final : public ConvertToBroker
+{
+public:
+    const std::string _transformJSON;
+    /// Construct DocumentBroker with URI and docKey
+    TransformDocumentStructureBroker(const std::string& uri,
+                    const Poco::URI& uriPublic,
+                    const std::string& docKey,
+                    const std::string& format,
+                    const std::string& lang,
+                    const std::string& transformJSON)
+                    : ConvertToBroker(uri, uriPublic, docKey, format, "", lang)
+                    , _transformJSON(transformJSON)
+                    {}
+
+private:
+    virtual bool isReadOnly() const override { return false; }
+
     void sendStartMessage(const std::shared_ptr<ClientSession>& clientSession,
                           const std::string& encodedFrom) override;
 };

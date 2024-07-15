@@ -38,7 +38,6 @@ L.Control.MobileWizardBuilder = L.Control.JSDialogBuilder.extend({
 		this._controlHandlers['radiobutton'] = this._radiobuttonControl;
 		this._controlHandlers['scrollwindow'] = undefined;
 		this._controlHandlers['tabcontrol'] = JSDialog.mobileTabControl;
-		this._controlHandlers['toolbox'] = this._toolboxHandler;
 		this._controlHandlers['borderstyle'] = JSDialog.mobileBorderSelector;
 
 		this._toolitemHandlers['.uno:FontworkAlignmentFloater'] = function () { return false; };
@@ -49,6 +48,7 @@ L.Control.MobileWizardBuilder = L.Control.JSDialogBuilder.extend({
 		this._toolitemHandlers['.uno:StyleUpdateByExampleimg'] = function () { return false; };
 		this._toolitemHandlers['.uno:StyleNewByExampleimg'] = function () { return false; };
 		this._toolitemHandlers['.uno:LineEndStyle'] = function () { return false; };
+		this._toolitemHandlers['.uno:SetOutline'] = function () { return false; };
 
 		this._toolitemHandlers['.uno:FontworkShapeType'] = this._fontworkShapeControl;
 		this._toolitemHandlers['SelectWidth'] = this._lineWidthControl;
@@ -65,13 +65,11 @@ L.Control.MobileWizardBuilder = L.Control.JSDialogBuilder.extend({
 		var div = L.DomUtil.create('div', 'spinfieldcontainer', parentContainer);
 		div.id = data.id;
 		controls['container'] = div;
-
-		var commandName = data.id ? data.id.substring('.uno:'.length) : data.id;
+		var commandName = data.id  && data.id.startsWith('.uno:') ? data.id.substring('.uno:'.length) : data.id;
 		if (commandName && commandName.length && L.LOUtil.existsIconForCommand(commandName, builder.map.getDocType())) {
 			var image = L.DomUtil.create('img', 'spinfieldimage', div);
 			var icon = (data.id === 'Transparency') ? builder._createIconURL('settransparency') : builder._createIconURL(data.id);
 			L.LOUtil.setImage(image, icon, builder.map);
-			image.src = icon;
 			icon.alt = '';
 		}
 
@@ -296,9 +294,12 @@ L.Control.MobileWizardBuilder = L.Control.JSDialogBuilder.extend({
 	},
 
 	_editControl: function(parentContainer, data, builder, callback) {
-		var edit = L.DomUtil.create('input', 'ui-edit ' + builder.options.cssClass, parentContainer);
+		var container = L.DomUtil.create('div', 'ui-edit-container ' + builder.options.cssClass, parentContainer);
+		container.id = data.id;
+
+		var edit = L.DomUtil.create('input', 'ui-edit ' + builder.options.cssClass, container);
 		edit.value = builder._cleanText(data.text);
-		edit.id = data.id;
+		edit.id = data.id + '-input';
 		edit.dir = 'auto';
 		if (data.password)
 			edit.type = 'password';
@@ -312,7 +313,7 @@ L.Control.MobileWizardBuilder = L.Control.JSDialogBuilder.extend({
 			if (callback)
 				callback(this.value);
 			else
-				builder.callback('edit', 'change', edit, this.value, builder);
+				builder.callback('edit', 'change', container, this.value, builder);
 		});
 
 		edit.addEventListener('click', function(e) {
@@ -633,21 +634,6 @@ L.Control.MobileWizardBuilder = L.Control.JSDialogBuilder.extend({
 			if (control)
 				L.DomUtil.addClass(control, 'hidden');
 		}
-
-		return false;
-	},
-
-	_toolboxHandler: function(parentContainer, data, builder) {
-		var toolbox = L.DomUtil.create('div', builder.options.cssClass + ' toolbox level-' + builder._currentDepth, parentContainer);
-		toolbox.id = data.id;
-
-		if (data.enabled === false || data.enabled === 'false') {
-			for (var index in data.children) {
-				data.children[index].enabled = false;
-			}
-		}
-
-		builder.build(toolbox, data.children, false, false);
 
 		return false;
 	},

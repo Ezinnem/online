@@ -16,7 +16,6 @@
 #include <sys/poll.h>
 #include <unistd.h>
 
-#include <Poco/Net/HTTPCookie.h>
 #include <Poco/Net/HTTPRequest.h>
 #include <Poco/Net/HTTPResponse.h>
 
@@ -30,7 +29,6 @@
 #include <Unit.hpp>
 #include <Util.hpp>
 #include <common/JsonUtil.hpp>
-
 
 #include <net/Socket.hpp>
 #if ENABLE_SSL
@@ -47,7 +45,6 @@ using Poco::Util::Application;
 
 const int Admin::MinStatsIntervalMs = 50;
 const int Admin::DefStatsIntervalMs = 1000;
-const std::string levelList[] = {"none", "fatal", "critical", "error", "warning", "notice", "information", "debug", "trace"};
 
 /// Process incoming websocket messages
 void AdminSocketHandler::handleMessage(const std::vector<char> &payload)
@@ -228,7 +225,7 @@ void AdminSocketHandler::handleMessage(const std::vector<char> &payload)
     else if (tokens.equals(0, "shutdown"))
     {
         LOG_INF("Setting ShutdownRequestFlag: Shutdown requested by admin.");
-        if (Admin::instance().logAdminAction() && Log::logger().getChannel())
+        if (Admin::instance().logAdminAction())
         {
             LOG_ANY("Shutdown requested by admin with source IPAddress [" << _clientIPAdress
                                                                           << ']');
@@ -367,6 +364,8 @@ void AdminSocketHandler::handleMessage(const std::vector<char> &payload)
             oss << "\"routeToken\"" << ':' << '"' << routeToken << '"' << ',';
             oss << "\"serverId\"" << ':' << '"' << serverId << '"' << '}';
             COOLWSD::alertUserInternal(dockey, oss.str());
+            if (SigUtil::getShutdownRequestFlag())
+                COOLWSD::setMigrationMsgReceived(dockey);
         }
         else
         {
@@ -410,6 +409,10 @@ void AdminSocketHandler::handleMessage(const std::vector<char> &payload)
             LOG_DBG("Invalid auth token");
             sendTextFrame("InvalidAuthToken " + id);
         }
+    }
+    else if(tokens.equals(0, "closemonitor"))
+    {
+       _admin->setCloseMonitorFlag();
     }
 }
 
@@ -491,8 +494,7 @@ bool AdminSocketHandler::handleInitialRequest(
         return true;
     }
 
-    HTTPResponse response;
-    response.setStatusAndReason(HTTPResponse::HTTP_BAD_REQUEST);
+    http::Response response(http::StatusCode::BadRequest);
     response.setContentLength(0);
     LOG_INF_S("Admin::handleInitialRequest bad request");
     socket->send(response);
@@ -615,7 +617,10 @@ void Admin::pollingThread()
             std::chrono::duration_cast<std::chrono::milliseconds>(now - lastMem).count();
         if (memWait <= MinStatsIntervalMs / 2) // Close enough
         {
+            // disable watchdog to avoid Document::updateMemoryDirty noise
+            disableWatchdog();
             _model.UpdateMemoryDirty();
+            enableWatchdog();
 
             const size_t totalMem = getTotalMemoryUsage();
             _model.addMemStats(totalMem);
@@ -646,7 +651,7 @@ void Admin::pollingThread()
 
             if (_lastRecvCount != recvCount || _lastSentCount != sentCount)
             {
-                LOG_TRC("Total Data sent: " << sentCount << ", recv: " << recvCount);
+                LOGA_TRC(Admin, "Total Data sent: " << sentCount << ", recv: " << recvCount);
                 _lastRecvCount = recvCount;
                 _lastSentCount = sentCount;
             }
@@ -685,38 +690,88 @@ void Admin::pollingThread()
         // Handle websockets & other work.
         const auto timeout = std::chrono::milliseconds(capAndRoundInterval(
             std::min(std::min(std::min(cpuWait, memWait), netWait), cleanupWait)));
-        LOG_TRC("Admin poll for " << timeout);
+        LOGA_TRC(Admin, "Admin poll for " << timeout);
         poll(timeout); // continue with ms for admin, settings etc.
     }
+
+    if (!COOLWSD::IndirectionServerEnabled)
+        return;
+
+    // if don't have monitor connection to the controller we set the _migrateMsgReceived
+    // for each docbroker so that docbroker can cleanup the documents
+    bool controllerMonitorConnection = false;
+    for (const auto& pair : _monitorSockets)
+    {
+        if (pair.first.find("controller") != std::string::npos)
+        {
+            controllerMonitorConnection = true;
+            break;
+        }
+    }
+
+    if (!controllerMonitorConnection)
+    {
+        LOG_WRN("Monitor connection to the controller doesn't exist, skipping shutdown migration");
+        COOLWSD::setAllMigrationMsgReceived();
+        return;
+    }
+
+    _model.sendShutdownReceivedMsg();
+
+    static const std::chrono::microseconds closeMonitorMsgTimeout = std::chrono::seconds(
+        COOLWSD::getConfigValue<int>("indirection_endpoint.migration_timeout_secs", 180));
+
+    std::chrono::time_point<std::chrono::steady_clock> closeMonitorMsgStartTime =
+        std::chrono::steady_clock::now();
+    while (!_closeMonitor)
+    {
+        LOG_DBG("Waiting for migration to complete before closing the monitor");
+        const auto now = std::chrono::steady_clock::now();
+        const auto elapsedMicroS =
+            std::chrono::duration_cast<std::chrono::microseconds>(now - closeMonitorMsgStartTime);
+        if (elapsedMicroS > closeMonitorMsgTimeout)
+        {
+            LOG_WRN("Timed out waiting for the migration server to respond within the configured "
+                    "timeout of "
+                    << closeMonitorMsgTimeout);
+            break;
+        }
+        poll(closeMonitorMsgTimeout - elapsedMicroS);
+    }
+
+    // if monitor closes early we set the _migrateMsgReceived for each docbroker
+    // so that docbroker can cleanup the documents
+    if (_closeMonitor)
+        COOLWSD::setAllMigrationMsgReceived();
 }
 
-void Admin::modificationAlert(const std::string& dockey, pid_t pid, bool value){
-    addCallback([=] { _model.modificationAlert(dockey, pid, value); });
+void Admin::modificationAlert(const std::string& docKey, pid_t pid, bool value){
+    addCallback([this, docKey, pid, value] { _model.modificationAlert(docKey, pid, value); });
 }
 
-void Admin::uploadedAlert(const std::string& dockey, pid_t pid, bool value)
+void Admin::uploadedAlert(const std::string& docKey, pid_t pid, bool value)
 {
-    addCallback([=] { _model.uploadedAlert(dockey, pid, value); });
+    addCallback([this, docKey, pid, value] { _model.uploadedAlert(docKey, pid, value); });
 }
 
 void Admin::addDoc(const std::string& docKey, pid_t pid, const std::string& filename,
                    const std::string& sessionId, const std::string& userName, const std::string& userId,
                    const int smapsFD, const std::string& wopiSrc, bool readOnly)
 {
-    addCallback([=] {
+    addCallback([this, docKey, pid, filename, sessionId, userName, userId, smapsFD, wopiSrc, readOnly] {
         _model.addDocument(docKey, pid, filename, sessionId, userName, userId, smapsFD, Poco::URI(wopiSrc), readOnly);
     });
 }
 
 void Admin::rmDoc(const std::string& docKey, const std::string& sessionId)
 {
-    addCallback([=] { _model.removeDocument(docKey, sessionId); });
+    addCallback([this, docKey, sessionId] { _model.removeDocument(docKey, sessionId); });
 }
 
 void Admin::rmDoc(const std::string& docKey)
 {
     LOG_INF("Removing complete doc [" << docKey << "] from Admin.");
-    addCallback([=]{ _model.removeDocument(docKey); });
+    addCallback([this, docKey]{ _model.removeDocument(docKey); });
 }
 
 void Admin::rescheduleMemTimer(unsigned interval)
@@ -787,10 +842,9 @@ unsigned Admin::getNetStatsInterval()
 
 std::string Admin::getChannelLogLevels()
 {
-    unsigned int wsdLogLevel = Log::logger().get("wsd").getLevel();
-    std::string result = "wsd=" + levelList[wsdLogLevel];
+    std::string result = "wsd=" + Log::getLogLevelName("wsd");
 
-    result += " kit=" + (_forkitLogLevel.empty() != true ? _forkitLogLevel: levelList[wsdLogLevel]);
+    result += " kit=" + (_forkitLogLevel.empty() != true ? _forkitLogLevel: Log::getLogLevelName("wsd"));
 
     return result;
 }
@@ -799,15 +853,9 @@ void Admin::setChannelLogLevel(const std::string& channelName, std::string level
 {
     ASSERT_CORRECT_THREAD();
 
-    // Get the list of channels..
-    std::vector<std::string> nameList;
-    Log::logger().names(nameList);
-
-    if (std::find(std::begin(levelList), std::end(levelList), level) == std::end(levelList))
-        level = "debug";
-
     if (channelName == "wsd")
-        Log::logger().get("wsd").setLevel(level);
+        Log::setLogLevelByName("wsd", level);
+
     else if (channelName == "kit")
     {
         COOLWSD::setLogLevelsOfKits(level); // For current kits.
@@ -820,11 +868,12 @@ std::string Admin::getLogLines()
 {
     ASSERT_CORRECT_THREAD();
 
-    try {
-        int lineCount = 500;
-        std::string fName = COOLWSD::getPathFromConfig("logging.file.property[0]");
+    try
+    {
+        static const std::string fName = COOLWSD::getPathFromConfig("logging.file.property[0]");
         std::ifstream infile(fName);
 
+        std::size_t lineCount = 500;
         std::string line;
         std::deque<std::string> lines;
 
@@ -832,7 +881,7 @@ std::string Admin::getLogLines()
         {
             std::istringstream iss(line);
             lines.push_back(line);
-            if (lines.size() > (size_t)lineCount)
+            if (lines.size() > lineCount)
             {
                 lines.pop_front();
             }
@@ -840,16 +889,21 @@ std::string Admin::getLogLines()
 
         infile.close();
 
-        if (lines.size() < (size_t)lineCount)
+        if (lines.size() < lineCount)
         {
-            lineCount = (int)lines.size();
+            lineCount = lines.size();
         }
 
-        line = ""; // Use the same variable to include result.
-        // Newest will be on top.
-        for (int i = lineCount - 1; i >= 0; i--)
+        line.clear(); // Use the same variable to include result.
+        if (lineCount > 0)
         {
-            line += "\n" + lines[i];
+            line.reserve(lineCount * 128); // Avoid repeated resizing.
+            // Newest will be on top.
+            for (int i = static_cast<int>(lineCount) - 1; i >= 0; i--)
+            {
+                line += '\n';
+                line += lines[i];
+            }
         }
 
         return line;
@@ -866,43 +920,48 @@ AdminModel& Admin::getModel()
 
 void Admin::updateLastActivityTime(const std::string& docKey)
 {
-    addCallback([=]{ _model.updateLastActivityTime(docKey); });
+    addCallback([this, docKey]{ _model.updateLastActivityTime(docKey); });
 }
 
 
 void Admin::addBytes(const std::string& docKey, uint64_t sent, uint64_t recv)
 {
-    addCallback([=] { _model.addBytes(docKey, sent, recv); });
+    addCallback([this, docKey, sent, recv] { _model.addBytes(docKey, sent, recv); });
 }
 
 void Admin::setViewLoadDuration(const std::string& docKey, const std::string& sessionId, std::chrono::milliseconds viewLoadDuration)
 {
-    addCallback([=]{ _model.setViewLoadDuration(docKey, sessionId, viewLoadDuration); });
+    addCallback([this, docKey, sessionId, viewLoadDuration]{ _model.setViewLoadDuration(docKey, sessionId, viewLoadDuration); });
 }
 
 void Admin::setDocWopiDownloadDuration(const std::string& docKey, std::chrono::milliseconds wopiDownloadDuration)
 {
-    addCallback([=]{ _model.setDocWopiDownloadDuration(docKey, wopiDownloadDuration); });
+    addCallback([this, docKey, wopiDownloadDuration]{ _model.setDocWopiDownloadDuration(docKey, wopiDownloadDuration); });
 }
 
 void Admin::setDocWopiUploadDuration(const std::string& docKey, const std::chrono::milliseconds uploadDuration)
 {
-    addCallback([=]{ _model.setDocWopiUploadDuration(docKey, uploadDuration); });
+    addCallback([this, docKey, uploadDuration]{ _model.setDocWopiUploadDuration(docKey, uploadDuration); });
 }
 
 void Admin::addSegFaultCount(unsigned segFaultCount)
 {
-    addCallback([=]{ _model.addSegFaultCount(segFaultCount); });
+    addCallback([this, segFaultCount]{ _model.addSegFaultCount(segFaultCount); });
 }
 
 void Admin::addLostKitsTerminated(unsigned lostKitsTerminated)
 {
-    addCallback([=]{ _model.addLostKitsTerminated(lostKitsTerminated); });
+    addCallback([this, lostKitsTerminated]{ _model.addLostKitsTerminated(lostKitsTerminated); });
 }
 
 void Admin::routeTokenSanityCheck()
 {
-    addCallback([=] { _model.routeTokenSanityCheck(); });
+    addCallback([this] { _model.routeTokenSanityCheck(); });
+}
+
+void Admin::sendShutdownReceivedMsg()
+{
+    addCallback([this] { _model.sendShutdownReceivedMsg(); });
 }
 
 void Admin::notifyForkit()
@@ -928,12 +987,12 @@ void Admin::triggerMemoryCleanup(const size_t totalMem)
     static const double memLimit = COOLWSD::getConfigValue<double>("memproportion", 0.0);
     if (memLimit == 0.0 || _totalSysMemKb == 0)
     {
-        LOG_TRC("Total memory consumed: " << totalMem <<
+        LOGA_TRC(Admin, "Total memory consumed: " << totalMem <<
                 " KB. Not configured to do memory cleanup. Skipping memory cleanup.");
         return;
     }
 
-    LOG_TRC("Total memory consumed: " << totalMem << " KB. Configured COOL memory proportion: " <<
+    LOGA_TRC(Admin, "Total memory consumed: " << totalMem << " KB. Configured COOL memory proportion: " <<
             memLimit << "% (" << static_cast<size_t>(_totalSysMemKb * memLimit / 100.) << " KB).");
 
     const double memToFreePercentage = (totalMem / static_cast<double>(_totalSysMemKb)) - memLimit / 100.;
@@ -1099,10 +1158,13 @@ void Admin::connectToMonitorSync(const std::string &uri)
     }
 
     LOG_TRC("Add monitor " << uri);
-    if (COOLWSD::getConfigValue<bool>("admin_console.logging.monitor_connect", true))
+    static const bool logMonitorConnect =
+        COOLWSD::getConfigValue<bool>("admin_console.logging.monitor_connect", true);
+    if (logMonitorConnect)
     {
         LOG_ANY("Connected to remote monitor with uri [" << uriWithoutParam << ']');
     }
+
     auto handler = std::make_shared<MonitorSocketHandler>(this, uri);
     _monitorSockets.insert({uriWithoutParam, handler});
     insertNewWebSocketSync(Poco::URI(uri), handler);
@@ -1133,16 +1195,22 @@ void Admin::getMetrics(std::ostringstream &metrics)
     _model.getMetrics(metrics);
 }
 
-void Admin::sendMetrics(const std::shared_ptr<StreamSocket>& socket, const std::shared_ptr<Poco::Net::HTTPResponse>& response)
+void Admin::sendMetrics(const std::shared_ptr<StreamSocket>& socket,
+                        const std::shared_ptr<http::Response>& response)
 {
     std::ostringstream oss;
-    response->add("Connection", "close");
-    response->write(oss);
     getMetrics(oss);
-    socket->send(oss.str());
+
+    response->add("Connection", "close");
+    response->setBody(oss.str(), "text/plain");
+
+    socket->send(*response);
     socket->shutdown();
-    bool skipAuthentication = COOLWSD::getConfigValue<bool>("security.enable_metrics_unauthenticated", false);
-    bool showLog = COOLWSD::getConfigValue<bool>("admin_console.logging.metrics_fetch", true);
+
+    static bool skipAuthentication =
+        COOLWSD::getConfigValue<bool>("security.enable_metrics_unauthenticated", false);
+    static bool showLog =
+        COOLWSD::getConfigValue<bool>("admin_console.logging.metrics_fetch", true);
     if (!skipAuthentication && showLog)
     {
         LOG_ANY("Metrics endpoint has been accessed by source IPAddress [" << socket->clientAddress() << ']');
@@ -1184,7 +1252,7 @@ void Admin::startMonitors()
     for (const auto& monitor : getMonitorList())
     {
         addCallback(
-            [=]
+            [this, monitor]
             {
                 scheduleMonitorConnect(monitor.first + "?ServerId=" + Util::getProcessIdentifier(),
                                        std::chrono::steady_clock::now());

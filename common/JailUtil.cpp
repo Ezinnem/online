@@ -14,7 +14,10 @@
 #include "FileUtil.hpp"
 #include "JailUtil.hpp"
 
+#include <sys/mount.h>
+#include <sys/stat.h>
 #include <sys/types.h>
+#include <sysexits.h>
 #include <fcntl.h>
 #include <unistd.h>
 #ifdef __linux__
@@ -24,17 +27,112 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
 #include <string>
 
 #include "Log.hpp"
 #include <SigUtil.hpp>
 
+extern int domount(bool namespace_mount, int argc, const char* const* argv);
+
 namespace JailUtil
 {
+
+static const std::string CoolTestMountpoint = "cool_test_mount";
+
+static void setdeny()
+{
+    std::ofstream of("/proc/self/setgroups");
+    of << "deny";
+}
+
+static void mapuser(uid_t origuid, uid_t newuid, gid_t origgid, gid_t newgid)
+{
+    {
+        std::ofstream of("/proc/self/uid_map");
+        of << newuid << " " << origuid << " 1";
+    }
+
+    {
+        std::ofstream of("/proc/self/gid_map");
+        of << newgid << " " << origgid << " 1";
+    }
+}
+
+bool enterMountingNS(uid_t uid, gid_t gid)
+{
+#ifdef __linux__
+    // Put this process into its own user and mount namespace.
+    if (unshare(CLONE_NEWNS | CLONE_NEWUSER) != 0)
+    {
+        // having multiple threads is a source of failure f.e.
+        fprintf(stderr, "enterMountingNS, unshare failed %s\n", strerror(errno));
+        return false;
+    }
+
+    // Do not propagate any mounts from this new namespace to the system.
+    if (mount("none", "/", nullptr, MS_REC | MS_PRIVATE, nullptr) != 0)
+    {
+        fprintf(stderr, "enterMountingNS, root mount failed %s\n", strerror(errno));
+        return false;
+    }
+
+    setdeny();
+
+    // Map this user as the root user of the new namespace
+    mapuser(uid, 0, gid, 0);
+
+    return true;
+#else
+    (void)uid;
+    (void)gid;
+    return false;
+#endif
+}
+
+bool enterUserNS(uid_t uid, gid_t gid)
+{
+#ifdef __linux__
+    if (unshare(CLONE_NEWUSER) != 0)
+    {
+        // having multiple threads is a source of failure f.e.
+        fprintf(stderr, "enterUserNS, unshare failed %s\n", strerror(errno));
+        return false;
+    }
+
+    // undo map of this user to root
+    mapuser(0, uid, 0, gid);
+
+    assert(geteuid() == uid);
+    assert(getegid() == gid);
+
+    return true;
+#else
+    (void)uid;
+    (void)gid;
+    return false;
+#endif
+}
+
 bool coolmount(const std::string& arg, std::string source, std::string target)
 {
     source = Util::trim(source, '/');
     target = Util::trim(target, '/');
+
+    if (isMountNamespacesEnabled())
+    {
+        const char *argv[4];
+        argv[0] = "notcoolmount";
+        int argc = 1;
+        if (!arg.empty())
+            argv[argc++] = arg.c_str();
+        if (!source.empty())
+            argv[argc++] = source.c_str();
+        if (!target.empty())
+            argv[argc++] = target.c_str();
+        return domount(true, argc, argv) == EX_OK;
+    }
+
     const std::string cmd = Poco::Path(Util::getApplicationPath(), "coolmount").toString() + ' '
                             + arg + ' ' + source + ' ' + target;
     LOG_TRC("Executing coolmount command: " << cmd);
@@ -84,7 +182,7 @@ bool remountReadonly(const std::string& source, const std::string& target)
 }
 
 /// Unmount a bind-mounted jail directory.
-static bool unmount(const std::string& target)
+static bool unmount(const std::string& target, bool silent = false)
 {
     LOG_DBG("Unmounting [" << target << ']');
     const bool res = coolmount("-u", "", target);
@@ -96,8 +194,8 @@ static bool unmount(const std::string& target)
         // Otherwise, it's a cleanup attempt of earlier mounts,
         // which may be left-over and now the config has changed.
         // This happens more often in dev labs than in prod.
-        if (JailUtil::isBindMountingEnabled())
-            LOG_ERR("Failed to unmount [" << target << ']');
+        if (JailUtil::isBindMountingEnabled() && !silent)
+            LOG_WRN("Failed to unmount [" << target << ']');
         else
             LOG_DBG("Failed to unmount [" << target << ']');
     }
@@ -135,7 +233,7 @@ bool isJailCopied(const std::string& root)
 static bool safeRemoveDir(const std::string& path)
 {
     // Always unmount, just in case.
-    unmount(path);
+    unmount(path, /*silent=*/true);
 
     // Regardless of the bind flag, check if the jail is marked as copied.
     const bool copied = isJailCopied(path);
@@ -148,9 +246,16 @@ static bool safeRemoveDir(const std::string& path)
     }
 
     // Recursively remove if link/copied.
-    const bool recursive = copied;
-    //FIXME: do not delete the 'copied' marker until the very end.
-    FileUtil::removeFile(path, recursive);
+    if (copied)
+    {
+        //FIXME: do not delete the 'copied' marker until the very end.
+        FileUtil::removeFile(path, /*recursive=*/true);
+    }
+    else
+    {
+        FileUtil::removeEmptyDirTree(path);
+    }
+
     return true;
 }
 
@@ -180,7 +285,7 @@ bool tryRemoveJail(const std::string& root)
     unmount(Poco::Path(root, "lo").toString());
 
     // Unmount the test-mount directory too.
-    const std::string testMountPath = Poco::Path(root, "cool_test_mount").toString();
+    const std::string testMountPath = Poco::Path(root, CoolTestMountpoint).toString();
     if (FileUtil::Stat(testMountPath).exists())
         unmount(testMountPath);
 
@@ -243,7 +348,11 @@ void cleanupJails(const std::string& root)
                     // legacy jails at the top-level
                     for (const auto& newJail : newJails)
                     {
-                        tryRemoveJail(Poco::Path(childDir, newJail).toString());
+                        const std::string path = Poco::Path(childDir, newJail).toString();
+                        if (newJail == CoolTestMountpoint)
+                            safeRemoveDir(path);
+                        else
+                            tryRemoveJail(path);
                     }
 
                     // top level linkable and tmp mount point.
@@ -295,7 +404,7 @@ void setupChildRoot(bool bindMount, const std::string& childRoot, const std::str
     {
         // Test mounting to verify it actually works,
         // as it might not function in some systems.
-        const std::string target = Poco::Path(childRoot, "cool_test_mount").toString();
+        const std::string target = Poco::Path(childRoot, CoolTestMountpoint).toString();
 
         // Make sure that we can both mount and unmount before enabling bind-mounting.
         if (bind(sysTemplate, target) && unmount(target))
@@ -312,107 +421,6 @@ void setupChildRoot(bool bindMount, const std::string& childRoot, const std::str
     else
         LOG_INF("Disabling Bind-Mounting of jail contents per "
                 "mount_jail_tree config in coolwsd.xml.");
-}
-
-/// Create a random device, either via mknod or by bind-mounting.
-bool createRandomDeviceInJail(const std::string& root, const std::string& devicePath, dev_t dev)
-{
-    const std::string absPath = root + devicePath;
-
-    if (FileUtil::Stat(absPath).exists())
-    {
-        LOG_DBG("Random device [" << devicePath << "] already exits");
-        return true;
-    }
-
-    LOG_DBG("Making [" << devicePath << "] node in [" << root << "/dev]");
-
-    if (mknod((absPath).c_str(),
-              S_IFCHR | S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH, dev) == 0)
-    {
-        LOG_DBG("Created random device [" << absPath << ']');
-        return true;
-    }
-
-    const auto mknodErrno = errno;
-
-    if (isBindMountingEnabled())
-    {
-        static bool warned = false;
-        if (!warned)
-        {
-            warned = true;
-            LOG_WRN("Performance issue: nodev mount permission or mknod fails. Have to bind mount "
-                    "random devices");
-        }
-
-        Poco::File(absPath).createFile();
-        if (coolmount("-b", devicePath, absPath))
-        {
-            LOG_DBG("Bind mounted [" << devicePath << "] -> [" << absPath << ']');
-            return true;
-        }
-
-        LOG_INF("Failed to bind mount [" << devicePath << "] -> [" << absPath << ']');
-    }
-    else
-    {
-        LOG_INF("Failed to create random device via mknod("
-                << absPath << "). Mount must not use nodev flag, or bind-mount must be enabled: "
-                << strerror(mknodErrno));
-    }
-
-    static bool warned = false;
-    if (!warned)
-    {
-        warned = true;
-        LOG_ERR("Failed to create random device ["
-                << devicePath << "] at [" << absPath
-                << "]. Please either allow creating devices or enable bind-mounting. Some "
-                   "features, such us password-protection and document-signing, might not work");
-    }
-
-    return false;
-}
-
-// This is the second stage of setting up /dev/[u]random
-// in the jails. Here we create the random devices in
-// /tmp/dev/ in the jail chroot. See setupRandomDeviceLinks().
-void setupJailDevNodes(const std::string& root)
-{
-    if (!FileUtil::isWritable(root))
-    {
-        LOG_WRN("Path [" << root << "] is read-only. Will not create the random device nodes.");
-        return;
-    }
-
-    const auto pathDev = Poco::Path(root, "/dev");
-
-    try
-    {
-        // Create the path first.
-        Poco::File(pathDev).createDirectory();
-    }
-    catch (const std::exception& ex)
-    {
-        LOG_ERR("Failed to create [" << pathDev.toString() << "]: " << ex.what());
-        return;
-    }
-
-#ifndef __FreeBSD__
-    // Create the random and urandom devices.
-    createRandomDeviceInJail(root, "/dev/random", makedev(1, 8));
-    createRandomDeviceInJail(root, "/dev/urandom", makedev(1, 9));
-#else
-    if (!FileUtil::Stat(root + "/dev/random").exists())
-    {
-         const bool res = coolmount("-d", "", root + "/dev");
-         if (res)
-            LOG_TRC("Mounted devfs hierarchy -> [" << root << "/dev].");
-        else
-            LOG_ERR("Failed to mount devfs -> [" << root << "/dev].");
-    }
-#endif
 }
 
 /// The envar name used to control bind-mounting of systemplate/jails.
@@ -435,6 +443,21 @@ bool isBindMountingEnabled()
     // Check if we have a valid envar set.
     return std::getenv(BIND_MOUNTING_ENVAR_NAME) != nullptr;
 }
+
+constexpr const char* NAMESPACE_MOUNTING_ENVAR_NAME = "COOL_NAMESPACE_MOUNT";
+
+void enableMountNamespaces()
+{
+    // Set the envar to enable.
+    setenv(NAMESPACE_MOUNTING_ENVAR_NAME, "1", 1);
+}
+
+bool isMountNamespacesEnabled()
+{
+    // Check if we have a valid envar set.
+    return std::getenv(NAMESPACE_MOUNTING_ENVAR_NAME) != nullptr;
+}
+
 
 namespace SysTemplate
 {

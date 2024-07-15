@@ -30,15 +30,6 @@ L.Control.Tabs = L.Control.extend({
 		setTimeout(function() {
 			$('.spreadsheet-tab').contextMenu(e.perm === 'edit');
 		}, 100);
-
-		if (window.mode.isMobile()) {
-			if (e.perm === 'edit') {
-				document.getElementById('spreadsheet-toolbar').style.display = 'block';
-			}
-			else {
-				document.getElementById('spreadsheet-toolbar').style.display = 'none';
-			}
-		}
 	},
 
 	_initialize: function () {
@@ -47,8 +38,7 @@ L.Control.Tabs = L.Control.extend({
 		this._spreadsheetTabs = {};
 		this._tabForContextMenu = 0;
 		var map = this._map;
-		var tableCell = document.getElementById('tb_spreadsheet-toolbar_right');
-		tableCell.style.verticalAlign = 'middle';
+		var tableCell = document.getElementById('spreadsheet-toolbar');
 		this._tabsCont = L.DomUtil.create('div', 'spreadsheet-tabs-container', tableCell);
 		var that = this;
 		function areTabsMultiple() {
@@ -69,10 +59,19 @@ L.Control.Tabs = L.Control.extend({
 			'.uno:Remove': {
 				name: _UNO('.uno:Remove', 'spreadsheet', true),
 				callback: (this._deleteSheet).bind(this),
-				visible: areTabsMultiple
+				visible: function() {
+					return areTabsMultiple() && !this._isProtectedSheet(this._tabForContextMenu);
+				}.bind(this)
 			},
 			'.uno:Name': {name: _UNO('.uno:RenameTable', 'spreadsheet', true),
-				callback: (this._renameSheet).bind(this)
+				      callback: (this._renameSheet).bind(this),
+				      visible: function() {
+					      return !this._isProtectedSheet(this._tabForContextMenu);
+				      }.bind(this)
+			},
+			'.uno:Protect': {
+				name: _UNO('.uno:Protect', 'spreadsheet', true),
+				callback: (this._protectSheet).bind(this),
 			},
 			'.uno:Show': {
 				name: _UNO('.uno:Show', 'spreadsheet', true),
@@ -199,6 +198,8 @@ L.Control.Tabs = L.Control.extend({
 					dropZoneIndicator.id = 'drop-zone-' + i;
 					var id = 'spreadsheet-tab' + i;
 					var tab = L.DomUtil.create('button', 'spreadsheet-tab', ssTabScroll);
+					L.DomUtil.create('div', 'lock', tab);
+					var label = L.DomUtil.create('div', '', tab);
 					if (window.mode.isMobile() || window.mode.isTablet()) {
 						(new Hammer(tab, {recognizers: [[Hammer.Press]]}))
 							.on('press', function (j) {
@@ -216,6 +217,10 @@ L.Control.Tabs = L.Control.extend({
 							}(i).bind(this));
 					}
 
+					if (!scrollDiv && i === selectedPart) {
+						horizScrollPos = tab.offsetLeft;
+					}
+
 					if (!window.mode.isMobile()) {
 						L.DomEvent.on(tab, 'dblclick', function(j) {
 							return function() {
@@ -231,7 +236,13 @@ L.Control.Tabs = L.Control.extend({
 						}(i).bind(this));
 					}
 
-					tab.textContent = e.partNames[i];
+					if (e.protectedParts[i]) {
+						L.DomUtil.addClass(tab, 'spreadsheet-tab-protected');
+					}
+					else {
+						L.DomUtil.removeClass(tab, 'spreadsheet-tab-protected');
+					}
+					label.textContent = e.partNames[i];
 					tab.id = id;
 
 					L.DomEvent
@@ -259,6 +270,9 @@ L.Control.Tabs = L.Control.extend({
 				var part =  parseInt(key.match(/\d+/g)[0]);
 				L.DomUtil.removeClass(this._spreadsheetTabs[key], 'spreadsheet-tab-selected');
 				if (part === selectedPart) {
+					// close auto filter popups on sheet tab selected
+					this._map.fire('closeAutoFilterDialog');
+					this._map.fire('closepopups');
 					L.DomUtil.addClass(this._spreadsheetTabs[key], 'spreadsheet-tab-selected');
 				}
 			}
@@ -289,21 +303,37 @@ L.Control.Tabs = L.Control.extend({
 		}
 	},
 
-	_setPart: function (e) {
+	// Set the part by index. Return true if cancelled.
+	_setPartIndex: function(index) {
 		if (cool.Comment.isAnyEdit()) {
 			cool.CommentSection.showCommentEditingWarning();
+			return true;
+		}
+
+		this._map._docLayer._clearReferences();
+		this._map.setPart(index, /*external:*/ false, /*calledFromSetPartHandler:*/ true);
+	},
+
+	_setPart: function (e) {
+		var part = e.currentTarget.id.match(/\d+/g)[0];
+		if (part == null) {
 			return;
 		}
 
-		var part =  e.target.id.match(/\d+/g)[0];
-		if (part !== null) {
-			this._map._docLayer._clearReferences();
-			this._map.setPart(parseInt(part), /*external:*/ false, /*calledFromSetPartHandler:*/ true);
+		part = parseInt(part);
+
+		if (part !== this._map._docLayer._selectedPart) {
+			this._setPartIndex(part);
 		}
 	},
 
 	//selected sheet is moved to new index
 	_moveSheet: function (newIndex) {
+		var currentTab = this._map.getCurrentPartNumber();
+		// odd but true: the base index changes according to the tab is dragged
+		// on the left or on the right wrt the current tab position
+		var newIndexZeroBased = newIndex > currentTab ? newIndex - 2 : newIndex - 1;
+		this._map._docLayer._sheetSwitch.updateOnSheetMoved(currentTab, newIndexZeroBased);
 		this._map.sendUnoCommand('.uno:Move?Copy:bool=false&UseCurrentDocument:bool=true&Index=' + newIndex);
 	},
 
@@ -323,6 +353,8 @@ L.Control.Tabs = L.Control.extend({
 		var contextMenuTab = this._tabForContextMenu;
 		if (contextMenuTab <= 0) return;
 
+		this._map._docLayer._sheetSwitch.updateOnSheetMoved(contextMenuTab, contextMenuTab - 1);
+
 		// core handles the decreasing of contextMenuTab by 1
 		// so, no need to do it here (for the second parameter)
 		this._moveSheetLR(contextMenuTab, contextMenuTab);
@@ -330,6 +362,8 @@ L.Control.Tabs = L.Control.extend({
 
 	_moveSheetRight: function () {
 		var contextMenuTab = this._tabForContextMenu;
+
+		this._map._docLayer._sheetSwitch.updateOnSheetMoved(contextMenuTab, contextMenuTab + 1);
 
 		/*
 		Why there is '+3' ?
@@ -351,7 +385,7 @@ L.Control.Tabs = L.Control.extend({
 
 	_deleteSheet: function() {
 		var nPos = this._tabForContextMenu;
-		var message = _('Are you sure you want to delete sheet, %sheet%?').replace('%sheet%', $('#spreadsheet-tab' + this._tabForContextMenu).text());
+		var message = _('Are you sure you want to delete sheet, {sheet}?').replace('{sheet}', $('#spreadsheet-tab' + this._tabForContextMenu).text());
 
 		this._map.uiManager.showInfoModal('delete-sheet-modal', '', message, '', _('OK'), function() {
 			this._map.deletePage(nPos);
@@ -366,6 +400,19 @@ L.Control.Tabs = L.Control.extend({
 			function (value) {
 				map.renamePage(value, nPos);
 			});
+	},
+
+	// Trigger sheet protection. It seems that it does it for the current sheet
+	// so we select it first.
+	_protectSheet: function() {
+		if (!this._setPartIndex(this._tabForContextMenu)) {
+			this._map.sendUnoCommand('.uno:Protect');
+		}
+	},
+
+	_isProtectedSheet: function(idx) {
+		var tab = L.DomUtil.get('spreadsheet-tab' + idx);
+		return tab && L.DomUtil.hasClass(tab, 'spreadsheet-tab-protected');
 	},
 
 	_showSheet: function() {
@@ -394,13 +441,14 @@ L.Control.Tabs = L.Control.extend({
 		// support duplication with ctrl in the future.
 		e.dataTransfer.dropEffect = 'move';
 
-		e.target.previousElementSibling.classList.add('tab-drop-area-active');
+		e.currentTarget.previousElementSibling.classList.add('tab-drop-area-active');
 
 		return false;
 	},
 
 	_handleDragLeave: function (e) {
-		e.target.previousElementSibling.classList.remove('tab-drop-area-active');
+		if ($(e.target).hasClass('spreadsheet-tab') || (e.target.getAttribute('id') == 'drop-zone-end-container'))
+			e.currentTarget.previousElementSibling.classList.remove('tab-drop-area-active');
 	},
 
 	_handleDrop: function(e) {
@@ -408,13 +456,13 @@ L.Control.Tabs = L.Control.extend({
 			e.stopPropagation();
 		}
 
-		e.target.previousElementSibling.classList.remove('tab-drop-area-active');
+		e.currentTarget.previousElementSibling.classList.remove('tab-drop-area-active');
 		var targetIndex = this._map._docLayer._partNames.indexOf(e.target.innerText);
 		this._moveSheet(targetIndex + 1); // drop to left side of the tab
 	},
 
 	_handleDragEnd: function (e) {
-		e.target.previousElementSibling.classList.remove('tab-drop-area-active');
+		e.currentTarget.previousElementSibling.classList.remove('tab-drop-area-active');
 	}
 });
 

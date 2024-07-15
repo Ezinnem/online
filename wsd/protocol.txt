@@ -242,9 +242,10 @@ dialog <command>
 
     <command> is unique identifier for the dialog that needs to be painted.
 
-uno <command>
+uno <command> [arguments]
 
     <command> is a line of text.
+    [argments] - JSON encoded arguments for the UNO command
 
 save dontTerminateEdit=<value> dontSaveIfUnmodified=<value>
 
@@ -499,9 +500,14 @@ statechanged: <key>=<value>
     Eg: 'statechanged: .uno:Undo=enabled'
 
 textselectioncontent:
+<JSON>
 
     Current selection's content, only for text-only selections of a reasonably limited size.
     For complex selection and large texts, selectioncontent message is returned.
+    The keys of the JSON are MIME types (text/html, text/plain;charset=utf-8),
+    the values are the content of the selection in that format.
+    For debug/test purposes, in case a single MIME type is requested, that's
+    returned as-is, not inside a JSON.
 
 complexselection:
 

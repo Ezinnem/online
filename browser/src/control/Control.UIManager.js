@@ -14,7 +14,7 @@
  *			 and allows to controll them (show/hide)
  */
 
-/* global app cool $ setupToolbar w2ui toolbarUpMobileItems _ Hammer JSDialog */
+/* global app $ setupToolbar _ Hammer JSDialog */
 L.Control.UIManager = L.Control.extend({
 	mobileWizard: null,
 	documentNameInput: null,
@@ -54,8 +54,7 @@ L.Control.UIManager = L.Control.extend({
 		map.on('unblockUI', this.unblockUI, this);
 
 		$('#toolbar-wrapper').on('click', function (event) {
-			if (event.target.parentElement.id === 'toolbar-up' || // checks if clicked on empty part of the toolbar on tabbed view
-				event.target.id === 'tb_editbar_item_item_64') // checks if clicked on empty part of the toolbar on compact view
+			if (event.target.parentElement.id === 'toolbar-up') // checks if clicked on empty part of the toolbar on tabbed view
 				that.map.fire('editorgotfocus');
 		});
 
@@ -66,8 +65,7 @@ L.Control.UIManager = L.Control.extend({
 				that.map.fire('editorgotfocus');}
 		});
 
-		if (window.zoteroEnabled)
-			this.map.on('updateviewslist', this.onUpdateViews, this);
+		this.map.on('updateviewslist', this.onUpdateViews, this);
 	},
 
 	// UI initialization
@@ -77,9 +75,10 @@ L.Control.UIManager = L.Control.extend({
 	},
 
 	shouldUseNotebookbarMode: function() {
-		var forceCompact = this.getSavedStateOrDefault('compactMode', null);
-		return (window.userInterfaceMode === 'notebookbar' && forceCompact === null)
-			|| forceCompact === false;
+		let forceCompact = window.prefs.getBoolean('compactMode', null);
+		// all other cases should default to notebookbar
+		let shouldUseClassic = (window.userInterfaceMode === 'classic' && forceCompact == null) || forceCompact === true;
+		return !shouldUseClassic;
 	},
 
 	// Dark mode toggle
@@ -96,30 +95,42 @@ L.Control.UIManager = L.Control.extend({
 		this.map.fire('darkmodechanged');
 	},
 
-	getDarkModeState: function() {
-		return this.getSavedStateOrDefault('darkTheme', window.uiDefaults['darkTheme'] ?  window.uiDefaults['darkTheme'] : false);
-	},
-
-	setCanvasColorAfterModeChange: function() {
+	setCanvasColorAfterModeChange: function(nColor) {
 		if (app.sectionContainer) {
 			app.sectionContainer.setBackgroundColorMode(false);
-			app.sectionContainer.setClearColor(window.getComputedStyle(document.documentElement).getPropertyValue('--color-canvas'));
+			if (nColor == undefined ) {
+				const colorCanvasPropety = window.prefs.getBoolean('darkTheme') ? '--color-canvas-dark' : '--color-canvas-light';
+				nColor = window.getComputedStyle(document.documentElement).getPropertyValue(colorCanvasPropety);
+			}
+			app.sectionContainer.setClearColor(nColor);
 			//change back to it's default value after setting canvas color
 			app.sectionContainer.setBackgroundColorMode(true);
 		}
 	},
 
+	invertBackground: function() {
+		app.socket.sendMessage('uno .uno:InvertBackground');
+		if (this.map.getDocType() == 'spreadsheet') {
+			var lightCanvasColor = window.getComputedStyle(document.documentElement).getPropertyValue('--color-canvas-light');
+			var darkCanvasColor = window.getComputedStyle(document.documentElement).getPropertyValue('--color-canvas-dark');
+			var nColor = app.sectionContainer.getClearColor(); // Current color of the canvas
+			// invert canvas color
+			nColor == lightCanvasColor ? nColor = darkCanvasColor : nColor = lightCanvasColor
+			this.setCanvasColorAfterModeChange(nColor);
+		}
+	},
+
 	toggleDarkMode: function() {
 		// get the initial mode
-		var selectedMode = this.getDarkModeState();
+		var inDarkTheme = window.prefs.getBoolean('darkTheme');
 		// swap them by invoking the appropriate load function and saving the state
-		if (selectedMode) {
-			this.setSavedState('darkTheme',false);
+		if (inDarkTheme) {
+			window.prefs.set('darkTheme', false);
 			this.loadLightMode();
 			this.activateDarkModeInCore(false);
 		}
 		else {
-			this.setSavedState('darkTheme',true);
+			window.prefs.set('darkTheme', true);
 			this.loadDarkMode();
 			this.activateDarkModeInCore(true);
 		}
@@ -130,20 +141,13 @@ L.Control.UIManager = L.Control.extend({
 	},
 
 	initDarkModeFromSettings: function() {
-		var selectedMode = this.getDarkModeState();
+		var inDarkTheme = window.prefs.getBoolean('darkTheme');
 
-		if (window.ThisIsTheAndroidApp) {
-			selectedMode = window.uiDefaults['darkTheme'] ?  window.uiDefaults['darkTheme'] : false;
-			this.setSavedState('darkTheme', selectedMode);
-		}
-
-		if (selectedMode) {
+		if (inDarkTheme) {
 			this.loadDarkMode();
-		}
-		else {
+		} else {
 			this.loadLightMode();
 		}
-		this.activateDarkModeInCore(selectedMode);
 	},
 
 	activateDarkModeInCore: function(activate) {
@@ -173,23 +177,18 @@ L.Control.UIManager = L.Control.extend({
 		// Wait for Coolwsd to initiate the switch.
 	},
 
-	getAccessibilityState: function() {
-		return window.isLocalStorageAllowed && window.localStorage.getItem('accessibilityState') === 'true';
-	},
-
 	toggleAccessibilityState: function() {
-		var savedA11yState = this.getAccessibilityState();
-		if (window.isLocalStorageAllowed)
-			window.localStorage.setItem('accessibilityState', !savedA11yState ? 'true' : 'false');
+		var prevAccessibilityState = window.prefs.getBoolean('accessibilityState');
+		window.prefs.set('accessibilityState', !prevAccessibilityState);
 		this.map.fire('a11ystatechanged');
-		this.map.setAccessibilityState(!savedA11yState);
+		this.map.setAccessibilityState(!prevAccessibilityState);
 	},
 
 	initializeBasicUI: function() {
 		var enableNotebookbar = this.shouldUseNotebookbarMode();
 		var that = this;
 
-		this.map._accessibilityState = this.getAccessibilityState();
+		this.map._accessibilityState = window.prefs.getBoolean('accessibilityState');
 
 		if (window.mode.isMobile() || !enableNotebookbar) {
 			var menubar = L.control.menubar();
@@ -204,23 +203,21 @@ L.Control.UIManager = L.Control.extend({
 		}
 
 		if (!window.mode.isMobile()) {
-			if (!enableNotebookbar) {
-				this.map.topToolbar = L.control.topToolbar();
-				this.map.addControl(this.map.topToolbar);
-			}
+			if (!enableNotebookbar)
+				this.map.topToolbar = JSDialog.TopToolbar(this.map);
 
-			this.map.addControl(L.control.statusBar());
-
-			this.map.jsdialog = L.control.jsDialog();
-			this.map.addControl(this.map.jsdialog);
+			this.map.statusBar = JSDialog.StatusBar(this.map);
 
 			this.map.sidebar = L.control.sidebar({animSpeed: 200});
 			this.map.addControl(this.map.sidebar);
 
-			this.map.addControl(L.control.mobileWizardPopup());
-
-			this.map.addControl(L.control.mention());
+			this.map.mention = L.control.mention(this.map);
+			this.map.formulaautocomplete = L.control.formulaautocomplete(this.map);
+			this.map.formulausage = L.control.formulausage(this.map);
 		}
+
+		this.map.jsdialog = L.control.jsDialog();
+		this.map.addControl(this.map.jsdialog);
 
 		setupToolbar(this.map);
 
@@ -235,6 +232,10 @@ L.Control.UIManager = L.Control.extend({
 		this.map.addControl(L.control.contextMenu());
 		this.map.userList = L.control.userList();
 		this.map.addControl(this.map.userList);
+		this.map.aboutDialog = JSDialog.aboutDialog(this.map);
+
+		if (L.Map.versionBar && window.allowUpdateNotification)
+			this.map.addControl(L.Map.versionBar);
 
 		var openBusyPopup = function(label) {
 			this.busyPopupTimer = setTimeout(function() {
@@ -286,7 +287,7 @@ L.Control.UIManager = L.Control.extend({
 	initializeSpecializedUI: function(docType) {
 		var isDesktop = window.mode.isDesktop();
 		var currentMode = this.getCurrentMode();
-		var enableNotebookbar = currentMode === 'notebookbar' && app.file.permission !== 'readonly';
+		var enableNotebookbar = currentMode === 'notebookbar' && !app.isReadOnly();
 		var hasShare = this.map.wopi.EnableShare;
 
 		document.body.setAttribute('data-userInterfaceMode', currentMode);
@@ -296,26 +297,23 @@ L.Control.UIManager = L.Control.extend({
 
 		if (window.mode.isMobile()) {
 			$('#mobile-edit-button').show();
-			this.map.addControl(L.control.mobileBottomBar(docType));
-			this.map.addControl(L.control.mobileTopBar(docType));
-			this.map.addControl(L.control.searchBar());
+			this.map.mobileBottomBar = JSDialog.MobileBottomBar(this.map);
+			this.map.mobileTopBar = JSDialog.MobileTopBar(this.map);
+			this.map.mobileSearchBar = JSDialog.MobileSearchBar(this.map);
 		} else if (enableNotebookbar) {
 			this.createNotebookbarControl(docType);
 			// makeSpaceForNotebookbar call in onUpdatePermission
 		}
 
-		if (window.uiDefaults[docType] && window.uiDefaults[docType]['ShowToolbar'] === false) {
+		if (!window.prefs.getBoolean(`${docType}.ShowToolbar`, true)) {
 			this.collapseNotebookbar();
 		}
 
 		this.initDarkModeFromSettings();
 
 		if (docType === 'spreadsheet') {
-			this.map.addControl(L.control.sheetsBar({shownavigation: isDesktop || window.mode.isTablet()}));
-			this.map.addControl(L.control.formulaBar());
-			var formulabar = L.control.formulaBarJSDialog();
-			this.map.formulabar = formulabar;
-			this.map.addControl(formulabar);
+			this.sheetsBar = JSDialog.SheetsBar(this.map, isDesktop || window.mode.isTablet());
+			this.map.formulabar = JSDialog.FormulaBar(this.map);
 			$('#toolbar-wrapper').addClass('spreadsheet');
 
 			// remove unused elements
@@ -327,6 +325,7 @@ L.Control.UIManager = L.Control.extend({
 			// remove unused elements
 			L.DomUtil.remove(L.DomUtil.get('spreadsheet-toolbar'));
 			$('#presentation-controls-wrapper').show();
+			this.initializeRuler();
 		}
 
 		if (docType === 'text') {
@@ -335,63 +334,57 @@ L.Control.UIManager = L.Control.extend({
 			L.DomUtil.remove(L.DomUtil.get('presentation-controls-wrapper'));
 			document.getElementById('selectbackground').parentNode.removeChild(document.getElementById('selectbackground'));
 
-			if ((window.mode.isTablet() || window.mode.isDesktop()) && this.map.canUserWrite()) {
-				var showRuler = this.getSavedStateOrDefault('ShowRuler');
-				var interactiveRuler = this.map.isEditMode();
-				var isRTL = document.documentElement.dir === 'rtl';
-				L.control.ruler({position: (isRTL ? 'topright' : 'topleft'), interactive:interactiveRuler, showruler: showRuler}).addTo(this.map);
-				this.map.fire('rulerchanged');
-			}
+			this.initializeRuler();
 
-			var showResolved = this.getSavedStateOrDefault('ShowResolved');
+			var showResolved = this.getBooleanDocTypePref('ShowResolved', true);
 			if (showResolved === false || showResolved === 'false')
 				this.map.sendUnoCommand('.uno:ShowResolvedAnnotations');
 		}
 
 		if (this.map.isPresentationOrDrawing() && (isDesktop || window.mode.isTablet())) {
-			this.map.addControl(L.control.presentationBar());
-		}
-
-		if (window.mode.isMobile() || (window.mode.isTablet() && !enableNotebookbar)) {
-			this.map.on('updatetoolbarcommandvalues', function() {
-				w2ui['editbar'].refresh();
-			});
+			JSDialog.PresentationBar(this.map);
 		}
 
 		this.map.on('changeuimode', this.onChangeUIMode, this);
 
-		if (typeof window.initializedUI === 'function')
+		if (typeof window.initializedUI === 'function') {
 			window.initializedUI();
+		}
+
+		var startPresentationGet = this.map.isPresentationOrDrawing() && window.coolParams.get('startPresentation');
+		if (startPresentationGet === 'true' || startPresentationGet === '1') {
+			app.dispatcher.dispatch('presentation');
+		}
 	},
 
 	initializeSidebar: function() {
 		// Hide the sidebar on start if saved state or UIDefault is set.
 		if (window.mode.isDesktop() && !window.ThisIsAMobileApp) {
-			var showSidebar = this.getSavedStateOrDefault('ShowSidebar');
+			var showSidebar = this.getBooleanDocTypePref('ShowSidebar', true);
 
-			if (this.getSavedStateOrDefault('PropertyDeck')) {
+			if (this.getBooleanDocTypePref('PropertyDeck', true)) {
 				app.socket.sendMessage('uno .uno:SidebarShow');
 			}
 
 			if (this.map.getDocType() === 'presentation') {
-				if (this.getSavedStateOrDefault('SdSlideTransitionDeck', false)) {
+				if (this.getBooleanDocTypePref('SdSlideTransitionDeck', false)) {
 					app.socket.sendMessage('uno .uno:SidebarShow');
 					app.socket.sendMessage('uno .uno:SlideChangeWindow');
 					this.map.sidebar.setupTargetDeck('.uno:SlideChangeWindow');
-				} else if (this.getSavedStateOrDefault('SdCustomAnimationDeck', false)) {
+				} else if (this.getBooleanDocTypePref('SdCustomAnimationDeck', false)) {
 					app.socket.sendMessage('uno .uno:SidebarShow');
 					app.socket.sendMessage('uno .uno:CustomAnimation');
 					this.map.sidebar.setupTargetDeck('.uno:CustomAnimation');
-				} else if (this.getSavedStateOrDefault('SdMasterPagesDeck', false)) {
+				} else if (this.getBooleanDocTypePref('SdMasterPagesDeck', false)) {
 					app.socket.sendMessage('uno .uno:SidebarShow');
 					app.socket.sendMessage('uno .uno:MasterSlidesPanel');
 					this.map.sidebar.setupTargetDeck('.uno:MasterSlidesPanel');
-				} else if (this.getSavedStateOrDefault('NavigatorDeck', false)) {
+				} else if (this.getBooleanDocTypePref('NavigatorDeck', false)) {
 					app.socket.sendMessage('uno .uno:SidebarShow');
 					app.socket.sendMessage('uno .uno:Navigator');
 					this.map.sidebar.setupTargetDeck('.uno:Navigator');
 				}
-			} else if (this.getSavedStateOrDefault('NavigatorDeck', false)) {
+			} else if (this.getBooleanDocTypePref('NavigatorDeck', false)) {
 				app.socket.sendMessage('uno .uno:SidebarShow');
 				app.socket.sendMessage('uno .uno:Navigator');
 				this.map.sidebar.setupTargetDeck('.uno:Navigator');
@@ -412,6 +405,19 @@ L.Control.UIManager = L.Control.extend({
 		}
 	},
 
+	// Initialize ruler
+	initializeRuler: function() {
+		if ((window.mode.isTablet() || window.mode.isDesktop()) && !app.isReadOnly()) {
+			var showRuler = this.getBooleanDocTypePref('ShowRuler');
+			var interactiveRuler = this.map.isEditMode();
+			var isRTL = document.documentElement.dir === 'rtl';
+			L.control.ruler({position: (isRTL ? 'topright' : 'topleft'), interactive:interactiveRuler, showruler: showRuler}).addTo(this.map);
+			if (!this.map.isPresentationOrDrawing())
+				L.control.vruler(this.map, {position: (isRTL ? 'topright' : 'topleft'), interactive:interactiveRuler, showruler: showRuler});
+			this.map.fire('rulerchanged');
+		}
+	},
+
 	removeClassicUI: function() {
 		if (this.map.menubar)
 		{
@@ -420,7 +426,7 @@ L.Control.UIManager = L.Control.extend({
 		}
 		if (this.map.topToolbar)
 		{
-			this.map.removeControl(this.map.topToolbar);
+			this.map.topToolbar.onRemove();
 			this.map.topToolbar = null;
 		}
 	},
@@ -428,8 +434,7 @@ L.Control.UIManager = L.Control.extend({
 	addClassicUI: function() {
 		this.map.menubar = L.control.menubar();
 		this.map.addControl(this.map.menubar);
-		this.map.topToolbar = L.control.topToolbar();
-		this.map.addControl(this.map.topToolbar);
+		this.map.topToolbar = JSDialog.TopToolbar(this.map);
 
 		//update the toolbar according to CheckFileInfo
 		this.map.topToolbar.onWopiProps(this.map.wopi);
@@ -497,17 +502,14 @@ L.Control.UIManager = L.Control.extend({
 		ms = ms !== undefined ? ms : 400;
 		setTimeout(function () {
 			var message = 'dialogevent ' +
-			    (window.sidebarId !== undefined ? window.sidebarId : -1) +
-			    ' {"id":"-1"}';
+				(window.sidebarId !== undefined ? window.sidebarId : -1) +
+				' {"id":"-1"}';
 			app.socket.sendMessage(message);
 		}, ms);
 
 	},
 	refreshToolbar: function() {
-		if (w2ui['editbar'])
-			w2ui['editbar'].refresh();
-		if (w2ui['actionbar'])
-			w2ui['actionbar'].refresh();
+		// TODO
 	},
 	addNotebookbarUI: function() {
 		this.refreshNotebookbar();
@@ -564,7 +566,7 @@ L.Control.UIManager = L.Control.extend({
 			break;
 		}
 
-		this.setSavedState('compactMode', uiMode.mode === 'classic');
+		window.prefs.set('compactMode', uiMode.mode === 'classic');
 		this.initializeSidebar();
 		this.insertCustomButtons();
 
@@ -584,42 +586,44 @@ L.Control.UIManager = L.Control.extend({
 	// UI modification
 
 	insertButtonToClassicToolbar: function(button) {
-		if (w2ui['editbar'] && !w2ui['editbar'].get(button.id)) {
-			if (this.map.isEditMode()) {
-				// add the css rule for the image
-				var style = $('html > head > style');
-				if (style.length == 0)
-					$('html > head').append('<style/>');
-				$('html > head > style').append('.w2ui-icon.' + encodeURIComponent(button.id) +
-					'{background: url("' + encodeURI(button.imgurl) + '") no-repeat center !important; }');
+		if (this.map.isEditMode()) {
+			// Position: Either specified by the caller, or defaulting to first position (before save)
+			var insertBefore = button.insertBefore || 'save';
 
-				// Position: Either specified by the caller, or defaulting to first position (before save)
-				var insertBefore = button.insertBefore || 'save';
-				// add the item to the toolbar
-				w2ui['editbar'].insert(insertBefore, [
-					{
-						type: 'button',
-						uno: button.unoCommand,
-						id: button.id,
-						img: button.id,
-						hint: _(button.hint.replaceAll('\"', '&quot;')), /* "Try" to localize ! */
-						/* Notify the host back when button is clicked (only when unoCommand is not set) */
-						postmessage: !Object.prototype.hasOwnProperty.call(button, 'unoCommand')
-					}
-				]);
-				if (button.mobile)
+			var newButton = [
 				{
-					// Add to our list of items to preserve when in mobile mode
-					// FIXME: Wrap the toolbar in a class so that we don't make use
-					// global variables and functions like this
-					var idx = toolbarUpMobileItems.indexOf(insertBefore);
-					toolbarUpMobileItems.splice(idx, 0, button.id);
+					type: 'button',
+					uno: button.unoCommand,
+					id: button.id,
+					img: button.id,
+					hint: _(button.hint.replaceAll('\"', '&quot;')), /* "Try" to localize ! */
+					/* Notify the host back when button is clicked (only when unoCommand is not set) */
+					postmessage: !Object.prototype.hasOwnProperty.call(button, 'unoCommand')
 				}
+			];
+
+			// add the css rule for the image
+			var style = $('html > head > style');
+			if (style.length == 0)
+				$('html > head').append('<style/>');
+			$('html > head > style').append('.w2ui-icon.' + encodeURIComponent(button.id) +
+				'{background: url("' + encodeURI(button.imgurl) + '") no-repeat center !important; }');
+
+			// TODO: other
+			var topToolbar = window.app.map.topToolbar;
+			if (topToolbar && !topToolbar.hasItem(button.id)) {
+				// translate to JSDialog JSON
+				newButton[0].command = newButton[0].uno;
+				newButton[0].type = 'toolitem';
+				newButton[0].w2icon = newButton[0].img;
+				newButton[0].text = newButton[0].hint;
+				topToolbar.insertItem(insertBefore, newButton);
 			}
-			else if (this.map.isReadOnlyMode()) {
-				// Just add a menu entry for it
-				this.map.fire('addmenu', {id: button.id, label: button.hint});
-			}
+		}
+
+		if (this.map.isReadOnlyMode()) {
+			// Just add a menu entry for it
+			this.map.fire('addmenu', {id: button.id, label: button.hint});
 		}
 	},
 
@@ -653,19 +657,25 @@ L.Control.UIManager = L.Control.extend({
 	},
 
 	showButtonInClassicToolbar: function(buttonId, show) {
-		var toolbars = [w2ui['toolbar-up'], w2ui['actionbar'], w2ui['editbar']];
+		// TODO: other
+		var toolbars = [];
 		var found = false;
 
 		toolbars.forEach(function(toolbar) {
 			if (toolbar && toolbar.get(buttonId)) {
 				found = true;
 				if (show) {
-					toolbar.show(buttonId);
+					toolbar.showItem(buttonId, true);
 				} else {
-					toolbar.hide(buttonId);
+					toolbar.showItem(buttonId, false);
 				}
 			}
 		});
+
+		var topToolbarHas = window.app.map.topToolbar.hasItem(buttonId);
+		found = found | topToolbarHas;
+		if (topToolbarHas)
+			window.app.map.topToolbar.showItem(buttonId, show);
 
 		if (!found) {
 			window.app.console.error('Toolbar button with id "' + buttonId + '" not found.');
@@ -703,7 +713,8 @@ L.Control.UIManager = L.Control.extend({
 	},
 
 	showCommandInClassicToolbar: function(command, show) {
-		var toolbars = [w2ui['toolbar-up'], w2ui['actionbar'], w2ui['editbar']];
+		// TODO: other
+		var toolbars = [];
 		var found = false;
 
 		toolbars.forEach(function(toolbar) {
@@ -714,9 +725,9 @@ L.Control.UIManager = L.Control.extend({
 				if (commands.indexOf(command) != -1) {
 					found = true;
 					if (show) {
-						toolbar.show(item.id);
+						toolbar.showItem(item.id, true);
 					} else {
-						toolbar.hide(item.id);
+						toolbar.showItem(item.id, false);
 					}
 				}
 			}.bind(this));
@@ -756,12 +767,13 @@ L.Control.UIManager = L.Control.extend({
 		$('.main-nav').show();
 		if (L.Params.closeButtonEnabled && !window.mode.isTablet()) {
 			$('#closebuttonwrapper').show();
+			$('#closebuttonwrapperseparator').show();
 		}
 
 		var obj = $('.unfold');
 		obj.removeClass('w2ui-icon unfold');
 		obj.addClass('w2ui-icon fold');
-		$('#tb_editbar_item_fold').prop('title', _('Hide Menu'));
+		$('#fold').prop('title', _('Hide Menu'));
 
 		if (this._notebookbarShouldBeCollapsed)
 			this.collapseNotebookbar();
@@ -779,12 +791,13 @@ L.Control.UIManager = L.Control.extend({
 		$('.main-nav').hide();
 		if (L.Params.closeButtonEnabled) {
 			$('#closebuttonwrapper').hide();
+			$('#closebuttonwrapperseparator').hide();
 		}
 
 		var obj = $('.fold');
 		obj.removeClass('w2ui-icon fold');
 		obj.addClass('w2ui-icon unfold');
-		$('#tb_editbar_item_fold').prop('title', _('Show Menu'));
+		$('#fold').prop('title', _('Show Menu'));
 	},
 
 	isMenubarHidden: function() {
@@ -801,16 +814,17 @@ L.Control.UIManager = L.Control.extend({
 	// Ruler
 
 	showRuler: function() {
+		this._map.sendUnoCommand('.uno:ShowRuler');
 		$('.cool-ruler').show();
 		$('#map').addClass('hasruler');
-		this.setSavedState('ShowRuler', true);
+		this.setDocTypePref('ShowRuler', true);
 		this.map.fire('rulerchanged');
 	},
 
 	hideRuler: function() {
 		$('.cool-ruler').hide();
 		$('#map').removeClass('hasruler');
-		this.setSavedState('ShowRuler', false);
+		this.setDocTypePref('ShowRuler', false);
 		this.map.fire('rulerchanged');
 	},
 
@@ -884,8 +898,8 @@ L.Control.UIManager = L.Control.extend({
 
 	showStatusBar: function() {
 		$('#document-container').css('bottom', this.documentBottom);
-		$('#toolbar-down').show();
-		this.setSavedState('ShowStatusbar', true);
+		this.map.statusBar.show();
+		this.setDocTypePref('ShowStatusbar', true);
 		this.map.fire('statusbarchanged');
 	},
 
@@ -895,9 +909,9 @@ L.Control.UIManager = L.Control.extend({
 
 		this.documentBottom = $('#document-container').css('bottom');
 		$('#document-container').css('bottom', '0px');
-		$('#toolbar-down').hide();
+		this.map.statusBar.hide();
 		if (!firstStart)
-			this.setSavedState('ShowStatusbar', false);
+			this.setDocTypePref('ShowStatusbar', false);
 		this.map.fire('statusbarchanged');
 	},
 
@@ -914,7 +928,7 @@ L.Control.UIManager = L.Control.extend({
 	},
 
 	isStatusBarVisible: function() {
-		return $('#toolbar-down').is(':visible');
+		return document.getElementById('toolbar-down').style.display !== 'none';
 	},
 
 	// Event handlers
@@ -959,9 +973,26 @@ L.Control.UIManager = L.Control.extend({
 		this.map.invalidateSize();
 	},
 
+	refreshUI: function () {
+		if (this.notebookbar && !this.map._shouldStartReadOnly())
+			this.refreshNotebookbar();
+		else
+			this.refreshMenubar();
+	},
+
 	onUpdateViews: function () {
-		var userPrivateInfo = this.map._docLayer ? this.map._viewInfo[this.map._docLayer._viewId].userprivateinfo : null;
-		if (userPrivateInfo) {
+		if (!this.map._docLayer || typeof this.map._docLayer._viewId === 'undefined')
+			return;
+
+		var myViewId = this.map._docLayer._viewId;
+		var myViewData = this.map._viewInfo[myViewId];
+		if (!myViewData) {
+			console.error('Not found view data for viewId: "' + myViewId + '"');
+			return;
+		}
+
+		var userPrivateInfo = myViewData.userprivateinfo;
+		if (userPrivateInfo && window.zoteroEnabled) {
 			var apiKey = userPrivateInfo.ZoteroAPIKey;
 			if (apiKey !== undefined && !this.map.zotero) {
 				this.map.zotero = L.control.zotero(this.map);
@@ -977,10 +1008,10 @@ L.Control.UIManager = L.Control.extend({
 			// in edit mode, passing 'edit' actually enters readonly mode
 			// and bring the blue circle editmode button back
 			this.map.setPermission('edit');
-			var toolbar = w2ui['actionbar'];
+			var toolbar = app.map.topToolbar;
 			if (toolbar) {
-				toolbar.uncheck('closemobile');
-				toolbar.uncheck('close');
+				toolbar.selectItem('closemobile', false);
+				toolbar.selectItem('close', false);
 			}
 		} else {
 			window.onClose();
@@ -1019,17 +1050,23 @@ L.Control.UIManager = L.Control.extend({
 
 	// Document area tooltip
 
-	/// Shows tooltip in the document area
+	_setTooltipText: function(element, text) {
+		var dummyNode = L.DomUtil.create('div');
+		dummyNode.innerText = text;
+		element.tooltip('option', 'content', dummyNode.innerHTML);
+	},
+
+	/// Shows general tooltips in the document area
 	/// tooltipInfo contains rectangle (position in twips) and text properties
-	/// elem has to be jQuery selector output eg. $('.leaflet-layer')
-	showDocumentTooltip: function(tooltipInfo, elem) {
+	showDocumentTooltip: function(tooltipInfo) {
 		var split = tooltipInfo.rectangle.split(',');
 		var latlng = this.map._docLayer._twipsToLatLng(new L.Point(+split[0], +split[1]));
 		var pt = this.map.latLngToContainerPoint(latlng);
+		var elem = $('.leaflet-layer');
 
 		elem.tooltip();
 		elem.tooltip('enable');
-		elem.tooltip('option', 'content', tooltipInfo.text);
+		this._setTooltipText(elem, tooltipInfo.text);
 		elem.tooltip('option', 'items', elem[0]);
 		elem.tooltip('option', 'position', { my: 'left bottom',  at: 'left+' + pt.x + ' top+' + pt.y, collision: 'fit fit' });
 		elem.tooltip('open');
@@ -1039,87 +1076,58 @@ L.Control.UIManager = L.Control.extend({
 		}, {once: true});
 	},
 
+	// Calc function tooltip
+
+	/// Shows tooltip over the cell while typing a function in a cell.
+	/// tooltipInfo contains possible function list. If you type a valid
+	/// function it'll show the usage of the function.
+	showFormulaTooltip: function(tooltipInfo, pos) {
+		var elem = $('.leaflet-layer');
+		var pt = this.map.latLngToContainerPoint(pos);
+		pt.y -=35; //Show tooltip above the cursor.
+
+		if ($('.ui-tooltip').length > 0) {
+			this._setTooltipText(elem, tooltipInfo);
+		}
+		else {
+			elem.tooltip({
+				tooltipClass: 'functiontooltip',
+				content: tooltipInfo,
+				items: elem[0],
+				position: { my: 'left top', at: 'left+' + pt.x +  ' top+' +pt.y, collision: 'fit fit' }
+			});
+			elem.tooltip('option', 'customClass', 'functiontooltip');
+			elem.tooltip('open');
+			elem.off('mouseleave');
+		}
+	},
+
+	hideFormulaTooltip: function() {
+		var elem = $('.leaflet-layer');
+		if ($('.ui-tooltip').length > 0) {
+			elem.tooltip();
+			elem.tooltip('option', 'disabled', true);
+		}
+	},
+
 	// Snack bar
 
 	closeSnackbar: function() {
-		var closeMessage = { id: 'snackbar', jsontype: 'dialog', type: 'snackbar', action: 'close' };
-		app.socket._onMessage({ textMsg: 'jsdialog: ' + JSON.stringify(closeMessage) });
+		JSDialog.SnackbarController.closeSnackbar();
 	},
 
 	showSnackbar: function(label, action, callback, timeout, hasProgress, withDismiss) {
-		if (!app.socket)
-			return;
-
-		this.closeSnackbar();
-
-		var buttonId = 'button';
-		var labelId = 'label';
-
-		var json = {
-			id: 'snackbar',
-			jsontype: 'dialog',
-			type: 'snackbar',
-			timeout: timeout,
-			'init_focus_id': action ? buttonId : undefined,
-			children: [
-				{
-					id: hasProgress ? 'snackbar-container-progress' : 'snackbar-container',
-					type: 'container',
-					children: [
-						action ? {id: labelId, type: 'fixedtext', text: label, labelFor: buttonId} : {id: 'label-no-action', type: 'fixedtext', text: label},
-						withDismiss ? {id: 'snackbar-dismiss-button', type: 'pushbutton', text: _('Dismiss')} : {},
-						hasProgress ? {id: 'progress', type: 'progressbar', value: 0, maxValue: 100} : {},
-						action ? {id: buttonId, type: 'pushbutton', text: action, labelledBy: labelId} : {}
-					]
-				}
-			]
-		};
-
-		var that = this;
-		var builderCallback = function(objectType, eventType, object, data) {
-			window.app.console.debug('control: \'' + objectType + '\' id:\'' + object.id + '\' event: \'' + eventType + '\' state: \'' + data + '\'');
-
-			if (object.id === buttonId && objectType === 'pushbutton' && eventType === 'click') {
-				if (callback)
-					callback();
-
-				that.closeSnackbar();
-			} else if (object.id === '__POPOVER__' && objectType === 'popover' && eventType === 'close') {
-				that.closeSnackbar();
-			}
-
-			if (object.id === 'snackbar-dismiss-button' && objectType === 'pushbutton' && eventType === 'click') {
-				that.closeSnackbar();
-			}
-		};
-
-		app.socket._onMessage({textMsg: 'jsdialog: ' + JSON.stringify(json), callback: builderCallback});
+		JSDialog.SnackbarController.showSnackbar(label, action, callback, timeout, hasProgress, withDismiss);
 	},
 
 	/// shows snackbar with progress
 	showProgressBar: function(message, buttonText, callback, timeout, withDismiss) {
-		this.showSnackbar(message, buttonText, callback, timeout ? timeout : -1, true, withDismiss);
+		JSDialog.SnackbarController.showSnackbar(message, buttonText, callback, timeout ? timeout : -1, true, withDismiss);
 	},
 
 	/// sets progressbar status, value should be in range 0-100
 	setSnackbarProgress: function(value) {
-		if (!app.socket)
-			return;
-
-		var json = {
-			id: 'snackbar',
-			jsontype: 'dialog',
-			type: 'snackbar',
-			action: 'update',
-			control: {
-				id: 'progress',
-				type: 'progressbar',
-				value: value,
-				maxValue: 100
-			}
-		};
-
-		app.socket._onMessage({textMsg: 'jsdialog: ' + JSON.stringify(json)});
+		JSDialog.SnackbarController.setSnackbarProgress(value);
 	},
 
 	// Modals
@@ -1160,9 +1168,6 @@ L.Control.UIManager = L.Control.extend({
 	},
 
 	isAnyDialogOpen: function() {
-		if (cool.Comment.isAnyEdit())
-			return true;
-
 		if (this.map.jsdialog)
 			return this.map.jsdialog.hasDialogOpened();
 		else
@@ -1426,10 +1431,10 @@ L.Control.UIManager = L.Control.extend({
 				id: 'info-modal-label1',
 				type: 'fixedtext',
 				text: message,
-				labelFor: 'input-modal-input',
+				labelFor: 'input-modal',
 			},
 			{
-				id: 'input-modal-input',
+				id: 'input-modal',
 				type: 'edit',
 				password: !!passwordInput,
 				text: defaultValue,
@@ -1486,21 +1491,38 @@ L.Control.UIManager = L.Control.extend({
 				type: 'fixedtext',
 				text: message
 			},
+			{
+				id: '',
+				type: 'buttonbox',
+				text: '',
+				enabled: true,
+				children: [
+					{
+						id: dialogId + '-response',
+						type: 'pushbutton',
+						text: _(linkText),
+						'has_default': true,
+					}
+				],
+				vertical: false,
+				layoutstyle: 'end'
+			},
 		]);
 
-		this.showModal(json);
+		this.showModal(json,
+		[{
+			id : dialogId + '-response',
+			func : () => {
+				if (!link || !linkText)
+					return;
+				var win = window.open(window.sanitizeUrl(link), '_blank');
+				win.focus();
+			}
+		}]);
 
 		if (!window.mode.isMobile()) {
 			document.getElementById(dialogId).style.marginRight = '0';
 			document.getElementById(dialogId).style.marginBottom = '0';
-		}
-
-		if (link && linkText) {
-			document.getElementById(dialogId + '-text').style.textDecoration = 'underline';
-			document.getElementById(dialogId + '-text').onclick = function() {
-				var win = window.open(link, '_blank');
-				win.focus();
-			};
 		}
 	},
 
@@ -1627,54 +1649,32 @@ L.Control.UIManager = L.Control.extend({
 		}
 	},
 
-	setSavedState: function(name, state) {
-		var docType = (name === 'compactMode') ? null : this.map.getDocType();
-		if (window.isLocalStorageAllowed)
-			localStorage.setItem('UIDefaults_' + docType + '_' + name, state);
+	setDocTypePref: function(name, value) {
+		const docType = this.map.getDocType();
+		return window.prefs.set(`${docType}.${name}`, value);
 	},
 
-	getSavedStateOrDefault: function(name, forcedDefault) {
-		var retval = forcedDefault !== undefined ? forcedDefault : true;
-		// we request compactMode very early, no info about doctype so unify all the calls
-		var docType = (name === 'compactMode') ? null : this.map.getDocType();
-		var state = null;
-		if (window.savedUIState && window.isLocalStorageAllowed)
-			state = localStorage.getItem('UIDefaults_' + docType + '_' + name);
-		switch (state) {
-		case 'true':
-			return true;
-		case 'false':
-			return false;
-		default:
-			// no saved state; must check the UIDefaults
-			if (window.uiDefaults && window.uiDefaults[docType])
-				retval = window.uiDefaults[docType][name];
-
-			// check UIDefaults root without limiting to the doctype
-			if (retval === undefined || retval === null)
-				retval = window.uiDefaults[name];
-
-			if (retval === undefined || retval === null) {
-				if (forcedDefault !== undefined)
-					return forcedDefault;
-				else
-					return true;
-			} else
-				return retval;
-		}
+	getBooleanDocTypePref: function(name, defaultValue = false) {
+		const docType = this.map.getDocType();
+		return window.prefs.getBoolean(`${docType}.${name}`, defaultValue);
 	},
 
 	enableTooltip: function(element) {
 		var elem = $(element);
 		if (window.mode.isDesktop()) {
-			elem.tooltip();
-			elem.click(function() {
+			if (this._tooltip) {
+				$(".ui-tooltip").remove();
+				this._tooltip = undefined;
+			}
+			this._tooltip = elem.tooltip();
+			elem.on("mousedown", function() {
 				$('.ui-tooltip').fadeOut(function() {
 					$(this).remove();
 				});
 			});
 		}
 		else {
+			elem.tooltip();
 			elem.tooltip({disabled: true});
 			(new Hammer(elem.get(0), {recognizers: [[Hammer.Press]]}))
 				.on('press', function () {

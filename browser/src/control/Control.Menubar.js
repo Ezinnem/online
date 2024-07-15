@@ -72,7 +72,7 @@ L.Control.Menubar = L.Control.extend({
 		text:  [
 			{name: _UNO('.uno:PickList', 'text'), id: 'file', type: 'menu', menu: [
 				{name: L.Control.MenubarShortcuts.addShortcut(_UNO('.uno:Save', 'text'), L.Control.MenubarShortcuts.shortcuts.SAVE), id: 'save', type: 'action'},
-				{name: _UNO('.uno:SaveAs', 'text'), id: 'saveas', type: window.uiDefaults && window.uiDefaults.saveAsMode === 'group' ? 'menu' : 'action', menu: [
+				{name: _UNO('.uno:SaveAs', 'text'), id: 'saveas', type: window.prefs.get('saveAsMode') === 'group' ? 'menu' : 'action', menu: [
 					{name: _('ODF text document (.odt)'), id: 'saveas-odt', type: 'action'},
 					{name: _('Word 2003 Document (.doc)'), id: 'saveas-doc', type: 'action'},
 					{name: _('Word Document (.docx)'), id: 'saveas-docx', type: 'action'},
@@ -116,8 +116,12 @@ L.Control.Menubar = L.Control.extend({
 					{uno: '.uno:ShowTrackedChanges'},
 					{type: 'separator'},
 					{uno: '.uno:AcceptTrackedChanges'},
-					{uno: '.uno:AcceptAllTrackedChanges'},
-					{uno: '.uno:RejectAllTrackedChanges'},
+					{uno: '.uno:AcceptTrackedChange'},
+					{uno: '.uno:AcceptTrackedChangeToNext'},
+					{name: _UNO('.uno:AcceptAllTrackedChanges', 'text'), id: 'acceptalltrackedchanges', type: 'action'},
+					{uno: '.uno:RejectTrackedChange'},
+					{uno: '.uno:RejectTrackedChangeToNext'},
+					{name: _UNO('.uno:RejectAllTrackedChanges', 'text'), id: 'rejectalltrackedchanges', type: 'action'},
 					{uno: '.uno:PreviousTrackedChange'},
 					{uno: '.uno:NextTrackedChange'}
 				]},
@@ -139,6 +143,7 @@ L.Control.Menubar = L.Control.extend({
 					{name: _('Show Status Bar'), id: 'showstatusbar', type: 'action'},
 					{name: _('Hide Menu Bar'), id: 'togglemenubar', type: 'action'},
 					{name: _('Dark Mode'), id: 'toggledarktheme', type: 'action'},
+					{name: _('Invert Background'), id: 'invertbackground', type: 'action'},
 					{uno: '.uno:SidebarDeck.PropertyDeck', name: _UNO('.uno:Sidebar')},
 					{uno: '.uno:Navigator', id: 'navigator'},
 					{type: 'separator'},
@@ -282,7 +287,9 @@ L.Control.Menubar = L.Control.extend({
 				{type: 'separator'},
 				{uno: '.uno:TransformDialog'},
 				{uno: '.uno:FormatLine'},
-				{uno: '.uno:FormatArea'}
+				{uno: '.uno:FormatArea'},
+				{uno: '.uno:NameGroup'},
+				{uno: '.uno:ObjectTitleDescription'},
 			]},
 			{name: _('References'), id: 'references', type: 'menu', menu: [
 				{name: _UNO('.uno:IndexesMenu', 'text'), uno: '.uno:InsertMultiIndex'},
@@ -374,6 +381,7 @@ L.Control.Menubar = L.Control.extend({
 				{name: _('Report an issue'), id: 'report-an-issue', type: 'action', iosapp: false},
 				{name: _('Latest Updates'), id: 'latestupdates', type: 'action', iosapp: false},
 				{name: _('Send Feedback'), id: 'feedback', type: 'action', mobileapp: false},
+				{name: _('Server audit'), id: 'serveraudit', type: 'action', mobileapp: false},
 				{name: _('About'), id: 'about', type: 'action'}]
 			},
 			{name: _('Last modification'), id: 'last-mod', type: 'action', tablet: false}
@@ -382,7 +390,7 @@ L.Control.Menubar = L.Control.extend({
 		presentation: [
 			{name: _UNO('.uno:PickList', 'presentation'), id: 'file', type: 'menu', menu: [
 				{name: L.Control.MenubarShortcuts.addShortcut(_UNO('.uno:Save', 'presentation'), L.Control.MenubarShortcuts.shortcuts.SAVE), id: 'save', type: 'action'},
-				{name: _UNO('.uno:SaveAs', 'presentation'), id: 'saveas', type: window.uiDefaults && window.uiDefaults.saveAsMode === 'group' ? 'menu' : 'action', menu: [
+				{name: _UNO('.uno:SaveAs', 'presentation'), id: 'saveas', type: window.prefs.get('saveAsMode') === 'group' ? 'menu' : 'action', menu: [
 					{name: _('ODF presentation (.odp)'), id: 'saveas-odp', type: 'action'},
 					{name: _('PowerPoint 2003 Presentation (.ppt)'), id: 'saveas-ppt', type: 'action'},
 					{name: _('PowerPoint Presentation (.pptx)'), id: 'saveas-pptx', type: 'action'},
@@ -402,7 +410,10 @@ L.Control.Menubar = L.Control.extend({
 				]},
 				{name: _UNO('.uno:SetDocumentProperties', 'presentation'), uno: '.uno:SetDocumentProperties', id: 'properties'},
 				{type: 'separator'},
-				{name: L.Control.MenubarShortcuts.addShortcut(_UNO('.uno:Print', 'presentation'), L.Control.MenubarShortcuts.shortcuts.PRINT), id: 'print', type: 'action'},
+				{name: L.Control.MenubarShortcuts.addShortcut(_UNO('.uno:Print', 'presentation'), L.Control.MenubarShortcuts.shortcuts.PRINT), id: 'print', type: 'menu', menu: [
+					{name: _('Full Page Slides'), id: 'print', type: 'action'},
+					{name: _('Notes Pages'), id: 'print-notespages' , type: 'action'},
+				]},
 				{name: _('Close document'), id: 'closedocument', type: 'action'}
 			]},
 			{name: _UNO('.uno:EditMenu', 'presentation'), id: 'editmenu', type: 'menu', menu: [
@@ -434,6 +445,7 @@ L.Control.Menubar = L.Control.extend({
 				   {name: _('Show Status Bar'), id: 'showstatusbar', type: 'action'},
 				   {name: _('Hide Menu Bar'), id: 'togglemenubar', type: 'action'},
 				   {name: _('Dark Mode'), id: 'toggledarktheme', type: 'action'},
+				   {name: _('Invert Background'), id: 'invertbackground', type: 'action'},
 				   {name: _('Master View'), uno: '.uno:SlideMasterPage'},
 				   {uno: '.uno:SidebarDeck.PropertyDeck', name: _UNO('.uno:Sidebar')},
 				   {uno: '.uno:Navigator', id: 'navigator'},
@@ -479,6 +491,8 @@ L.Control.Menubar = L.Control.extend({
 				{uno: '.uno:TransformDialog'},
 				{uno: '.uno:FormatLine'},
 				{uno: '.uno:FormatArea'},
+				{uno: '.uno:NameGroup'},
+				{uno: '.uno:ObjectTitleDescription'},
 				{type: 'separator'},
 				{uno: '.uno:OutlineBullet'},
 				{uno: '.uno:ThemeDialog'}]
@@ -528,6 +542,7 @@ L.Control.Menubar = L.Control.extend({
 				{name: _('Report an issue'), id: 'report-an-issue', type: 'action', iosapp: false},
 				{name: _('Latest Updates'), id: 'latestupdates', type: 'action', iosapp: false},
 				{name: _('Send Feedback'), id: 'feedback', type: 'action', mobileapp: false},
+				{name: _('Server audit'), id: 'serveraudit', type: 'action', mobileapp: false},
 				{name: _('About'), id: 'about', type: 'action'}]
 			},
 			{name: _('Last modification'), id: 'last-mod', type: 'action', tablet: false}
@@ -579,6 +594,7 @@ L.Control.Menubar = L.Control.extend({
 					{type: 'separator'},
 					{name: _('Toggle UI Mode'), id: 'toggleuimode', type: 'action'},
 					{name: _('Dark Mode'), id: 'toggledarktheme', type: 'action'},
+					{name: _('Invert Background'), id: 'invertbackground', type: 'action'},
 					{uno: '.uno:SidebarDeck.PropertyDeck', name: _UNO('.uno:Sidebar')},
 					{uno: '.uno:Navigator', id: 'navigator'},
 					{name: _('Show Status Bar'), id: 'showstatusbar', type: 'action'},
@@ -615,6 +631,8 @@ L.Control.Menubar = L.Control.extend({
 				{uno: '.uno:TransformDialog'},
 				{uno: '.uno:FormatLine'},
 				{uno: '.uno:FormatArea'},
+				{uno: '.uno:NameGroup'},
+				{uno: '.uno:ObjectTitleDescription'},
 				{type: 'separator'},
 				{uno: '.uno:OutlineBullet'},
 				{uno: '.uno:ThemeDialog'}]
@@ -655,6 +673,7 @@ L.Control.Menubar = L.Control.extend({
 				{name: _('Report an issue'), id: 'report-an-issue', type: 'action', iosapp: false},
 				{name: _('Latest Updates'), id: 'latestupdates', type: 'action', iosapp: false},
 				{name: _('Send Feedback'), id: 'feedback', type: 'action', mobileapp: false},
+				{name: _('Server audit'), id: 'serveraudit', type: 'action', mobileapp: false},
 				{name: _('About'), id: 'about', type: 'action'}]
 			},
 			{name: _('Last modification'), id: 'last-mod', type: 'action', tablet: false}
@@ -663,7 +682,7 @@ L.Control.Menubar = L.Control.extend({
 		spreadsheet: [
 			{name: _UNO('.uno:PickList', 'spreadsheet'), id: 'file', type: 'menu', menu: [
 				{name: L.Control.MenubarShortcuts.addShortcut(_UNO('.uno:Save', 'spreadsheet'), L.Control.MenubarShortcuts.shortcuts.SAVE), id: 'save', type: 'action'},
-				{name: _UNO('.uno:SaveAs', 'spreadsheet'), id: 'saveas', type: window.uiDefaults && window.uiDefaults.saveAsMode === 'group' ? 'menu' : 'action', menu: [
+				{name: _UNO('.uno:SaveAs', 'spreadsheet'), id: 'saveas', type: window.prefs.get('saveAsMode') === 'group' ? 'menu' : 'action', menu: [
 					{name: _('ODF spreadsheet (.ods)'), id: 'saveas-ods', type: 'action'},
 					{name: _('Excel 2003 Spreadsheet (.xls)'), id: 'saveas-xls', type: 'action'},
 					{name: _('Excel Spreadsheet (.xlsx)'), id: 'saveas-xlsx', type: 'action'},
@@ -716,8 +735,11 @@ L.Control.Menubar = L.Control.extend({
 				   {name: _('Show Status Bar'), id: 'showstatusbar', type: 'action'},
 				   {name: _('Hide Menu Bar'), id: 'togglemenubar', type: 'action'},
 				   {name: _('Dark Mode'), id: 'toggledarktheme', type: 'action'},
+				   {name: _('Invert Background'), id: 'invertbackground', type: 'action'},
 				   {uno: '.uno:SidebarDeck.PropertyDeck', name: _UNO('.uno:Sidebar')},
 				   {uno: '.uno:Navigator', id: 'navigator'},
+				   {type: 'separator'},
+				   {name: _UNO('.uno:ToggleSheetGrid', 'spreadsheet', true), uno: '.uno:ToggleSheetGrid', id: 'sheetgrid'},
 				   {name: _UNO('.uno:FreezePanes', 'spreadsheet', true), id: 'FreezePanes', type: 'action', uno: '.uno:FreezePanes'},
 				   {name: _UNO('.uno:FreezeCellsMenu', 'spreadsheet', true), id: 'FreezeCellsMenu', type: 'menu', uno: '.uno:FreezeCellsMenu', menu: [
 					   {name: _UNO('.uno:FreezePanesColumn', 'spreadsheet', true), id: 'FreezePanesColumn', type: 'action', uno: '.uno:FreezePanesColumn'},
@@ -810,13 +832,25 @@ L.Control.Menubar = L.Control.extend({
 				    {uno: '.uno:UngroupSparklines'}
 				]},
 				{name: _UNO('.uno:ConditionalFormatMenu', 'spreadsheet'), type: 'menu', menu: [
-					{name: _('Condition...'), type: 'menu', menu: [
-						{name: _('Greater than...'), uno: '.uno:ConditionalFormatEasy?FormatRule:short=2'},
-						{name: _('Less than...'), uno: '.uno:ConditionalFormatEasy?FormatRule:short=1'},
-						{name: _('Equal to...'), uno: '.uno:ConditionalFormatEasy?FormatRule:short=0'},
-						{name: _('Between...'), uno: '.uno:ConditionalFormatEasy?FormatRule:short=6'},
+					{name: _('Highlight cells with...'), type: 'menu', menu: [
+						{name: _('Values greater than...'), uno: '.uno:ConditionalFormatEasy?FormatRule:short=2'},
+						{name: _('Values less than...'), uno: '.uno:ConditionalFormatEasy?FormatRule:short=1'},
+						{name: _('Values equal to...'), uno: '.uno:ConditionalFormatEasy?FormatRule:short=0'},
+						{name: _('Values between...'), uno: '.uno:ConditionalFormatEasy?FormatRule:short=6'},
+						{name: _('Values duplicate...'), uno: '.uno:ConditionalFormatEasy?FormatRule:short=8'},
+						{name: _('Containing text...'), uno: '.uno:ConditionalFormatEasy?FormatRule:short=23'},
 						{type: 'separator'},
-						{name: _('More conditions...'), uno: '.uno:ConditionalFormatDialog'},
+						{name: _('More highlights...'), uno: '.uno:ConditionalFormatDialog'},
+					]},
+					{name: _('Top/Bottom Rules...'), type: 'menu', menu: [
+						{name: _('Top N elements...'), uno: '.uno:ConditionalFormatEasy?FormatRule:short=11'},
+						{name: _('Top N percent...'), uno: '.uno:ConditionalFormatEasy?FormatRule:short=13'},
+						{name: _('Bottom N elements...'), uno: '.uno:ConditionalFormatEasy?FormatRule:short=12'},
+						{name: _('Bottom N percent...'), uno: '.uno:ConditionalFormatEasy?FormatRule:short=14'},
+						{name: _('Above Average...'), uno: '.uno:ConditionalFormatEasy?FormatRule:short=15'},
+						{name: _('Below Average...'), uno: '.uno:ConditionalFormatEasy?FormatRule:short=16'},
+						{type: 'separator'},
+						{name: _('More highlights...'), uno: '.uno:ConditionalFormatDialog'},
 					]},
 					{uno: '.uno:ColorScaleFormatDialog'},
 					{uno: '.uno:DataBarFormatDialog'},
@@ -909,6 +943,7 @@ L.Control.Menubar = L.Control.extend({
 				{name: _UNO('.uno:LanguageMenu'), type: 'menu', menu: [
 					{name: _('None (Do not check spelling)'), id: 'nonelanguage', uno: '.uno:LanguageStatus?Language:string=Default_LANGUAGE_NONE'}]},
 				{uno: '.uno:GoalSeekDialog'},
+				{uno: '.uno:Protect'},
 				{type: 'separator'},
 				{name: _UNO('.uno:RunMacro'), id: 'runmacro', uno: '.uno:RunMacro'}
 			]},
@@ -918,6 +953,7 @@ L.Control.Menubar = L.Control.extend({
 				{name: _('Report an issue'), id: 'report-an-issue', type: 'action', iosapp: false},
 				{name: _('Latest Updates'), id: 'latestupdates', type: 'action', iosapp: false},
 				{name: _('Send Feedback'), id: 'feedback', type: 'action', mobileapp: false},
+				{name: _('Server audit'), id: 'serveraudit', type: 'action', mobileapp: false},
 				{name: _('About'), id: 'about', type: 'action'}]
 			},
 			{name: _('Last modification'), id: 'last-mod', type: 'action', tablet: false}
@@ -960,8 +996,8 @@ L.Control.Menubar = L.Control.extend({
 				{uno: '.uno:TrackChanges'},
 				{uno: '.uno:ShowTrackedChanges'},
 				{type: 'separator'},
-				{uno: '.uno:AcceptAllTrackedChanges'},
-				{uno: '.uno:RejectAllTrackedChanges'},
+				{name: _UNO('.uno:AcceptAllTrackedChanges', 'text'), id: 'acceptalltrackedchanges', type: 'action'},
+				{name: _UNO('.uno:RejectAllTrackedChanges', 'text'), id: 'rejectalltrackedchanges', type: 'action'},
 				{uno: '.uno:PreviousTrackedChange'},
 				{uno: '.uno:NextTrackedChange'}
 			]},
@@ -1296,7 +1332,7 @@ L.Control.Menubar = L.Control.extend({
 		commandStates: {},
 
 		// Only these menu options will be visible in readonly mode
-		allowedReadonlyMenus: ['file', 'downloadas', 'view', 'insert', 'help'],
+		allowedReadonlyMenus: ['file', 'downloadas', 'view', 'insert', 'slide', 'help'],
 
 		allowedViewModeActions: [
 			'savecomments', 'shareas', 'print', // file menu
@@ -1305,7 +1341,7 @@ L.Control.Menubar = L.Control.extend({
 			!window.ThisIsAMobileApp ? 'exportdirectpdf' : 'downloadas-pdf', !window.ThisIsAMobileApp ? 'exportepub' : 'downloadas-epub', // file menu
 			'downloadas-ods', 'downloadas-xls', 'downloadas-xlsx', 'downloadas-csv', 'closedocument', // file menu
 			'fullscreen', 'zoomin', 'zoomout', 'zoomreset', 'showstatusbar', 'togglemenubar', 'showresolved', 'toggledarktheme', // view menu
-			'about', 'keyboard-shortcuts', 'latestupdates', 'feedback', 'online-help', 'report-an-issue', // help menu
+			'about', 'keyboard-shortcuts', 'latestupdates', 'feedback', 'serveraudit', 'online-help', 'report-an-issue', // help menu
 			'insertcomment'
 		]
 	},
@@ -1321,6 +1357,10 @@ L.Control.Menubar = L.Control.extend({
 		// Use original template as provided by server
 		this._menubarCont = map.mainMenuTemplate.cloneNode(true);
 		$('#main-menu-state').after(this._menubarCont);
+
+		if (!this._map['wopi'].DisablePresentation)
+			this.options.allowedViewModeActions = this.options.allowedViewModeActions.concat(['fullscreen-presentation', 'presentation-currentslide', 'present-in-window']);
+
 		this._initializeMenu(this.options.initial);
 
 		map.on('doclayerinit', this._onDocLayerInit, this);
@@ -1328,8 +1368,6 @@ L.Control.Menubar = L.Control.extend({
 		map.on('addmenu', this._addMenu, this);
 		map.on('languagesupdated', this._onInitLanguagesMenu, this);
 		map.on('updatetoolbarcommandvalues', this._onStyleMenu, this);
-
-		this._resetOverflow();
 	},
 
 	onRemove: function() {
@@ -1342,8 +1380,6 @@ L.Control.Menubar = L.Control.extend({
 
 		this._menubarCont.remove();
 		this._menubarCont = null;
-
-		this._resetOverflow();
 	},
 
 	_addMenu: function (e) {
@@ -1613,22 +1649,6 @@ L.Control.Menubar = L.Control.extend({
 		}
 	},
 
-	// needed for smartmenus to work inside notebookbar
-	_setupOverflow: function() {
-		$('.main-nav.hasnotebookbar').css('overflow', 'visible');
-		$('.notebookbar-scroll-wrapper').css('overflow', 'visible');
-	},
-
-	_resetOverflow: function() {
-		$('.main-nav').css('overflow', '');
-		$('.notebookbar-scroll-wrapper').css('overflow', '');
-	},
-
-	_onMouseOut: function(e) {
-		var self = e.data.self;
-		self._resetOverflow();
-	},
-
 	_checkedMenu: function(uno, item) {
 		var constChecked = 'lo-menu-item-checked';
 		var state = this._map['stateChangeHandler'].getItemValue(uno);
@@ -1643,7 +1663,6 @@ L.Control.Menubar = L.Control.extend({
 
 	_beforeShow: function(e, menu) {
 		var self = e.data.self;
-		self._setupOverflow();
 		var items = $(menu).children().children('a').not('.has-submenu');
 		$(items).each(function() {
 			var aItem = this;
@@ -1715,10 +1734,12 @@ L.Control.Menubar = L.Control.extend({
 							$(aItem).removeClass(constChecked);
 						}
 					} else if (id == 'toggledarktheme') {
-						if (self._map.uiManager.getDarkModeState()) {
+						if (window.prefs.getBoolean('darkTheme')) {
 							$(aItem).addClass(constChecked);
+							$('#menu-invertbackground').show();
 						} else {
 							$(aItem).removeClass(constChecked);
+							$('#menu-invertbackground').hide();
 						}
 					} else if (id === 'showstatusbar') {
 						if (self._map.uiManager.isStatusBarVisible()) {
@@ -1743,7 +1764,7 @@ L.Control.Menubar = L.Control.extend({
 						else
 							$(aItem).show();
 					} else if (id === 'togglea11ystate') {
-						var enabled = self._map.uiManager.getAccessibilityState();
+						var enabled = window.prefs.getBoolean('accessibilityState');
 						if (enabled) {
 							$(aItem).addClass(constChecked);
 						} else {
@@ -1775,6 +1796,16 @@ L.Control.Menubar = L.Control.extend({
 								$(aItem).removeClass(constChecked);
 							}
 						}
+					} else if (id === 'acceptalltrackedchanges' || id === 'rejectalltrackedchanges') {
+						var command = id === 'acceptalltrackedchanges' ? '.uno:AcceptAllTrackedChanges' : '.uno:RejectAllTrackedChanges';
+						itemState = self._map['stateChangeHandler'].getItemValue(command);
+						if (itemState === 'disabled') {
+							$(aItem).addClass('disabled');
+						} else {
+							$(aItem).removeClass('disabled');
+						}
+					} else if (id === 'serveraudit' && (app.isAdminUser === false || !self._map.serverAuditDialog)) {
+						$(aItem).css('display', 'none');
 					} else {
 						$(aItem).removeClass('disabled');
 					}
@@ -1864,16 +1895,11 @@ L.Control.Menubar = L.Control.extend({
 		} else if (id === 'saveas' && type !== 'menu') { // jsdialog has no type='action'
 			this._map.openSaveAs();
 		} else if (id === 'savecomments') {
-			if (this._map.isPermissionEditForComments()) {
-				this._map.fire('postMessage', {msgId: 'UI_Save'});
-				if (!this._map._disableDefaultAction['UI_Save']) {
-					this._map.save(false, false);
-				}
-			}
+			app.dispatcher.dispatch('savecomments');
 		} else if (id === 'shareas' || id === 'ShareAs') {
-			this._map.dispatch('shareas');
-		} else if (id === 'print') {
-			this._map.print();
+			app.dispatcher.dispatch('shareas');
+		} else if (id === 'print' || id === 'print-notespages') {
+			app.dispatcher.dispatch(id);
 		} else if (id.startsWith('downloadas-')
 			|| id.startsWith('saveas-')
 			|| id.startsWith('export')
@@ -1882,10 +1908,12 @@ L.Control.Menubar = L.Control.extend({
 			|| id === 'deletepage'
 			|| id === 'remotelink'
 			|| id === 'toggledarktheme'
+			|| id === 'invertbackground'
 			|| id === 'home-search'
 			|| id === 'print-active-sheet'
-			|| id == 'print-all-sheets') {
-			this._map.dispatch(id);
+			|| id === 'print-all-sheets'
+			|| id === 'serveraudit') {
+			app.dispatcher.dispatch(id);
 		} else if (id === 'insertcomment') {
 			this._map.insertComment();
 		} else if (id === 'insertgraphic') {
@@ -1897,7 +1925,7 @@ L.Control.Menubar = L.Control.extend({
 		} else if (id === 'zoomin' && this._map.getZoom() < this._map.getMaxZoom()) {
 			this._map.zoomIn(1, null, true /* animate? */);
 		} else if (id === 'showresolved') {
-			this._map.dispatch('showresolvedannotations');
+			app.dispatcher.dispatch('.uno:ShowResolvedAnnotations');
 		} else if (id === 'zoomout' && this._map.getZoom() > this._map.getMinZoom()) {
 			this._map.zoomOut(1, null, true /* animate? */);
 		} else if (id === 'zoomreset') {
@@ -1943,11 +1971,11 @@ L.Control.Menubar = L.Control.extend({
 		} else if (id === 'forum') {
 			window.open('https://forum.collaboraonline.com', '_blank');
 		} else if (id === 'inserthyperlink') {
-			this._map.dispatch('hyperlinkdialog');
+			app.dispatcher.dispatch('hyperlinkdialog');
 		} else if (id === 'keyboard-shortcuts' || id === 'online-help') {
 			this._map.showHelp(id + '-content');
 		} else if (L.Params.revHistoryEnabled && (id === 'rev-history' || id === 'Rev-History' || id === 'last-mod')) {
-			this._map.dispatch('rev-history');
+			app.dispatcher.dispatch('rev-history');
 		} else if (id === 'closedocument') {
 			window.onClose();
 		} else if (id === 'repair') {
@@ -1974,6 +2002,10 @@ L.Control.Menubar = L.Control.extend({
 			this._map.hideSlide();
 		} else if (id.indexOf('morelanguages-') != -1) {
 			this._map.fire('morelanguages', { applyto: id.substr('morelanguages-'.length) });
+		} else if (id === 'acceptalltrackedchanges') {
+			app.dispatcher.dispatch('.uno:AcceptAllTrackedChanges');
+		} else if (id === 'rejectalltrackedchanges') {
+			app.dispatcher.dispatch('.uno:RejectAllTrackedChanges');
 		}
 		// Inform the host if asked
 		if (postmessage)
@@ -2088,7 +2120,7 @@ L.Control.Menubar = L.Control.extend({
 				return false;
 			case 'insertcomment':
 			case 'savecomments':
-				if (!this._map.isPermissionEditForComments()) {
+				if (!app.isCommentEditingAllowed()) {
 					return false;
 				}
 			}
@@ -2124,6 +2156,9 @@ L.Control.Menubar = L.Control.extend({
 		if (menuItem.id && (menuItem.id.startsWith('exportas')) && this._map['wopi'].UserCanNotWriteRelative)
 			return false;
 
+		if (menuItem.id && menuItem.id === 'exportpdf' && window.ThisIsTheAndroidApp)
+			return false;
+
 		if ((menuItem.id === 'shareas' || menuItem.id === 'ShareAs') && !this._map['wopi'].EnableShare)
 			return false;
 
@@ -2149,7 +2184,7 @@ L.Control.Menubar = L.Control.extend({
 		// to get access to.
 		if (menuItem.id && menuItem.id.startsWith('downloadas-')) {
 			var format = menuItem.id.substring('downloadas-'.length);
-			this._map._docLayer.registerExportFormat(menuItem.name, format);
+			app.registerExportFormat(menuItem.name, format);
 
 			if (this._map['wopi'].HideExportOption)
 				return false;
@@ -2158,7 +2193,7 @@ L.Control.Menubar = L.Control.extend({
 		if (menuItem.id && menuItem.id.startsWith('export')) {
 			if (!menuItem.id.startsWith('exportas-')) {
 				var format = menuItem.id.substring('export'.length);
-				this._map._docLayer.registerExportFormat(menuItem.name, format);
+				app.registerExportFormat(menuItem.name, format);
 			}
 
 			if (this._map['wopi'].HideExportOption)
@@ -2426,9 +2461,9 @@ L.Control.Menubar = L.Control.extend({
 				menuStructure['checked'] = true;
 			}
 		} else if (item.id === 'togglea11ystate') {
-			if (this._map.uiManager.getAccessibilityState())
+			if (window.prefs.getBoolean('accessibilityState'))
 				menuStructure['checked'] = true;
-		} else if (item.id === 'toggledarktheme' && this._map.uiManager.getDarkModeState()) {
+		} else if (item.id === 'toggledarktheme' && window.prefs.getBoolean('darkTheme')) {
 			menuStructure['checked'] = true;
 		}
 

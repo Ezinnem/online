@@ -12,6 +12,7 @@
 #include <config.h>
 
 #include "NetUtil.hpp"
+#include "AsyncDNS.hpp"
 #include <common/Util.hpp>
 
 #include "Socket.hpp"
@@ -21,6 +22,7 @@
 
 #include <Poco/Exception.h>
 #include <Poco/Net/DNS.h>
+#include <Poco/Net/NetException.h>
 #include <Poco/Net/NetworkInterface.h>
 
 #include <netdb.h>
@@ -32,11 +34,84 @@ namespace net
 
 #if !MOBILEAPP
 
+struct DNSCacheEntry
+{
+    std::string queryAddress;
+    Poco::Net::HostEntry hostEntry;
+    std::chrono::steady_clock::time_point lookupTime;
+};
+
+static Poco::Net::HostEntry resolveDNS(const std::string& addressToCheck, std::vector<DNSCacheEntry>& querycache)
+{
+    const auto now = std::chrono::steady_clock::now();
+
+    // remove entries >= 20 seconds old
+    std::erase_if(querycache, [now](const auto& entry)->bool {
+                                 auto ageMS = std::chrono::duration_cast<std::chrono::milliseconds>(now - entry.lookupTime).count();
+                                 return ageMS > 20000;
+                              });
+
+    // search for hit
+    auto findIt = std::find_if(querycache.begin(), querycache.end(),
+                               [&addressToCheck](const auto& entry)->bool {
+                                 return entry.queryAddress == addressToCheck;
+                               });
+    if (findIt != querycache.end())
+        return findIt->hostEntry;
+
+    // lookup and cache
+    auto hostEntry = Poco::Net::DNS::resolve(addressToCheck);
+    querycache.push_back(DNSCacheEntry{addressToCheck, hostEntry, now});
+    return hostEntry;
+}
+
+class DNSResolver
+{
+private:
+    std::vector<DNSCacheEntry> _querycache;
+public:
+    Poco::Net::HostEntry resolveDNS(const std::string& addressToCheck)
+    {
+        return net::resolveDNS(addressToCheck, _querycache);
+    }
+};
+
+Poco::Net::HostEntry resolveDNS(const std::string& addressToCheck)
+{
+    static DNSResolver resolver;
+    return resolver.resolveDNS(addressToCheck);
+}
+
+std::string canonicalHostName(const std::string& addressToCheck)
+{
+    return resolveDNS(addressToCheck).name();
+}
+
+std::vector<std::string> resolveAddresses(const std::string& addressToCheck)
+{
+    Poco::Net::HostEntry hostEntry = resolveDNS(addressToCheck);
+    const auto& addresses = hostEntry.addresses();
+    std::vector<std::string> ret;
+    ret.reserve(addresses.size());
+    for (const auto& address : addresses)
+        ret.push_back(address.toString());
+    return ret;
+}
+
+std::string resolveOneAddress(const std::string& addressToCheck)
+{
+    Poco::Net::HostEntry hostEntry = resolveDNS(addressToCheck);
+    const auto& addresses = hostEntry.addresses();
+    if (addresses.empty())
+        throw Poco::Net::NoAddressFoundException(addressToCheck);
+    return addresses[0].toString();
+}
+
 std::string resolveHostAddress(const std::string& targetHost)
 {
     try
     {
-        return Poco::Net::DNS::resolveOne(targetHost).toString();
+        return resolveOneAddress(targetHost);
     }
     catch (const Poco::Exception& exc)
     {
@@ -79,6 +154,133 @@ bool isLocalhost(const std::string& targetHost)
     return false;
 }
 
+void AsyncDNS::startThread()
+{
+    assert(!_thread);
+    _exit = false;
+    _thread.reset(new std::thread(&AsyncDNS::resolveDNS, this));
+}
+
+void AsyncDNS::joinThread()
+{
+    _exit = true;
+    _condition.notify_all();
+    _thread->join();
+    _thread.reset();
+}
+
+void AsyncDNS::dumpQueueState(std::ostream& os) const
+{
+    // NOT thread-safe
+    auto activeLookup = _activeLookup;
+    auto lookups = _lookups;
+    os << "  active lookup: " << (activeLookup.cb ? "true" : "false") << '\n';
+    if (activeLookup.cb)
+    {
+        os << "    lookup: " << activeLookup.query << '\n';
+        os << "    callback: " << activeLookup.dumpState() << '\n';
+    }
+    os << "  queued lookups: " << lookups.size() << '\n';
+    while (!lookups.empty())
+    {
+        os << "    lookup: " << lookups.front().query << '\n';
+        os << "    callback: " << lookups.front().dumpState() << '\n';
+        lookups.pop();
+    }
+}
+
+AsyncDNS::AsyncDNS()
+    : _resolver(std::make_unique<DNSResolver>())
+{
+    startThread();
+}
+
+AsyncDNS::~AsyncDNS()
+{
+    joinThread();
+}
+
+void AsyncDNS::resolveDNS()
+{
+    std::unique_lock<std::mutex> guard(_lock);
+    while (true)
+    {
+        while (_lookups.empty() && !_exit)
+            _condition.wait(guard);
+
+        if (_exit)
+            break;
+
+        _activeLookup = _lookups.front();
+        _lookups.pop();
+
+        // Unlock to allow entries to queue up in _lookups while
+        // resolving
+        _lock.unlock();
+
+        std::string hostToCheck, exception;
+
+        try
+        {
+            hostToCheck = _resolver->resolveDNS(_activeLookup.query).name();
+        }
+        catch (const Poco::Exception& exc)
+        {
+            exception = "net::canonicalHostName(\"" + _activeLookup.query + "\") failed: " + exc.displayText();
+        }
+
+        _activeLookup.cb(hostToCheck, exception);
+
+        _activeLookup = {};
+
+        _lock.lock();
+    }
+}
+
+void AsyncDNS::addLookup(const std::string& lookup, const DNSThreadFn& cb,
+                         const DNSThreadDumpStateFn& dumpState)
+{
+    std::unique_lock<std::mutex> guard(_lock);
+    _lookups.emplace(Lookup({lookup, cb, dumpState}));
+    guard.unlock();
+    _condition.notify_one();
+}
+
+static std::unique_ptr<AsyncDNS> AsyncDNSThread;
+
+//static
+void AsyncDNS::startAsyncDNS()
+{
+    AsyncDNSThread = std::make_unique<AsyncDNS>();
+}
+
+//static
+void AsyncDNS::dumpState(std::ostream& os)
+{
+    if (AsyncDNSThread)
+    {
+        os << "AsyncDNS:\n";
+        AsyncDNSThread->dumpQueueState(os);
+    }
+    else
+    {
+        os << "AsyncDNS : doesn't exist.\n";
+    }
+}
+
+//static
+void AsyncDNS::stopAsyncDNS()
+{
+    AsyncDNSThread.reset();
+}
+
+//static
+void AsyncDNS::canonicalHostName(const std::string& addressToCheck, const DNSThreadFn& cb,
+                                 const DNSThreadDumpStateFn& dumpState)
+{
+    AsyncDNSThread->addLookup(addressToCheck, cb, dumpState);
+}
+
 #endif //!MOBILEAPP
 
 std::shared_ptr<StreamSocket>
@@ -119,7 +321,7 @@ connect(const std::string& host, const std::string& port, const bool isSSL,
 
             if (ai->ai_addrlen && ai->ai_addr)
             {
-                int fd = ::socket(ai->ai_addr->sa_family, SOCK_STREAM | SOCK_NONBLOCK, 0);
+                int fd = ::socket(ai->ai_addr->sa_family, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, 0);
                 if (fd < 0)
                 {
                     LOG_SYS("Failed to create socket");
@@ -224,3 +426,4 @@ bool parseUri(std::string uri, std::string& scheme, std::string& host, std::stri
 }
 
 } // namespace net
+/* vim:set shiftwidth=4 softtabstop=4 expandtab: */

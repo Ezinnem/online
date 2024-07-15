@@ -9,11 +9,28 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-window.app = { // Shouldn't have any functions defined.
+/*
+	Shouldn't have any functions defined. See "docstatefunctions.js" for state functions.
+	Class definitions can be added into "definitions" property and used like in below examples:
+		* app.sectionContainer.addSection(new app.definitions.AutoFillMarkerSection());
+		* var autoFillSection = new app.definitions.AutoFillMarkerSection();
+*/
+window.app = {
 	definitions: {}, // Class instances are created using definitions under this variable.
 	dpiScale: window.devicePixelRatio,
 	roundedDpiScale: Math.round(window.devicePixelRatio),
+	canvasSize: null, // To be assigned SimplePoint.
+	viewId: null, // Unique view id of the user.
+	isAdminUser: null, // Is admin on the integrator side - used eg. to show update warnings
+	calc: {
+		cellAddress: null, // To be assigned SimplePoint.
+		cellCursorVisible: false,
+		cellCursorRectangle: null, // To be assigned SimpleRectangle.
+		otherCellCursors: {},
+		splitCoordinate: null, // SimplePoint.
+	},
 	map: null, // Make map object a part of this.
+	dispatcher: null, // A Dispatcher class instance is assigned to this.
 	twipsToPixels: 0, // Twips to pixels multiplier.
 	pixelsToTwips: 0, // Pixels to twips multiplier.
 	UI: {
@@ -28,43 +45,37 @@ window.app = { // Shouldn't have any functions defined.
 		readOnly: true,
 		permission: 'readonly',
 		disableSidebar: false,
-		cursor: {
+		textCursor: {
 			visible: false,
 
 			/*
 				Starts as null, so we can see if the first invalidation happened or not.
-				This is a rectangle: [x, y, w, h].
+				This is a simpleRectangle.
 				One should consider this as a document object coordinate as in CanvasSectionContainer.
 				This gives the coordinate relative to the document, not relative to the UI.
-				In core pixels.
 			*/
-			rectangle: null
+			rectangle: null // SimpleRectangle.
 		},
 		size: {
 			pixels: [0, 0], // This can change according to the zoom level and document's size.
 			twips: [0, 0]
 		},
-		viewedRectangle: [0, 0, 0, 0], // Visible part of the file (x, y, w, h).
+		viewedRectangle: null, // Visible part of the file - SimpleRectangle.
 		fileBasedView: false, // (draw-impress only) Default is false. For read-only documents, user can view all parts at once. In that case, this variable is set to "true".
-		calc: {
-			cellCursor: {
-				address: [0, 0],
-				rectangle: {
-					pixels: [0, 0, 0, 0],
-					twips: [0, 0, 0, 0]
-				},
-				visible: false,
-			}
-		},
 		writer: {
-			pageRectangleList: [], // Array of arrays: [x, y, w, h] (as usual) // twips only. Pixels will be calculated on the fly. Corresponding pixels may change too ofte
+			pageRectangleList: [], // Array of arrays: [x, y, w, h] (as usual) // twips only. Pixels will be calculated on the fly. Corresponding pixels may change too often.
 		},
+		exportFormats: [] // possible output formats
 	},
 	view: {
 		commentHasFocus: false,
 		size: {
 			pixels: [0, 0] // This can be larger than the document's size.
 		}
+	},
+	following: { // describes which cursor we follow with the view
+		mode: 'none', // none | user | editor
+		viewId: -1, // viewId of currently followed user
 	},
 	tile: {
 		size: {
@@ -93,6 +104,9 @@ window.app = { // Shouldn't have any functions defined.
 		'ThemeColors': { name: _('Theme colors'), colors: [] },
 		'DocumentColors': { name: _('Document colors'), colors: [] },
 	},
+	colorLastSelection: {}, // last used colors for uno commands
+
+	serverAudit: null, // contains list of warnings / errors detected on the server instance
 };
 
 var activateValidation = false;
@@ -128,7 +142,6 @@ if (activateValidation) {
 
 	window.app = new Proxy(window.app, validator);
 	window.app.file = new Proxy(window.app.file, validator);
-
 }
 
 window.JSDialog = {}; // initialize jsdialog module

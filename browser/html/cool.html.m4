@@ -16,6 +16,8 @@ m4_ifelse(IOSAPP,[true],
 <title>Online Editor</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0 minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="previewImg" content="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyMDAgMjAwJz4KICAgPGNpcmNsZSB0cmFuc2Zvcm09J3JvdGF0ZSgwKScgdHJhbnNmb3JtLW9yaWdpbj0nY2VudGVyJyBmaWxsPSdub25lJyBzdHJva2U9JyNCNkI2QjYnIHN0cm9rZS13aWR0aD0nMTUnIHN0cm9rZS1saW5lY2FwPSdyb3VuZCcgc3Ryb2tlLWRhc2hhcnJheT0nMjMwIDEwMDAnIHN0cm9rZS1kYXNob2Zmc2V0PScwJyBjeD0nMTAwJyBjeT0nMTAwJyByPSc3MCc+CiAgICAgPGFuaW1hdGVUcmFuc2Zvcm0KICAgICAgICAgYXR0cmlidXRlTmFtZT0ndHJhbnNmb3JtJwogICAgICAgICB0eXBlPSdyb3RhdGUnCiAgICAgICAgIGZyb209JzAnCiAgICAgICAgIHRvPSczNjAnCiAgICAgICAgIGR1cj0nMicKICAgICAgICAgcmVwZWF0Q291bnQ9J2luZGVmaW5pdGUnPgogICAgICA8L2FuaW1hdGVUcmFuc2Zvcm0+CiAgIDwvY2lyY2xlPgo8L3N2Zz4=">
+<meta name="previewSmile" content="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjRweCIgdmlld0JveD0iMCAtOTYwIDk2MCA5NjAiIHdpZHRoPSIyNHB4IiBmaWxsPSIjNWY2MzY4Ij48cGF0aCBkPSJtNDI0LTI5NiAyODItMjgyLTU2LTU2LTIyNiAyMjYtMTE0LTExNC01NiA1NiAxNzAgMTcwWm01NiAyMTZxLTgzIDAtMTU2LTMxLjVUMTk3LTE5N3EtNTQtNTQtODUuNS0xMjdUODAtNDgwcTAtODMgMzEuNS0xNTZUMTk3LTc2M3E1NC01NCAxMjctODUuNVQ0ODAtODgwcTgzIDAgMTU2IDMxLjVUNzYzLTc2M3E1NCA1NCA4NS41IDEyN1Q4ODAtNDgwcTAgODMtMzEuNSAxNTZUNzYzLTE5N3EtNTQgNTQtMTI3IDg1LjVUNDgwLTgwWm0wLTgwcTEzNCAwIDIyNy05M3Q5My0yMjdxMC0xMzQtOTMtMjI3dC0yMjctOTNxLTEzNCAwLTIyNyA5M3QtOTMgMjI3cTAgMTM0IDkzIDIyN3QyMjcgOTNabTAtMzIwWiIvPjwvc3ZnPg==">
 
 <script>
 m4_dnl# Define MOBILEAPP as true if this is either for the iOS app or for the gtk+ "app" testbed
@@ -107,6 +109,18 @@ m4_ifelse(EMSCRIPTENAPP,[true],
   [   window.ThisIsTheEmscriptenApp = false;]
 )
 
+// This function may look unused, but it's needed in WASM and Android to send data through the fake websocket. Please
+// don't remove it without first grepping for 'Base64ToArrayBuffer' in the C++ code
+var Base64ToArrayBuffer = function(base64Str) {
+  var binStr = atob(base64Str);
+  var ab = new ArrayBuffer(binStr.length);
+  var bv = new Uint8Array(ab);
+  for (var i = 0, l = binStr.length; i < l; i++) {
+    bv[[i]] = binStr.charCodeAt(i);
+  }
+  return ab;
+}
+
   window.bundlejsLoaded = false;
   window.fullyLoadedAndReady = false;
   window.addEventListener('load', function() {
@@ -185,34 +199,38 @@ m4_ifelse(MOBILEAPP,[true],
           <!-- visuallyhidden: hide it visually but keep it available to screen reader and other assistive technology -->
           <label class="visuallyhidden" for="document-name-input" aria-hidden="false">Document name</label>
           <input id="document-name-input" type="text" spellcheck="false" disabled="true" style="display: none"/>
+          <div id="document-name-input-loading-bar"></div>
+          <progress id="document-name-input-progress-bar" class="progress-bar" value="0" max="99"></progress>
         </div>
       </div>
 
       <div id="userListHeader">
-        <button id="userListSummary"></button>
-        <div id="userListPopover"></div>
+        <div id="followingChipBackground">
+          <div id="followingChip"></div>
+        </div>
+        <div id="userListSummaryBackground"><button id="userListSummary"></button></div>
       </div>
-
+      <div id="closebuttonwrapperseparator"></div>
       <div id="closebuttonwrapper">
         <div class="closebuttonimage" id="closebutton"></div>
       </div>
      </nav>
 
-     <table id="toolbar-wrapper">
-     <tr>
-       <td id="toolbar-logo"></td>
-       <td id="toolbar-mobile-back" class="editmode-off"></td>
-       <td id="toolbar-up"></td>
-       <td id="toolbar-hamburger">
-         <label class="main-menu-btn" for="main-menu-state">
-           <span class="main-menu-btn-icon" id="main-menu-btn-icon"></span>
-         </label>
-       </td>
-     </tr>
-     <tr>
-       <td colspan="4" id="formulabar" style="display: none"></td>
-     </tr>
-    </table>
+     <div id="toolbar-wrapper" role="toolbar" aria-orientation="horizontal">
+        <div id="toolbar-row" class="toolbar-row">
+          <div id="toolbar-logo"></div>
+          <div id="toolbar-mobile-back" class="editmode-off"></div>
+          <div class="jsdialog ui-spacer"></div>
+          <div id="toolbar-up"></div>
+          <div id="toolbar-hamburger">
+            <label class="main-menu-btn" for="main-menu-state">
+              <span class="main-menu-btn-icon" id="main-menu-btn-icon"></span>
+            </label>
+          </div>
+        </div>
+       <div colspan="4" id="formulabar" style="display: none"></div>
+       <progress id="mobile-progress-bar" class="progress-bar" value="0" max="99"></progress>
+    </div>
 
     <input id="insertgraphic" aria-labelledby="menu-insertgraphic" type="file" accept="image/*" style="position: fixed; top: -100em">
     <input id="selectbackground" aria-labelledby="menu-selectbackground" type="file" accept="image/*" style="position: fixed; top: -100em">
@@ -272,6 +290,8 @@ m4_ifelse(MOBILEAPP,[true],
             <div id="slow-proxy"></div>
             m4_ifelse(DEBUG,[true],[<div id="js-dialog">JSDialogs: <a href="javascript:void(function() { app.socket.sendMessage('uno .uno:WidgetTestDialog') }() )">View widgets</a></div>])
             <div id="routeToken"></div>
+            <div id="wopi-host-id" style="display: none">%WOPI_HOST_ID%</div>
+            <div id="proxy-prefix-id" style="display: none">%PROXY_PREFIX_ENABLED%</div>
             <p style="margin-inline-end: auto;"><span dir="ltr">Copyright © _YEAR_, VENDOR.</span></p>
           </div>
         </div>
@@ -299,20 +319,20 @@ m4_ifelse(MOBILEAPP,[true],
       window.coolLogging = 'true';
       window.enableWelcomeMessage = false;
       window.autoShowWelcome = false;
-	  window.autoShowFeedback = true;
+      window.autoShowFeedback = true;
+      window.allowUpdateNotification = false;
       window.outOfFocusTimeoutSecs = 1000000;
       window.idleTimeoutSecs = 1000000;
       window.protocolDebug = false;
       window.frameAncestors = '';
       window.socketProxy = false;
       window.tileSize = 256;
-      window.groupDownloadAsForNb = 'true'
       window.uiDefaults = {};
       window.useIntegrationTheme = 'false';
       window.checkFileInfoOverride = {};
       window.deeplEnabled = false;
       window.zoteroEnabled = false;
-      window.savedUIState = false;
+      window.savedUIState = true;
       window.wasmEnabled = false;
       window.indirectionUrl='';],
      [window.host = '%HOST%';
@@ -328,6 +348,7 @@ m4_ifelse(MOBILEAPP,[true],
       window.enableWelcomeMessage = %ENABLE_WELCOME_MSG%;
       window.autoShowWelcome = %AUTO_SHOW_WELCOME%;
       window.autoShowFeedback = %AUTO_SHOW_FEEDBACK%;
+      window.allowUpdateNotification = %ENABLE_UPDATE_NOTIFICATION%;
       window.userInterfaceMode = '%USER_INTERFACE_MODE%';
       window.useIntegrationTheme = '%USE_INTEGRATION_THEME%';
       window.enableMacrosExecution = '%ENABLE_MACROS_EXECUTION%';
@@ -338,7 +359,6 @@ m4_ifelse(MOBILEAPP,[true],
       window.frameAncestors = decodeURIComponent('%FRAME_ANCESTORS%');
       window.socketProxy = %SOCKET_PROXY%;
       window.tileSize = 256;
-      window.groupDownloadAsForNb = %GROUP_DOWNLOAD_AS%;
       window.uiDefaults = %UI_DEFAULTS%;
       window.checkFileInfoOverride = %CHECK_FILE_INFO_OVERRIDE%;
       window.deeplEnabled = %DEEPL_ENABLED%;
@@ -361,9 +381,8 @@ m4_ifelse(IOSAPP,[true],
 m4_ifelse(ANDROIDAPP,[true],
      [window.userInterfaceMode = window.coolParams.get('userinterfacemode');])
 
-m4_ifelse(ANDROIDAPP,[true],
-     [var darkTheme = window.coolParams.get('darkTheme');
-      if (darkTheme) {window.uiDefaults = {'darkTheme': true};}])
+var darkTheme = window.coolParams.get('darkTheme');
+if (darkTheme) {window.uiDefaults = {'darkTheme': true};}
 
 m4_ifelse(EMSCRIPTENAPP,[true],
      [window.userInterfaceMode = 'notebookbar';])

@@ -4,6 +4,8 @@ if ENABLE_TESTS
 export MAX_CONCURRENCY=4
 AUTOMAKE_OPTION = serial-tests
 
+DIST_FOLDER ?= $(abs_top_builddir)/browser/dist
+
 # unittest: tests that run a captive coolwsd as part of themselves.
 check_PROGRAMS = fakesockettest
 
@@ -14,7 +16,7 @@ if ENABLE_SSL
 include_paths += ${OPENSSL_CFLAGS}
 endif
 
-AM_CXXFLAGS = $(CPPUNIT_CFLAGS) -DTDOC=\"$(abs_top_srcdir)/test/data\" \
+AM_CXXFLAGS = $(CPPUNIT_CFLAGS) -DTDOC=\"$(abs_top_srcdir)/test/data\" -DTDIST=\"$(DIST_FOLDER)\" \
 	-I${top_srcdir}/common -I${top_srcdir}/net -I${top_srcdir}/wsd -I${top_srcdir}/kit \
 	-I${top_srcdir} -I${top_srcdir}/test \
 	-pthread -DCOOLWSD_DATADIR='"@COOLWSD_DATADIR@"' \
@@ -30,6 +32,9 @@ AM_CXXFLAGS = $(CPPUNIT_CFLAGS) -DTDOC=\"$(abs_top_srcdir)/test/data\" \
 # 'Finished in' in the `make check` output.
 # When adding new tests, please maintain order.
 all_la_unit_tests = \
+	unit-perf.la \
+	unit-proxy.la \
+	unit-synthetic-lok.la \
 	unit-wopi-async-slow.la \
 	unit-tiletest.la \
 	unit-wopi-fail-upload.la \
@@ -40,7 +45,9 @@ all_la_unit_tests = \
 	unit-httpws.la \
 	unit-quarantine.la \
 	unit-load-torture.la \
+	unit-save-torture.la \
 	unit-copy-paste.la \
+	unit-copy-paste-writer.la \
 	unit-crash.la \
 	unit-wopi-fileurl.la \
 	unit-wopi-save-on-exit.la \
@@ -81,6 +88,7 @@ all_la_unit_tests = \
 	unit-prefork.la \
 	unit-bad-doc-load.la \
 	unit-hosting.la \
+	unit-join-disconnect.la \
 	unit-timeout.la \
 	unit-base.la
 #	unit-admin.la
@@ -111,9 +119,10 @@ endif
 AM_CPPFLAGS = -pthread -I$(top_srcdir) -DBUILDING_TESTS -DLOK_ABORT_ON_ASSERTION
 
 wsd_sources = \
-            ../common/SpookyV2.cpp \
             ../common/Authorization.cpp \
+            ../common/SpookyV2.cpp \
             ../kit/Kit.cpp \
+            ../kit/KitWebSocket.cpp \
             ../kit/TestStubs.cpp \
             ../wsd/FileServerUtil.cpp \
             ../wsd/RequestDetails.cpp \
@@ -121,7 +130,7 @@ wsd_sources = \
             ../wsd/ProofKey.cpp
 
 test_base_sources = \
-	TileQueueTests.cpp \
+	KitQueueTests.cpp \
 	RequestDetailsTests.cpp \
 	StringVectorTests.cpp \
 	FileServeWhiteBoxTests.cpp \
@@ -137,15 +146,16 @@ common_sources = \
 	../common/ConfigUtil.cpp \
 	../common/DummyTraceEventEmitter.cpp \
 	../common/Log.cpp \
-	../common/MessageQueue.cpp \
 	../common/Session.cpp \
 	../common/SigUtil.cpp \
 	../common/Unit.cpp \
 	../common/FileUtil.cpp \
 	../common/Util.cpp \
+	../common/Util-desktop.cpp \
 	../common/StringVector.cpp \
 	../common/TraceEvent.cpp \
 	../common/Simd.cpp \
+	../kit/KitQueue.cpp \
 	../wsd/Exceptions.cpp \
 	../net/HttpRequest.cpp \
 	../net/Socket.cpp \
@@ -175,18 +185,18 @@ unit_base_la_LIBADD += -lssl -lcrypto
 endif
 
 fakesockettest_CPPFLAGS = -g
-fakesockettest_SOURCES = fakesockettest.cpp  ../net/FakeSocket.cpp ../common/DummyTraceEventEmitter.cpp ../common/Log.cpp ../common/Util.cpp
+fakesockettest_SOURCES = fakesockettest.cpp  ../net/FakeSocket.cpp ../common/DummyTraceEventEmitter.cpp ../common/Log.cpp ../common/Util.cpp ../common/Util-desktop.cpp
 fakesockettest_LDADD = $(CPPUNIT_LIBS)
 
 # old-style unit tests - bootstrapped via UnitClient
 unit_base_la_SOURCES = UnitClient.cpp ${test_base_sources}
-unit_tiletest_la_SOURCES = UnitClient.cpp TileCacheTests.cpp
+unit_tiletest_la_SOURCES = UnitClient.cpp TileCacheTests.cpp KitPidHelpers.cpp
 unit_tiletest_la_LIBADD = $(CPPUNIT_LIBS)
-unit_integration_la_SOURCES = UnitClient.cpp integration-http-server.cpp
+unit_integration_la_SOURCES = UnitClient.cpp integration-http-server.cpp KitPidHelpers.cpp
 unit_integration_la_LIBADD = $(CPPUNIT_LIBS)
-unit_httpws_la_SOURCES = UnitClient.cpp httpwstest.cpp
+unit_httpws_la_SOURCES = UnitClient.cpp httpwstest.cpp KitPidHelpers.cpp
 unit_httpws_la_LIBADD = $(CPPUNIT_LIBS)
-unit_crash_la_SOURCES = UnitClient.cpp httpcrashtest.cpp
+unit_crash_la_SOURCES = UnitClient.cpp httpcrashtest.cpp KitPidHelpers.cpp
 unit_crash_la_LIBADD = $(CPPUNIT_LIBS)
 
 # unit test modules:
@@ -201,7 +211,11 @@ unit_typing_la_SOURCES = UnitTyping.cpp
 unit_typing_la_LIBADD = $(CPPUNIT_LIBS)
 unit_copy_paste_la_SOURCES = UnitCopyPaste.cpp
 unit_copy_paste_la_LIBADD = $(CPPUNIT_LIBS)
+unit_copy_paste_writer_la_SOURCES = UnitCopyPasteWriter.cpp
+unit_copy_paste_writer_la_LIBADD = $(CPPUNIT_LIBS)
 unit_convert_la_SOURCES = UnitConvert.cpp
+unit_join_disconnect_la_SOURCES = UnitJoinDisconnect.cpp
+unit_join_disconnect_la_LIBADD = $(CPPUNIT_LIBS)
 unit_timeout_la_SOURCES = UnitTimeout.cpp
 unit_timeout_la_LIBADD = $(CPPUNIT_LIBS)
 unit_prefork_la_SOURCES = UnitPrefork.cpp
@@ -262,6 +276,10 @@ unit_paste_la_SOURCES = UnitPaste.cpp
 unit_paste_la_LIBADD = $(CPPUNIT_LIBS)
 unit_load_torture_la_SOURCES = UnitLoadTorture.cpp
 unit_load_torture_la_LIBADD = $(CPPUNIT_LIBS)
+unit_save_torture_la_SOURCES = UnitSaveTorture.cpp
+unit_save_torture_la_LIBADD = $(CPPUNIT_LIBS)
+unit_synthetic_lok_la_SOURCES = UnitSyntheticLok.cpp
+unit_synthetic_lok__la_LIBADD = $(CPPUNIT_LIBS)
 unit_rendering_options_la_SOURCES = UnitRenderingOptions.cpp
 unit_rendering_options_la_LIBADD = $(CPPUNIT_LIBS)
 unit_password_protected_la_SOURCES = UnitPasswordProtected.cpp
@@ -292,6 +310,10 @@ unit_hosting_la_SOURCES = UnitHosting.cpp
 unit_hosting_la_LIBADD = $(CPPUNIT_LIBS)
 unit_quarantine_la_SOURCES = UnitQuarantine.cpp
 unit_quarantine_la_LIBADD = $(CPPUNIT_LIBS)
+unit_perf_la_SOURCES = UnitPerf.cpp
+unit_perf_la_LIBADD = $(CPPUNIT_LIBS) $(LIBPFM_LIBS)
+unit_proxy_la_SOURCES = UnitProxy.cpp
+unit_proxy_la_LIBADD = $(CPPUNIT_LIBS) $(LIBPFM_LIBS)
 
 if HAVE_LO_PATH
 SYSTEM_STAMP = @SYSTEMPLATE_PATH@/system_stamp

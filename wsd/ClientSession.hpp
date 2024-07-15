@@ -320,6 +320,8 @@ private:
     /// If this session is read-only because of failed lock, try to unlock and make it read-write.
     bool attemptLock(const std::shared_ptr<DocumentBroker>& docBroker);
 
+    std::string getIsAdminUserStatus() const;
+
 private:
     std::weak_ptr<DocumentBroker> _docBroker;
 
@@ -419,6 +421,9 @@ private:
 
     /// the canonical id unique to the set of rendering properties of this session
     int _canonicalViewId;
+
+    /// If server audit was already sent
+    bool _sentAudit;
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

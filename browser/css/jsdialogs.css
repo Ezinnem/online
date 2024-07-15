@@ -42,17 +42,27 @@
 	min-width: 400px;
 }
 
+.jsdialog-container:not(.snackbar) td[role='gridcell'] {
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+#AcceptRejectChangesDialog {
+	width: max-content;
+	max-width: 1000px;
+}
 .jsdialog.one-child-popup {
 	border: 0;
 	margin: 0 !important;
 }
 
-.jsdialog-window.modalpopup:not(.snackbar) {
+.jsdialog-window.modalpopup:not(.snackbar),
+.hyperlink-pop-up-container {
 	min-width: 198px;
 	max-width: 498px;
 	border: 1px solid var(--color-border-darker) !important;
 	border-radius: var(--border-radius);
-	box-shadow: 0 0 3px var(--color-border-darker);
+	box-shadow: 0 0 3px var(--color-box-shadow);
 	overflow: auto;
 	position: relative;
 	margin: auto;
@@ -142,7 +152,7 @@
 	vertical-align: middle;
 }
 
-.jsdialog.vertical:not(.sidebar) {
+.jsdialog.vertical:not(.sidebar):not(.ui-separator) {
 	width: 100%;
 }
 
@@ -223,22 +233,28 @@ td.jsdialog > [id^='table-box']:not(.sidebar) {
 	background-color: transparent;
 }
 .jsdialog.ui-separator.vertical {
-	height: 100%;
-	padding-right: 6px;
-	/* border-right: 1px dashed #888; */
-	background-image: linear-gradient(#888 22%, rgba(255,255,255,0) 0%);
-	background-position: right center;
-	background-size: 1px 14px;
-	background-repeat: repeat-y;
-	box-shadow: inset 0 34px 0 0 white;
+	margin: 5px 0px;
+	padding-right: 1px;
+	background-color: var(--color-background-darker);
 }
 
 .jsdialog.ui-separator.horizontal {
-	width: 100%;
 	margin: 0px;
 	background-color: var(--color-border-lighter);
 	border: none;
 	height: 1px;
+}
+
+/* Badge */
+.ui-badge {
+	padding: 5px !important;
+	color: var(--color-main-text);
+	background-color: var(--color-background-darker);
+	border-width: 0px;
+	border-radius: var(--border-radius);
+	font-family: var(--cool-font);
+	font-size: var(--default-font-size);
+	font-weight: normal;
 }
 
 /* Tabs */
@@ -365,8 +381,8 @@ td.jsdialog > [id^='table-box']:not(.sidebar) {
 }
 
 .ui-listview-icon {
-	height: var(--btn-size);
-	width: var(--btn-size);
+	height: var(--btn-size-s);
+	width: var(--btn-size-s);
 	margin-inline-end: 8px;
 	vertical-align: middle;
 }
@@ -391,6 +407,18 @@ td.jsdialog > [id^='table-box']:not(.sidebar) {
 .ui-expander-content > .root-container.jsdialog {
 	margin: 4px;
 }
+
+/* Link Button*/
+
+.ui-linkbutton {
+	color: var(--color-text-dark) !important;
+}
+
+.ui-linkbutton:hover {
+	cursor: pointer;
+	color: var(--color-text-lighter) !important;
+}
+
 /* TreeView */
 
 .ui-treeview {
@@ -419,7 +447,7 @@ td.jsdialog > [id^='table-box']:not(.sidebar) {
 	min-height: 100px;
 	min-width: 100px;
 	max-height: 150px;
-	width: max-content;
+	width: inherit;
 }
 
 .ui-treeview.empty .ui-treeview-body {
@@ -635,6 +663,7 @@ input[type='checkbox']:checked.autofilter, .jsdialog input[type='checkbox']:chec
 	border: none;
 	height: 18px;
 	width: 20px;
+	display: block;
 }
 
 .jsdialog .radiobutton > label {
@@ -677,6 +706,10 @@ input[type='checkbox']:checked.autofilter, .jsdialog input[type='checkbox']:chec
 	background-color: var(--color-background-lighter);
 }
 
+.jsdialog.spinfieldcontainer[disabled] input {
+	border: 1px solid var(--color-border-lighter);
+}
+
 .spinfield {
 	padding: 4px 0 4px 4px;
 	height: 28px;
@@ -690,7 +723,7 @@ input[type='checkbox']:checked.autofilter, .jsdialog input[type='checkbox']:chec
 	font-size: var(--default-font-size);
 	color: var(--color-text-dark);
 	margin: 5px;
-	margin-inline-start: calc(-40px);
+	margin-inline-start: calc(-50px);
 }
 /* spinfield (number) */
 input[type='number'] {
@@ -723,13 +756,12 @@ input[type='number']:hover::-webkit-outer-spin-button {
 }
 
 .ui-listbox,
-.ui-combobox {
+.ui-combobox,
+.ui-timefield  {
 	box-sizing: border-box;
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	appearance: none;
-	min-width: 100px;
-	width: 100%;
 	height: 28px;
 	line-height: normal;
 	font-size: var(--default-font-size);
@@ -737,6 +769,14 @@ input[type='number']:hover::-webkit-outer-spin-button {
 	border-radius: var(--border-radius);
 	background-color: var(--color-background-dark);
 	color: var(--color-text-dark);
+}
+
+.jsdialog-window .ui-listbox,
+.jsdialog-window .ui-combobox,
+.jsdialog-window .ui-timefield {
+	height: 32px;/* Use the same height as in .jsdialog.ui-edit */
+	min-width: 100px;
+	width: 100%;
 }
 
 .ui-listbox option {
@@ -777,14 +817,16 @@ input[type='number']:hover::-webkit-outer-spin-button {
 }
 
 /* ui-combobox */
-.ui-combobox {
+.ui-combobox,
+.ui-timefield {
 	border: 1px solid var(--color-border);
 }
 
 .ui-combobox-content {
 	width: 100%;
 	border: none;
-	border-radius: var(--border-radius) 0px 0px var(--border-radius);
+	border-start-start-radius: var(--border-radius);
+	border-end-start-radius: var(--border-radius);
 	color: var(--color-text-dark);
 	background-color: var(--color-background-lighter);
 }
@@ -820,13 +862,15 @@ input[type='number']:hover::-webkit-outer-spin-button {
 
 .ui-combobox-entry {
 	width: calc(100% + 15px); /* + padding for scrollbar */
+	display: flex;
+	align-items: center;
 }
 
-.ui-combobox-entry span:hover {
+.ui-combobox-entry:hover {
 	background-color: var(--color-background-dark);
 }
 
-.ui-combobox-entry.selected span:not(:hover) {
+.ui-combobox-entry.selected:not(:hover) span {
 	border: 1px solid var(--color-primary);
 	background-color: var(--color-primary);
 	color: var(--color-primary-text);
@@ -842,6 +886,27 @@ input[type='number']:hover::-webkit-outer-spin-button {
 	color: var(--color-text-dark);
 }
 
+.ui-combobox-entry.checked::before {
+	content: '\2713';
+	display: inline-block;
+	color: var(--color-primary);
+	padding: 0 6px;
+}
+
+.ui-combobox-entry.notchecked::before {
+	content: '\2713';
+	display: inline-block;
+	visibility: hidden;
+	padding: 0 6px;
+}
+
+.ui-combobox-icon {
+	background-repeat: no-repeat !important;
+	width: var(--btn-size);
+	height: var(--btn-size);
+}
+
+/* these rules are for custom rendering like font previews */
 .ui-combobox-entry img {
 	border: 1px solid transparent;
 	max-height: 24px; /* required for hidpi*/
@@ -899,6 +964,9 @@ input[type='number']:hover::-webkit-outer-spin-button {
 	background-color: var(--color-background-dark);
 	border: 1px solid var(--color-border-dark);
 	border-radius: var(--border-radius);
+	vertical-align: top;
+	width: -webkit-fill-available;
+	width: -moz-available;
 }
 
 /* buttons: btns.css */
@@ -1050,6 +1118,7 @@ input[type='number']:hover::-webkit-outer-spin-button {
 
 #ZoteroDialog .ui-treeview-body {
 	max-height: 500px;
+	max-width: 100%;
 }
 
 .autofilter-container-submenu > .autofilter-container {
@@ -1058,6 +1127,19 @@ input[type='number']:hover::-webkit-outer-spin-button {
 
 .autofilter-container-submenu .autofilter.root-container .ui-treeview {
 	border-color: transparent;
+}
+
+/* hide radio in filter by color */
+.jsdialog.autofilter #background tr th:nth-of-type(1),
+.jsdialog.autofilter #textcolor tr th:nth-of-type(1),
+.jsdialog.autofilter #background tr td:nth-of-type(1),
+.jsdialog.autofilter #textcolor tr td:nth-of-type(1) {
+	display: none;
+}
+
+/* hide arrow icons in the autofilter menu*/
+#menu img.jsdialog.autofilter.ui-treeview-checkbox {
+	display: none;
 }
 
 /* Word count dialog */
@@ -1171,7 +1253,9 @@ input[type='number']:hover::-webkit-outer-spin-button {
 	height: 5px;
 	width: 24px;
 	position: relative;
-	top: -6px;
+	top: -5px;
+	grid-column: 1;
+	grid-row: 2;
 	border: 1px solid var(--color-border-dark);
 	border-radius: 7px;
 	outline: 1px solid var(--color-background-lighter);
@@ -1194,11 +1278,13 @@ input[type='number']:hover::-webkit-outer-spin-button {
 }
 
 .arrowbackground {
-	width: 15px;
-	height: 23px;
+	box-sizing: border-box;
+	width: 16px;
+	height: 16px;
 	display: inline-block;
 	border-left: 1px solid transparent;
 	background-color: transparent;
+	grid-column: 3;
 }
 
 .arrowbackground:hover {
@@ -1246,15 +1332,14 @@ input[type='number']:hover::-webkit-outer-spin-button {
 	border-top-color: var(--color-text-lighter);
 }
 
-/* sum button in formulabar */
-.formulabar.menubutton {
-	padding: 0px !important;
-	margin: 0 4px 0 0 !important;
-}
-
 /* toolbox */
 .jsdialog.toolbox {
 	display: flex;
+}
+
+.jsdialog.ui-spacer {
+	display: flex;
+	flex-grow: 1;
 }
 
 /* spinner */
@@ -1270,6 +1355,50 @@ input[type='number']:hover::-webkit-outer-spin-button {
 @keyframes spin {
 	0% { transform: rotate(0deg); }
 	100% { transform: rotate(360deg); }
+}
+
+/* color picker */
+.ui-color-picker {
+	padding: 4px;
+}
+
+.ui-color-picker,
+#ui-color-picker-custom,
+#ui-color-picker-recent {
+	display: grid;
+	grid-gap: 4px;
+	align-items: center;
+}
+
+.ui-color-picker-palette {
+	display: grid;
+	grid-gap: 4px;
+}
+
+.ui-color-picker-entry {
+	border: 1px solid transparent;
+	cursor: pointer;
+	width: 16px;
+	height: 16px;
+}
+
+.ui-color-picker-entry:hover {
+	border: 1px solid var(--color-primary);
+}
+
+#ui-color-picker-custom,
+#ui-color-picker-recent {
+	grid-auto-flow: column;
+}
+
+.ui-color-picker .ui-listbox-container,
+.ui-color-picker button {
+	margin: 0px !important;
+	width: 100% !important;
+}
+
+#ui-color-picker-custom input {
+	max-width: 75px;
 }
 
 /* busy popup */
@@ -1570,13 +1699,23 @@ input[type='number']:hover::-webkit-outer-spin-button {
 
 /* toolbuttons */
 
-.jsdialog .ui-content.unobutton {
+.jsdialog:not(.menubutton) > .ui-content.unobutton {
 	width: var(--btn-size);
+}
+
+.jsdialog .ui-content.unobutton {
 	height: var(--btn-size);
-	margin-inline-end: 5px;
+	padding: 0px;
 	vertical-align: middle;
 	background-color: transparent;
 	border: none;
+}
+
+.unotoolbutton.has-dropdown {
+	display: grid;
+	align-items: center;
+	grid-auto-flow: column;
+	grid-template-rows: auto 0px;
 }
 
 .unotoolbutton.jsdialog.sidebar.ui-content > .arrowbackground {
@@ -1632,14 +1771,29 @@ input[type='number']:hover::-webkit-outer-spin-button {
 	filter: invert(.9)
 }
 
+/* scrollable content */
+.ui-scrollable-content {
+	overflow-x: scroll;
+	overflow-y: hidden;
+	scrollbar-width: none; /* Firefox >= 64 */
+	overflow: -moz-scrollbars-none; /* Firefox < 64 */
+	-ms-overflow-style: none;  /* Internet Explorer 10+ */
+	display: flex;
+	align-items: center;
+}
+
+.ui-scrollable-content::-webkit-scrollbar { /* WebKit */
+	width: 0;
+	height: 0;
+}
 
 /* formulabar */
 #sc_input_window.formulabar {
-	height: 28px;
 	border: 1px solid var(--color-border);
 	flex-grow: 1;
 	background-color: var(--color-background-lighter);
 	border-radius: var(--border-radius) 0 0 var(--border-radius);
+	align-self: stretch;
 }
 
 .ui-custom-textarea {
@@ -1667,7 +1821,7 @@ input[type='number']:hover::-webkit-outer-spin-button {
 	grid-column: 1;
 	grid-row: 1;
 	white-space: pre-wrap;
-	text-wrap: wrap;
+	white-space: wrap;
 }
 
 .ui-custom-textarea-cursor-layer {
@@ -1690,17 +1844,30 @@ input[type='number']:hover::-webkit-outer-spin-button {
 }
 
 #sc_input_window.formulabar.expanded {
-	height: 72px !important;
 	border-radius: var(--border-radius) 0 var(--border-radius) var(--border-radius) !important;
 }
 
-.formulabar.unotoolbutton {
-	margin-inline-end: 4px !important;
-	opacity: 0.8;
+#formulabar-buttons-toolbox.formulabar.toolbox {
+	display: grid;
+	grid-auto-flow: column;
+	align-items: center;
+	grid-column-gap: 4px;
+	grid-template-columns: repeat(3, 30px);
 }
 
-#acceptformula {
-	margin-inline-start: 3px;
+#formulabar-buttons-toolbox * {
+	align-items: center;
+	justify-content: center;
+}
+
+.unotoolbutton.formulabar {
+	display: flex;
+}
+
+.formulabar.unotoolbutton {
+	margin: 0 !important;
+	padding: 0 !important;
+	opacity: 0.8;
 }
 
 .formulabar.unotoolbutton:hover {
@@ -1714,7 +1881,7 @@ input[type='number']:hover::-webkit-outer-spin-button {
 }
 
 #expand.formulabar {
-	height: 28px !important;
+	height: 30px !important;
 	margin: 0 !important;
 	border-radius: 0 var(--border-radius) var(--border-radius) 0 !important;
 	border-inline-start: none !important;
@@ -1742,7 +1909,7 @@ input[type='number']:hover::-webkit-outer-spin-button {
 }
 
 #zoterolist.jsdialog {
-	width: 800px;
+	width: calc(min(800px, 80vw));
 }
 
 .jsdialog[id^='zotero'][id$='-label'] {
@@ -1762,8 +1929,47 @@ input[type='number']:hover::-webkit-outer-spin-button {
 	background-color: var(--color-background-lighter);
 	border: 1px solid var(--color-border-darker);
 }
-
+#toolbar-down .jsdialog.menubutton:not([disabled]):hover,
+#toolbar-down .ui-listbox:not([disabled]):hover,
+#toolbar-down .jsdialog.ui-edit:not([disabled]):hover,
+#toolbar-down .jsdialog.ui-textarea:not([disabled]):hover {
+	color: var(--color-text-darker);
+	background-color: transparent !important;
+	border-color: transparent;
+}
+#toolbar-down .unobutton .unolabel {
+	cursor: pointer;
+}
+#toolbar-down .unotoolbutton:hover {
+	background-color: transparent !important;
+	border-color: transparent;
+}
 /* Formula Wizard */
+#FormulaDialog .ui-tabs-root {
+	background-color: var(--color-background-tabs-group);
+	border-radius: var(--border-radius-large);
+}
+#FormulaDialog .jsdialog.ui-tabpage {
+	display: flex;
+}
+#FormulaDialog .jsdialog.ui-tabpage > .ui-grid {
+	grid-template-rows: 0 auto !important;
+	grid-gap: 0px;
+}
+#FormulaDialog #StructPage {
+	display: grid;
+	grid-template-rows: auto 1fr;
+	grid-row-gap: 4px;
+}
+#FormulaDialog #StructPage .ui-treeview-entry {
+	background-color: transparent;
+}
+#FormulaDialog #search {
+	display: flex;
+}
+#FormulaDialog #search-input {
+	flex-grow: 1;
+}
 #FormulaDialog #ParameterPage > .ui-grid-cell {
 	display: flex;
 	flex-direction: column;
@@ -1779,6 +1985,12 @@ input[type='number']:hover::-webkit-outer-spin-button {
 }
 #FormulaDialog #box3 {
 	display: grid;
+	min-width: 400px;
+}
+#FormulaDialog .ui-tabs-content.jsdialog {
+	grid-auto-columns: 250px;
+	margin-right: 0.2em;
+	margin-top: 0px;
 }
 
 div [id^='TemplateDialog'] {
@@ -1897,6 +2109,12 @@ kbd,
 	min-width: 75%;
 }
 
+/* Keyboard shortcuts */
+#modal-dialog-keyboard-shortcuts-content-box {
+	width: 468px;
+	max-width: 95%; /* Safe guard for when window is too small */
+}
+
 /* Calc -> Insert -> Pivot Table */
 #PivotTableLayout #box2 {
 	grid-gap: 12px; /* make space for vertical separator */
@@ -1905,4 +2123,31 @@ kbd,
 /* Modal info with 2 line message*/
 .jsdialog-container [id^='info-modal-label'] {
 	display: flex;
+}
+
+/* DocumentPropertiesDialog Custom props */
+#DocumentPropertiesDialog #headerbox,
+#DocumentPropertiesDialog #properties > .jsdialog.ui-grid {
+	grid-template-columns: 128px 128px auto 26px !important;
+	align-items: center;
+	margin-block-start: 4px;
+}
+
+#DocumentPropertiesDialog #properties > .jsdialog.ui-grid > .ui-grid-cell > .ui-grid-cell {
+	align-items: center;
+	grid-column-gap: 4px;
+}
+
+#DocumentPropertiesDialog #customprops button {
+	line-height: 16px;
+	width: 100%;
+	margin: 0;
+}
+
+#DocumentPropertiesDialog #customprops .jsdialog.ui-scrollwindow {
+	max-height: min-content;
+}
+
+#ServerAuditDialog #ServerAuditDialog-mainbox {
+	min-width: calc(min(800px, 80vw));
 }

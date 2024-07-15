@@ -120,7 +120,6 @@ NODE_MODULES_SRC =\
 
 COOL_CSS_LST =\
 	$(builddir)/node_modules/select2/dist/css/select2.css \
-	$(srcdir)/css/w2ui-1.5.rc1.css \
 	$(srcdir)/css/leaflet.css \
 	$(srcdir)/css/leaflet-spinner.css \
 	$(srcdir)/css/selectionMarkers.css \
@@ -135,7 +134,6 @@ COOL_CSS_LST =\
 	$(srcdir)/css/spreadsheet.css \
 	$(srcdir)/css/writer-mobile.css \
 	$(srcdir)/css/writer.css \
-	$(srcdir)/css/editor.css \
 	$(srcdir)/css/iframedialog.css \
 	$(builddir)/node_modules/jquery-contextmenu/dist/jquery.contextMenu.css \
 	$(builddir)/node_modules/smartmenus/dist/css/sm-core-css.css \
@@ -179,10 +177,6 @@ COOL_LIBS_JS +=\
 	l10n.js
 endif
 
-COOL_LIBS_JS +=\
-	w2ui-1.5.rc1.js \
-	viamapi-client.js
-
 NODE_MODULES_JS_SRC = $(patsubst %.js,$(builddir)/%.js,$(NODE_MODULES_JS))
 NODE_MODULES_JS_DST = $(patsubst %.js,$(DIST_FOLDER)/%.js,$(NODE_MODULES_JS))
 
@@ -194,6 +188,8 @@ COOL_LIBS_JS_DST = $(patsubst %.js,$(DIST_FOLDER)/%.js,$(COOL_LIBS_JS))
 # in a rather precise order.
 COOL_JS_LST =\
 	src/docstate.js \
+	src/docstatefunctions.js \
+	src/docdispatcher.ts \
 	src/Leaflet.js \
 	src/errormessages.js \
 	src/unocommands.js \
@@ -201,11 +197,13 @@ COOL_JS_LST =\
 	src/core/Log.js \
 	src/core/Util.js \
 	src/core/LOUtil.js \
+	src/core/geometry.ts \
 	src/core/Rectangle.ts \
 	src/core/Class.js \
 	src/core/Events.js \
 	src/core/Socket.js \
 	src/core/Matrix.js \
+	src/core/Debug.js \
 	src/geometry/Point.ts \
 	src/geometry/Bounds.ts \
 	src/geometry/Transformation.ts \
@@ -213,7 +211,6 @@ COOL_JS_LST =\
 	src/geo/LatLngBounds.js \
 	src/geo/projection/Projection.LonLat.js \
 	src/geo/crs/CRS.js \
-	src/geo/crs/CRS.Simple.js \
 	src/control/IFrameDialog.js \
 	src/map/Map.js \
 	src/control/Control.IdleHandler.ts \
@@ -221,12 +218,35 @@ COOL_JS_LST =\
 	src/layer/tile/SheetSwitch.ts \
 	src/layer/Layer.js \
 	src/layer/tile/SheetGeometry.ts \
-	src/layer/tile/CanvasSectionProps.js \
-	src/layer/tile/CanvasSectionContainer.ts \
-	src/layer/tile/CommentSection.ts \
-	src/layer/tile/CommentListSection.ts \
-	src/layer/tile/TilesSection.ts \
-	src/layer/tile/AutoFillMarkerSection.ts \
+	src/layer/tile/Premult.ts \
+	src/canvas/CanvasSectionProps.js \
+	src/canvas/CanvasSectionContainer.ts \
+	src/canvas/CanvasSectionObject.ts \
+	src/canvas/sections/CommentSection.ts \
+	src/canvas/sections/CommentListSection.ts \
+	src/canvas/sections/CalcGridSection.ts \
+	src/canvas/sections/SplitSection.ts \
+	src/canvas/sections/PixelGridSection.ts \
+	src/canvas/sections/TilesSection.ts \
+	src/canvas/sections/AutoFillMarkerSection.ts \
+	src/canvas/sections/HTMLObjectSection.ts \
+	src/canvas/sections/URLPopUpSection.ts \
+	src/canvas/sections/InvalidationRectangleSection.ts \
+	src/canvas/sections/ShapeHandlesSection.ts \
+	src/canvas/sections/ShapeHandleCustomSubSection.ts \
+	src/canvas/sections/ShapeHandlePolySubSection.ts \
+	src/canvas/sections/ShapeHandleGluePointSubSection.ts \
+	src/canvas/sections/ShapeHandleAnchorSubSection.ts \
+	src/canvas/sections/ShapeHandleRotationSubSection.ts \
+	src/canvas/sections/ShapeHandleScalingSubSection.ts \
+	src/canvas/sections/ValidityInputHelpSection.ts \
+	src/canvas/sections/CellCursorSection.ts \
+	src/canvas/sections/CellSelectionHandleSection.ts \
+	src/canvas/sections/CalcValidityDropDownSection.ts \
+	src/canvas/sections/TextSelectionHandleSection.ts \
+	src/canvas/sections/OtherViewGraphicSelectionSection.ts \
+	src/canvas/sections/OtherViewCellCursorSection.ts \
+	src/canvas/sections/OtherViewCursorSection.ts \
 	src/layer/vector/CEventsHandler.ts \
 	src/layer/vector/CPointSet.ts \
 	src/layer/vector/CPath.ts \
@@ -238,7 +258,7 @@ COOL_JS_LST =\
 	src/layer/vector/CSplitterLine.ts \
 	src/layer/marker/Cursor.ts \
 	src/layer/vector/CanvasOverlay.ts \
-	src/layer/tile/ScrollSection.ts \
+	src/canvas/sections/ScrollSection.ts \
 	src/layer/tile/CanvasTileLayer.js \
 	src/layer/vector/CDarkOverlay.ts \
 	src/layer/SplitPanesContext.ts \
@@ -247,8 +267,8 @@ COOL_JS_LST =\
 	src/layer/tile/WriterTileLayer.js \
 	src/layer/tile/ImpressTileLayer.js \
 	src/layer/tile/CalcTileLayer.js \
-	src/layer/tile/ContentControlSection.ts \
-	src/layer/BackgroundColor.js \
+	src/canvas/sections/CursorHeaderSection.ts \
+	src/canvas/sections/ContentControlSection.ts \
 	src/layer/marker/ProgressOverlay.js \
 	src/layer/marker/TextInput.js \
 	src/layer/marker/A11yTextInput.js \
@@ -257,34 +277,19 @@ COOL_JS_LST =\
 	src/layer/marker/Marker.js \
 	src/layer/marker/DivIcon.js \
 	src/layer/Popup.js \
-	src/layer/Layer.Popup.js \
-	src/layer/marker/Marker.Popup.js \
 	src/layer/LayerGroup.js \
-	src/layer/FeatureGroup.js \
 	src/layer/vector/Renderer.js \
 	src/layer/vector/Path.js \
-	src/layer/vector/Path.Popup.js \
 	src/geometry/LineUtil.js \
 	src/layer/vector/Polyline.js \
 	src/geometry/PolyUtil.js \
 	src/layer/vector/Polygon.js \
 	src/layer/vector/Rectangle.js \
-	src/layer/vector/CircleMarker.js \
-	src/layer/vector/Circle.js \
-	src/layer/vector/SVG.js \
-	src/layer/vector/SplitPanesRenderer.js \
-	src/layer/vector/SplitPanesSVG.js \
-	src/layer/vector/Path.Transform.SVG.js \
 	src/core/Handler.js \
-	src/layer/vector/SVGGroup.js \
 	src/layer/vector/Path.Drag.Transform.js \
 	src/layer/vector/Path.Drag.js \
 	src/layer/vector/Path.Transform.Util.js \
-	src/layer/vector/Path.Transform.js \
-	src/layer/vector/SVG.VML.js \
-	src/layer/vector/Path.Transform.SVG.VML.js \
 	src/layer/vector/Canvas.js \
-	src/layer/vector/Path.Transform.Canvas.js \
 	src/layer/FormFieldButtonLayer.js \
 	src/dom/DomEvent.js \
 	src/dom/Draggable.js \
@@ -296,6 +301,7 @@ COOL_JS_LST =\
 	src/dom/DomEvent.Pointer.js \
 	src/map/handler/Map.TouchGesture.js \
 	src/map/handler/Map.Keyboard.js \
+	src/map/handler/Map.KeyboardShortcuts.ts \
 	src/map/handler/Map.Welcome.js \
 	src/map/handler/Map.Feedback.js \
 	src/map/handler/Map.VersionBar.js \
@@ -307,6 +313,7 @@ COOL_JS_LST =\
 	src/map/handler/Map.StateChanges.js \
 	src/map/handler/Map.WOPI.js \
 	src/layer/marker/Marker.Drag.js \
+	src/control/Control.AboutDialog.ts \
 	src/control/Control.Toolbar.js \
 	src/control/Control.Command.js \
 	src/control/Control.js \
@@ -326,41 +333,53 @@ COOL_JS_LST =\
 	src/control/Control.Tabs.js \
 	src/control/Control.Permission.js \
 	src/control/Control.Selection.js \
+	src/control/Control.ServerAuditDialog.ts \
 	src/control/Control.LokDialog.js \
 	src/control/Control.AlertDialog.js \
-	src/control/ColorPicker.js \
+	src/control/ColorPicker.ts \
+	src/control/jsdialog/Component.Toolbar.ts \
+	src/control/jsdialog/Definitions.Menu.ts \
 	src/control/jsdialog/Util.Dropdown.js \
+	src/control/jsdialog/Util.Events.ts \
 	src/control/jsdialog/Util.FocusCycle.js \
+	src/control/jsdialog/Util.MessageRouter.ts \
 	src/control/jsdialog/Util.ModalHelper.js \
+	src/control/jsdialog/Util.OnDemandRenderer.ts \
+	src/control/jsdialog/Util.ScrollableBar.ts \
+	src/control/jsdialog/Util.SnackbarController.ts \
+	src/control/jsdialog/Util.StateChange.ts \
+	src/control/jsdialog/Widget.ButtonBox.ts \
 	src/control/jsdialog/Widget.Calendar.js \
+	src/control/jsdialog/Widget.ColorPicker.ts \
 	src/control/jsdialog/Widget.Combobox.js \
+	src/control/jsdialog/Widget.Containers.ts \
 	src/control/jsdialog/Widget.DrawingArea.js \
 	src/control/jsdialog/Widget.FormulabarEdit.js \
 	src/control/jsdialog/Widget.Frame.js \
-	src/control/jsdialog/Widget.IconView.js \
-	src/control/jsdialog/Widget.LanguageSelector.js \
+	src/control/jsdialog/Widget.HTMLContent.ts \
+	src/control/jsdialog/Widget.IconView.ts \
 	src/control/jsdialog/Widget.MenuButton.js \
 	src/control/jsdialog/Widget.MobileBorderSelector.js \
 	src/control/jsdialog/Widget.MobileTabControl.js \
 	src/control/jsdialog/Widget.MultilineEdit.js \
 	src/control/jsdialog/Widget.Progressbar.js \
 	src/control/jsdialog/Widget.ScrolledWindow.js \
+	src/control/jsdialog/Widget.SidebarContainers.ts \
+	src/control/jsdialog/Widget.Timefield.js \
 	src/control/jsdialog/Widget.TreeView.js \
 	src/control/Control.JSDialog.js \
 	src/control/Control.JSDialogBuilder.js \
 	src/control/Control.MobileWizardBuilder.js \
 	src/control/Control.MobileWizardWindow.js \
 	src/control/Control.MobileWizard.js \
-	src/control/Control.MobileWizardPopup.js \
 	src/control/Control.LanguageDialog.js \
 	src/control/Control.Attribution.js \
 	src/control/Control.MobileSlide.js \
 	src/control/Control.StatusBar.js \
-	src/control/Control.SearchBar.js \
-	src/control/Control.MobileTopBar.js \
+	src/control/Control.MobileSearchBar.ts \
+	src/control/Control.MobileTopBar.ts \
 	src/control/Control.MobileBottomBar.js \
-	src/control/Control.UserList.js \
-	src/control/Control.FormulaBar.js \
+	src/control/Control.UserList.ts \
 	src/control/Control.FormulaBarJSDialog.js \
 	src/control/Control.SheetsBar.js \
 	src/control/Control.PresentationBar.js \
@@ -375,7 +394,10 @@ COOL_JS_LST =\
 	src/control/Control.NotebookbarBuilder.js \
 	src/control/Control.Layers.js \
 	src/control/Control.Sidebar.js \
-	src/control/Control.Mention.js \
+	src/control/AutoCompletePopup.ts \
+	src/control/Control.Mention.ts \
+	src/control/Control.FormulaUsagePopup.ts \
+	src/control/Control.FormulaAutoCompletePopup.ts \
 	src/control/Control.Zotero.js \
 	src/control/Search.js \
 	src/control/Permission.js \
@@ -385,6 +407,7 @@ COOL_JS_LST =\
 	src/control/Scroll.js \
 	src/control/Styles.js \
 	src/control/Ruler.js \
+	src/control/VRuler.ts \
 	src/dom/PosAnimation.js \
 	src/map/anim/Map.PanAnimation.js \
 	src/dom/PosAnimation.Timer.js \
@@ -467,6 +490,21 @@ define global_file
 		@$(NODE) node_modules/uglify-js/bin/uglifyjs $< --output $@)
 endef
 
+define run_eslint_check
+	@$(NODE) node_modules/eslint/bin/eslint.js \
+		--resolve-plugins-relative-to $(abs_builddir) \
+		--ignore-path $(srcdir)/.eslintignore \
+		--config .eslintrc \
+		--no-eslintrc $(1)
+endef
+
+define run_prettier_check
+	@$(NODE) node_modules/.bin/prettier \
+		--ignore-path $(srcdir)/.prettierignore \
+		--ignore-path $(srcdir)/.beforeprettier \
+		$(1)
+endef
+
 .PHONY: build-cool
 
 all-local: build-cool
@@ -539,17 +577,18 @@ $(DIST_FOLDER)/admin-bundle.js: $(COOL_ADMIN_DST) \
 $(INTERMEDIATE_DIR)/admin-src.js: $(COOL_ADMIN_TS_JS) $(COOL_ADMIN_JS)
 	@mkdir -p $(dir $@)
 	@echo "Checking for admin JS errors..."
-	@$(NODE) node_modules/eslint/bin/eslint.js --resolve-plugins-relative-to $(abs_builddir) --ignore-path $(srcdir)/.eslintignore --config $(srcdir)/.eslintrc --no-eslintrc $(srcdir)/admin/src
+	$(call run_eslint_check,--ignore-pattern $(COOL_ADMIN_TS_JS) $(srcdir)/admin/src)
+	$(call run_prettier_check,--debug-check $(srcdir)/admin/src)
 	@awk 'FNR == 1 {print ""} 1' $(COOL_ADMIN_TS_JS) $(patsubst %.js,$(srcdir)/%.js,$(COOL_ADMIN_JS)) > $@
 
-$(INTERMEDIATE_DIR)/cool-src.js: tscompile.done $(call prereq_cool) $(COOL_JS_DST)
+$(INTERMEDIATE_DIR)/cool-src.js: tscompile.done $(call prereq_cool) $(COOL_JS_DST) $(abs_top_srcdir)/scripts/unocommands.py
 	@mkdir -p $(dir $@)
 	$(abs_top_srcdir)/scripts/unocommands.py --check $(abs_top_srcdir)
 	@printf "Checking for obsolete JS build intermediates in this makefile... "
 	@if ! test "z$(COOL_ASSERT_INTERSECT)" == "z"; then echo; echo "Error: please remove obsolete files:"; echo "$(COOL_ASSERT_INTERSECT)"; exit 1; else echo "clean"; fi
 	@echo "Checking for cool JS errors..."
-	@$(NODE) node_modules/eslint/bin/eslint.js $(srcdir)/src --resolve-plugins-relative-to $(abs_builddir) \
-		$(srcdir)/js --ignore-path $(srcdir)/.eslintignore --no-eslintrc --config $(srcdir)/.eslintrc
+	$(call run_eslint_check,$(srcdir)/src $(srcdir)/js)
+	$(call run_prettier_check,--debug-check $(srcdir)/src $(srcdir)/js/global.js)
 	@echo "Bundling cool..."
 	$(call bundle_cool)
 
@@ -709,7 +748,9 @@ install-data-hook:
 		--exclude='multidocs.html' \
 		--exclude='tsconfig.tsbuildinfo' \
 		dist $(DESTDIR)$(pkgdatadir)/browser/;
-	find . -type f ! -iname "*.png" -exec brotli --force {} \;
+if ENABLE_WASM
+	find $(DESTDIR)$(pkgdatadir)/browser/dist -type f ! -iname "*.png" -exec brotli --force {} \;
+endif
 endif
 
 libs:
@@ -726,26 +767,24 @@ pot:
 		admin/src/AdminSocketSettings.js \
 		admin/src/Util.js \
 		js/global.js \
-		js/w2ui-1.5.rc1.js \
-		src/control/ColorPicker.js \
+		src/control/ColorPicker.ts \
+		src/control/Control.AboutDialog.ts \
 		src/control/Control.AlertDialog.js \
 		src/control/Control.Command.js \
 		src/control/Control.ContextMenu.js \
 		src/control/Control.DocumentNameInput.js \
 		src/control/Control.DocumentRepair.js \
 		src/control/Control.DownloadProgress.js \
-		src/control/Control.FormulaBar.js \
 		src/control/Control.FormulaBarJSDialog.js \
 		src/control/Control.IdleHandler.ts \
 		src/control/Control.JSDialogBuilder.js \
 		src/control/Control.LanguageDialog.js \
 		src/control/Control.Menubar.js \
 		src/control/Control.MobileBottomBar.js \
-		src/control/Control.MobileTopBar.js \
+		src/control/Control.MobileTopBar.ts \
 		src/control/Control.MobileWizardBuilder.js \
 		src/control/Control.MobileWizardWindow.js \
 		src/control/Control.MobileWizard.js \
-		src/control/Control.MobileWizardPopup.js \
 		src/control/Control.Notebookbar.js \
 		src/control/Control.NotebookbarBuilder.js \
 		src/control/Control.NotebookbarCalc.js \
@@ -755,28 +794,61 @@ pot:
 		src/control/Control.PartsPreview.js \
 		src/control/Control.PresentationBar.js \
 		src/control/Control.Scroll.Annotation.js \
-		src/control/Control.SearchBar.js \
+		src/control/Control.MobileSearchBar.ts \
+		src/control/Control.ServerAuditDialog.ts \
 		src/control/Control.SheetsBar.js \
 		src/control/Control.StatusBar.js \
 		src/control/Control.Tabs.js \
 		src/control/Control.Toolbar.js \
 		src/control/Control.TopToolbar.js \
 		src/control/Control.UIManager.js \
-		src/control/Control.UserList.js \
+		src/control/Control.UserList.ts \
 		src/control/Control.Zotero.js \
 		src/control/Parts.js \
 		src/control/Permission.js \
 		src/control/Ruler.js \
+		src/control/VRuler.ts \
 		src/control/Signing.js \
 		src/control/Toolbar.js \
+		src/control/jsdialog/Component.Toolbar.ts \
+		src/control/jsdialog/Definitions.Menu.ts \
+		src/control/jsdialog/Util.Dropdown.js \
+		src/control/jsdialog/Util.Events.ts \
+		src/control/jsdialog/Util.FocusCycle.js \
+		src/control/jsdialog/Util.MessageRouter.ts \
+		src/control/jsdialog/Util.ModalHelper.js \
+		src/control/jsdialog/Util.OnDemandRenderer.ts \
+		src/control/jsdialog/Util.ScrollableBar.ts \
+		src/control/jsdialog/Util.SnackbarController.ts \
+		src/control/jsdialog/Util.StateChange.ts \
+		src/control/jsdialog/Widget.ButtonBox.ts \
+		src/control/jsdialog/Widget.Calendar.js \
+		src/control/jsdialog/Widget.ColorPicker.ts \
+		src/control/jsdialog/Widget.Combobox.js \
+		src/control/jsdialog/Widget.Containers.ts \
+		src/control/jsdialog/Widget.DrawingArea.js \
+		src/control/jsdialog/Widget.FormulabarEdit.js \
+		src/control/jsdialog/Widget.Frame.js \
+		src/control/jsdialog/Widget.HTMLContent.ts \
+		src/control/jsdialog/Widget.IconView.ts \
+		src/control/jsdialog/Widget.MenuButton.js \
 		src/control/jsdialog/Widget.MobileBorderSelector.js \
+		src/control/jsdialog/Widget.MobileTabControl.js \
+		src/control/jsdialog/Widget.MultilineEdit.js \
+		src/control/jsdialog/Widget.Progressbar.js \
+		src/control/jsdialog/Widget.ScrolledWindow.js \
+		src/control/jsdialog/Widget.SidebarContainers.ts \
+		src/control/jsdialog/Widget.Timefield.js \
 		src/control/jsdialog/Widget.TreeView.js \
 		src/core/Socket.js \
+		src/core/Debug.js \
 		src/docstate.js \
+		src/docstatefunctions.js \
+		src/docdispatcher.ts \
 		src/errormessages.js \
 		src/layer/tile/CanvasTileLayer.js \
-		src/layer/tile/CommentListSection.ts \
-		src/layer/tile/CommentSection.ts \
+		src/canvas/sections/CommentListSection.ts \
+		src/canvas/sections/CommentSection.ts \
 		src/main.js \
 		src/map/Clipboard.js \
 		src/map/Map.js \
@@ -824,6 +896,25 @@ jsconfig: $(abs_srcdir)/jsconfig.json $(abs_srcdir)/admin/jsconfig.json
 
 build-tests: $(MOCHA_TS_JS_FILES)
 	@echo "Build of mocha test finished."
+
+eslint: $(COOL_ADMIN_TS_JS)
+	$(call run_eslint_check,--max-warnings 0 \
+		--ignore-pattern $(COOL_ADMIN_TS_JS) \
+		$(srcdir)/src \
+		$(srcdir)/js \
+		$(srcdir)/admin/src)
+
+prettier:
+	$(call run_prettier_check,--check \
+		$(srcdir)/src \
+		$(srcdir)/js \
+		$(srcdir)/admin/src)
+
+prettier-write:
+	$(call run_prettier_check,--write \
+		$(srcdir)/src \
+		$(srcdir)/js \
+		$(srcdir)/admin/src)
 
 MOCHA_TEST_LOG = "`pwd`/mocha.log"
 DUPLICATION_TEST_LOG = "`pwd`/duplication.log"

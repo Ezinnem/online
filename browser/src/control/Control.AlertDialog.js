@@ -21,7 +21,9 @@ L.Control.AlertDialog = L.Control.extend({
 	},
 
 	_onError: function(e) {
-		if (!this._map._fatal) {
+		if (!this._map._fatal &&
+		    e.cmd !== 'notasync' &&
+		    e.type !== 'warn') {
 			this._map.uiManager.closeAll();
 		}
 
@@ -94,12 +96,15 @@ L.Control.AlertDialog = L.Control.extend({
 
 				JSDialog.showInfoModalWithOptions(alertId, alertOptions);
 			}
+		} else if (e.cmd == 'notasync') { // developer only no translation needed
+			this._map.uiManager.showInfoModal(
+				'cool_alert', '', 'This dialog is non-async', '', _('Close'), function() { /* Do nothing. */ }, false);
 		} else if (e.cmd && e.kind) {
 			this._map.fire('hidebusy');
 
-			var msg = _('The server encountered a %0 error while parsing the %1 command.');
-			msg = msg.replace('%0', e.kind);
-			msg = msg.replace('%1', e.cmd);
+			var msg = _('The server encountered a {0} error while parsing the {1} command.');
+			msg = msg.replace('{0}', e.kind);
+			msg = msg.replace('{1}', e.cmd);
 			this._map.uiManager.showInfoModal('cool_alert', '', msg, '', _('Close'), function() { /* Do nothing. */ }, false);
 		}
 	}

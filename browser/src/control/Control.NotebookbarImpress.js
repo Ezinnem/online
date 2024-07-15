@@ -183,10 +183,12 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 
 		if (!this._map['wopi'].UserCanNotWriteRelative) {
 			content.push(
-				(window.uiDefaults && window.uiDefaults.saveAsMode === 'group') ?
+				(window.prefs.get('saveAsMode') === 'group') ?
 				{
-					'id': 'saveas',
-					'type': 'bigmenubartoolitem',
+					'id': 'saveas:SaveAsMenu',
+					'command': 'saveas',
+					'class': 'unosaveas',
+					'type': 'exportmenubutton',
 					'text': _('Save As'),
 					'accessibility': { focusBack: true, combination: 'SA', de: null }
 				}:
@@ -203,9 +205,10 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 		if (!this._map['wopi'].UserCanNotWriteRelative) {
 			content.push(
 			{
-				'id': 'exportas',
+				'id': 'exportas:ExportAsMenu',
+				'command': 'exportas',
 				'class': 'unoexportas',
-				'type': 'bigmenubartoolitem',
+				'type': 'exportmenubutton',
 				'text': _('Export As'),
 				'accessibility': { focusBack: true, combination: 'EA', de: null }
 			});
@@ -219,6 +222,7 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 					(this._map['wopi'].EnableShare) ?
 						{
 							'id': 'ShareAs',
+							'class': 'unoShareAs',
 							'type': 'customtoolitem',
 							'text': _('Share'),
 							'command': 'shareas',
@@ -228,6 +232,7 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 						(L.Params.revHistoryEnabled) ?
 						{
 							'id': 'Rev-History',
+							'class': 'unoRev-History',
 							'type': 'customtoolitem',
 							'text': _('See history'),
 							'command': 'rev-history',
@@ -242,8 +247,8 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 		if (!this._map['wopi'].HidePrintOption) {
 			content.push(
 			{
-				'id': 'file-print',
-				'type': 'bigtoolitem',
+				'id': 'file-print:PrintOptions',
+				'type': 'exportmenubutton',
 				'text': _UNO('.uno:Print', 'presentation'),
 				'command': '.uno:Print',
 				'accessibility': { focusBack: true, combination: 'PF', de: null }
@@ -266,122 +271,18 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 			});
 		}
 
-		if ((!!window.groupDownloadAsForNb) && !this._map['wopi'].HideExportOption) {
+		if (!this._map['wopi'].HideExportOption) {
 			content.push({
-				'id': 'downloadas',
+				'id': 'downloadas:DownloadAsMenu',
+				'command': 'downloadas',
 				'class': 'unodownloadas',
-				'type': 'bigmenubartoolitem',
+				'type': 'exportmenubutton',
 				'text': _('Download'),
 				'accessibility': { focusBack: true, combination: 'DA', de: null }
 			});
+		}
 
-			if (!this._map['wopi'].HideRepairOption) {
-				content.push({
-					'type': 'container',
-					'children': [
-						{
-							'id': 'repair',
-							'class': 'unorepair',
-							'type': 'bigmenubartoolitem',
-							'text': _('Repair'),
-							'command': _('Repair'),
-							'accessibility': { focusBack: true, combination: 'RF', de: null }
-						}
-					],
-					'vertical': 'true'
-				});
-			}
-		} else if (!this._map['wopi'].HideExportOption) {
-			content = content.concat([
-				{
-					'id': 'file-downloadas-odp-downloadas-odg',
-					'type': 'container',
-					'children': [
-						{
-							'id': 'downloadas-odp',
-							'class': 'unodownloadas-odp',
-							'type': 'menubartoolitem',
-							'text': _('ODF Presentation (.odp)'),
-							'command': '',
-							'accessibility': { focusBack: true, combination: 'DA', de: null }
-						},
-						{
-							'id': 'downloadas-odg',
-							'class': 'unodownloadas-odg',
-							'type': 'menubartoolitem',
-							'text': _('ODF Drawing (.odg)'),
-							'command': '',
-							'accessibility': { focusBack: true, combination: 'DO', de: null }
-						},
-					],
-					'vertical': 'true'
-				},
-				{
-					'id': 'file-downloadas-ppt-downloadas-pptx',
-					'type': 'container',
-					'children': [
-						{
-							'id': 'downloadas-ppt',
-							'class': 'unodownloadas-ppt',
-							'type': 'menubartoolitem',
-							'text': _('PowerPoint 2003 Presentation (.ppt)'),
-							'command': '',
-							'accessibility': { focusBack: true, combination: 'DP', de: null }
-						},
-						{
-							'id': 'downloadas-pptx',
-							'class': 'unodownloadas-pptx',
-							'type': 'menubartoolitem',
-							'text': _('PowerPoint Presentation (.pptx)'),
-							'command': '',
-							'accessibility': { focusBack: true, combination: 'DX', de: null }
-						},
-					],
-					'vertical': 'true'
-				},
-				{
-					'id': 'file-exportdirectpdf',
-					'type': 'container',
-					'children': [
-						{
-							'id': !window.ThisIsAMobileApp ? 'exportdirectpdf' : 'downloadas-pdf',
-							'class': 'unoexportpdf',
-							'type': 'customtoolitem',
-							'text': _('PDF Document (.pdf)'),
-							'command': !window.ThisIsAMobileApp ? 'exportdirectpdf' : 'downloadas-pdf',
-							'inlineLabel': true,
-							'accessibility': { focusBack: true, combination: 'ED', de: null }
-						},
-						{
-							'id': 'exportpdf' ,
-							'class': 'unoexportpdf',
-							'type': 'customtoolitem',
-							'text': _('PDF Document (.pdf) - Expert'),
-							'command': 'exportpdf' ,
-							'inlineLabel': true,
-							'accessibility': { focusBack: true, combination: 'DF', de: null }
-						},
-					],
-					'vertical': 'true'
-				}
-			]);
-			if (!this._map['wopi'].HideRepairOption) {
-				content.push({
-					'type': 'container',
-					'children': [
-						{
-							'id': 'repair',
-							'class': 'unorepair',
-							'type': 'bigmenubartoolitem',
-							'text': _('Repair'),
-							'command': _('Repair'),
-							'accessibility': { focusBack: true, combination: 'RF', de: null }
-						}
-					],
-					'vertical': 'true'
-				});
-			}
-		} else if (!this._map['wopi'].HideRepairOption) {
+		if (!this._map['wopi'].HideRepairOption) {
 			content.push({
 				'type': 'container',
 				'children': [
@@ -443,7 +344,7 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 				'command': 'presentation',
 				'accessibility': { focusBack: true, combination: 'PR', de: null }
 			},
-			window.mode.isDesktop() ?
+			!window.ThisIsAMobileApp ?
 				{
 					'id': 'view-presentation-in-window',
 					'type': 'bigcustomtoolitem',
@@ -513,11 +414,12 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 						'type': 'toolbox',
 						'children': [
 							{
-								'id': 'collapsenotebookbar',
-								'class': 'unocollapsenotebookbar',
+								'id': 'showruler',
+								'class': 'unoshowruler',
 								'type': 'menubartoolitem',
-								'text': _('Collapse Tabs'),
-								'accessibility': { focusBack: true, combination: 'CU', de: null }
+								'text': _('Ruler'),
+								'command': _('Show Ruler'),
+								'accessibility': { focusBack: true, combination: 'R', de: 'L' }
 							}
 						]
 					},
@@ -538,6 +440,31 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 				'vertical': 'true'
 			},
 			{
+				'id': 'collapsenotebookbar',
+				'class': 'unocollapsenotebookbar',
+				'type': 'bigmenubartoolitem',
+				'text': _('Collapse Tabs'),
+				'accessibility': { focusBack: true, combination: 'CU', de: null }
+			},
+			{
+				'type': 'container',
+				'children': [
+					{
+						'id': 'view-normal-view',
+						'type': 'toolitem',
+						'text': _('Normal View'),
+						'command': '.uno:NormalMultiPaneGUI',
+					},
+					{
+						'id': 'view-notes-view',
+						'type': 'toolitem',
+						'text': _('Notes View'),
+						'command': '.uno:NotesMode',
+					},
+				],
+				'vertical': 'true'
+			},
+			{
 				'id': 'view-master-view',
 				'type': 'bigtoolitem',
 				'text': _('Master View'),
@@ -549,6 +476,13 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 				'class': 'unotoggledarktheme',
 				'type': 'bigmenubartoolitem',
 				'text': _('Dark Mode'),
+				'accessibility': { focusBack: true, combination: 'TT', de: null }
+			},
+			{
+				'id':'invertbackground',
+				'class': 'unoinvertbackground',
+				'type': 'bigcustomtoolitem',
+				'text': _('Invert Background'),
 				'accessibility': { focusBack: true, combination: 'TT', de: null }
 			},
 			{
@@ -587,8 +521,8 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 				'vertical': 'true'
 			},
 			{
-				'id': 'home-paste',
-				'type': 'bigtoolitem',
+				'id': 'home-paste:PasteMenu',
+				'type': 'menubutton',
 				'text': _UNO('.uno:Paste'),
 				'command': '.uno:Paste',
 				'accessibility': { focusBack: true, combination: 'V', de: null }
@@ -601,7 +535,7 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 						'children': [
 							{
 								'id': 'home-cut',
-								'type': 'toolitem',
+								'type': 'customtoolitem',
 								'text': _UNO('.uno:Cut'),
 								'command': '.uno:Cut',
 								'accessibility': { focusBack: true, combination: 'X', de: null }
@@ -620,13 +554,14 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 						'children': [
 							{
 								'id': 'home-coppy',
-								'type': 'toolitem',
+								'type': 'customtoolitem',
 								'text': _UNO('.uno:Copy'),
 								'command': '.uno:Copy',
 								'accessibility': { focusBack: true, combination: 'C', de: null }
 							},
 							{
 								'id': 'home-set-default',
+								'class': 'unoResetAttributes',
 								'type': 'toolitem',
 								'text': _UNO('.uno:SetDefault'),
 								'command': '.uno:SetDefault',
@@ -740,7 +675,8 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 										'accessibility': { focusBack: true, combination: 'FL', de: null }
 									},
 									{
-										'id': 'home-charbackcolor',
+										'id': 'home-charbackcolor:ColorPickerMenu',
+										'noLabel': true,
 										'class': 'unospan-CharBackColor',
 										'type': 'toolitem',
 										'text': _UNO('.uno:CharBackColor'),
@@ -748,7 +684,8 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 										'accessibility': { focusBack: true, combination: 'HC', de: null }
 									},
 									{
-										'id': 'home-color',
+										'id': 'home-color:ColorPickerMenu',
+										'noLabel': true,
 										'class': 'unospan-FontColor',
 										'type': 'toolitem',
 										'text': _UNO('.uno:Color'),
@@ -762,6 +699,13 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 					}
 				],
 				'vertical': 'true'
+			},
+			{
+				'id': 'home-insert-annotation',
+				'type': 'bigtoolitem',
+				'text': _UNO('.uno:InsertAnnotation'),
+				'command': '.uno:InsertAnnotation',
+				'accessibility': { focusBack: false, combination: 'ZC', de: 'ZC' }
 			},
 			{
 				'type': 'container',
@@ -912,11 +856,12 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 										'accessibility': { focusBack: true, combination: 'SR', de: null }
 									},
 									{
-										'id': 'home-line-spacing',
-										'type': 'toolitem',
+										'id': 'home-line-spacing:LineSpacingMenu',
+										'type': 'menubutton',
+										'noLabel': true,
 										'text': _UNO('.uno:LineSpacing'),
 										'command': '.uno:LineSpacing',
-										'accessibility': { focusBack: true, combination: 'SL', de: null }
+										'accessibility': { focusBack: false, combination: 'SL', de: null }
 									},
 									{
 										'id': 'home-para-right-to-left',
@@ -948,8 +893,9 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 						'type': 'toolbox',
 						'children': [
 							{
-								'id': 'home-basic-shapes',
-								'type': 'toolitem',
+								'id': 'home-basic-shapes:InsertShapesMenu',
+								'type': 'menubutton',
+								'noLabel': true,
 								'text': _('Shapes'),
 								'command': '.uno:BasicShapes',
 								'accessibility': { focusBack: true, combination: 'IH', de: null }
@@ -961,8 +907,9 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 						'type': 'toolbox',
 						'children': [
 							{
-								'id': 'home-connector-tool-box',
-								'type': 'toolitem',
+								'id': 'home-connector-tool-box:InsertConnectorsMenu',
+								'type': 'menubutton',
+								'noLabel': true,
 								'text': _UNO('.uno:ConnectorToolbox', 'presentation'),
 								'command': '.uno:ConnectorToolbox',
 								'accessibility': { focusBack: true, combination: 'TC', de: null }
@@ -979,7 +926,8 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 						'type': 'toolbox',
 						'children': [
 							{
-								'id': 'home-xline-color',
+								'id': 'home-xline-color:ColorPickerMenu',
+								'noLabel': true,
 								'class': 'unospan-XLineColor',
 								'type': 'toolitem',
 								'text': _UNO('.uno:XLineColor'),
@@ -992,7 +940,8 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 						'type': 'toolbox',
 						'children': [
 							{
-								'id': 'home-fill-color',
+								'id': 'home-fill-color:ColorPickerMenu',
+								'noLabel': true,
 								'class': 'unospan-FillColor',
 								'type': 'toolitem',
 								'text': _UNO('.uno:FillColor'),
@@ -1011,8 +960,17 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 						'type': 'toolbox',
 						'children': [
 							{
-								'id': 'home-insert-graphic',
-								'type': 'toolitem',
+								'id': 'home-insert-table:InsertTableMenu',
+								'type': 'menubutton',
+								'noLabel': true,
+								'text': _UNO('.uno:InsertTable', 'presentation'),
+								'command': '.uno:InsertTable',
+								'accessibility': { focusBack: true, combination: 'IT', de: null }
+							},
+							{
+								'id': 'home-insert-graphic:InsertImageMenu',
+								'type': 'menubutton',
+								'noLabel': true,
 								'text': _UNO('.uno:InsertGraphic'),
 								'command': '.uno:InsertGraphic',
 								'accessibility': { focusBack: true, combination: 'IG', de: null }
@@ -1042,13 +1000,6 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 								'text': _UNO('.uno:InsertObjectChart'),
 								'command': '.uno:InsertObjectChart',
 								'accessibility': { focusBack: true, combination: 'IC', de: null }
-							},
-							{
-								'id': 'home-insert-table',
-								'type': 'toolitem',
-								'text': _UNO('.uno:InsertTable', 'presentation'),
-								'command': '.uno:InsertTable',
-								'accessibility': { focusBack: true, combination: 'IT', de: null }
 							}
 						]
 					}
@@ -1151,6 +1102,35 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 				'accessibility': { focusBack: true, combination: 'TD', de: null }
 			},
 			{
+				'id': 'format-name-description',
+				'type': 'container',
+				'children': [
+					{
+						'type': 'toolbox',
+						'children': [
+							{
+								'type': 'toolitem',
+								'text': _UNO('.uno:NameGroup', 'text'),
+								'command': '.uno:NameGroup',
+								'accessibility': { focusBack: false, combination: 'NG', de: null }
+							}
+						]
+					},
+					{
+						'type': 'toolbox',
+						'children': [
+							{
+								'type': 'toolitem',
+								'text': _UNO('.uno:ObjectTitleDescription', 'text'),
+								'command': '.uno:ObjectTitleDescription',
+								'accessibility': { focusBack: false, combination: 'DS', de: null }
+							}
+						]
+					}
+				],
+				'vertical': 'true'
+			},
+			{
 				'id': 'format-theme-dialog',
 				'type': 'bigtoolitem',
 				'text': _UNO('.uno:ThemeDialog'),
@@ -1202,8 +1182,8 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 				'vertical': 'true'
 			},
 			{
-				'id': 'insert-insert-graphic',
-				'type': 'bigtoolitem',
+				'id': 'insert-insert-graphic:InsertImageMenu',
+				'type': 'menubutton',
 				'text': _UNO('.uno:InsertGraphic'),
 				'command': '.uno:InsertGraphic',
 				'accessibility': { focusBack: true, combination: 'IG', de: null }
@@ -1215,8 +1195,9 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 						'type': 'toolbox',
 						'children': [
 							{
-								'id': 'insert-insert-table',
-								'type': 'toolitem',
+								'id': 'insert-insert-table:InsertTableMenu',
+								'type': 'menubutton',
+								'noLabel': true,
 								'text': _UNO('.uno:InsertTable', 'presentation'),
 								'command': '.uno:InsertTable',
 								'accessibility': { focusBack: true, combination: 'IT', de: null }
@@ -1238,7 +1219,38 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 				],
 				'vertical': 'true'
 			},
-			{
+			(this._map['wopi'].EnableRemoteLinkPicker) ? {
+				'type': 'container',
+				'children': [
+					{
+						'type': 'toolbox',
+						'children': [
+							{
+								'id': 'insert-hyperlink-dialog',
+								'class': 'unoHyperlinkDialog',
+								'type': 'customtoolitem',
+								'text': _UNO('.uno:HyperlinkDialog'),
+								'command': 'hyperlinkdialog',
+								'accessibility': { focusBack: true, combination: 'IL', de: null }
+							}
+						]
+					},
+					{
+						'type': 'toolbox',
+						'children': [
+							{
+								'id': 'insert-insert-remote-link',
+								'class': 'unoremotelink',
+								'type': 'customtoolitem',
+								'text': _('Smart Picker'),
+								'command': 'remotelink',
+								'accessibility': { focusBack: true, combination: 'RL', de: null }
+							}
+						]
+					}
+				],
+			'vertical': 'true'
+			} : {
 				'id': 'HyperlinkDialog',
 				'class': 'unoHyperlinkDialog',
 				'type': 'bigcustomtoolitem',
@@ -1246,14 +1258,13 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 				'command': 'hyperlinkdialog',
 				'accessibility': { focusBack: true, combination: 'IL', de: null }
 			},
-			(this._map['wopi'].EnableRemoteLinkPicker) ? {
-				'id': 'insert-insert-smart-picker',
-				'class': 'unoremotelink',
-				'type': 'bigcustomtoolitem',
-				'text': _('Smart Picker'),
-				'command': 'remotelink',
-				'accessibility': { focusBack: true, combination: 'RL', de: null }
-			} : {},
+			{
+				'id': 'insert-insert-annotation',
+				'type': 'bigtoolitem',
+				'text': _UNO('.uno:InsertAnnotation', 'text'),
+				'command': '.uno:InsertAnnotation',
+				'accessibility': { focusBack: false, combination: 'ZC', de: 'ZC' }
+			},
 			{
 				'type': 'container',
 				'children': [
@@ -1333,8 +1344,9 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 						'type': 'toolbox',
 						'children': [
 							{
-								'id': 'insert-basic-shapes',
-								'type': 'toolitem',
+								'id': 'insert-basic-shapes:InsertShapesMenu',
+								'type': 'menubutton',
+								'noLabel': true,
 								'text': _('Shapes'),
 								'command': '.uno:BasicShapes',
 								'accessibility': { focusBack: true, combination: 'IS', de: null }
@@ -1389,15 +1401,20 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 				'vertical': 'true'
 			},
 			{
-				'id': 'insert-header-and-footer',
-				'type': 'bigtoolitem',
-				'text': _UNO('.uno:HeaderAndFooter', 'presentation'),
-				'command': '.uno:HeaderAndFooter',
-				'accessibility': { focusBack: true, combination: 'HF', de: null }
-			},
-			{
 				'type': 'container',
 				'children': [
+					{
+						'type': 'toolbox',
+						'children': [
+							{
+								'id': 'insert-header-and-footer',
+								'type': 'toolitem',
+								'text': _UNO('.uno:HeaderAndFooter', 'presentation'),
+								'command': '.uno:HeaderAndFooter',
+								'accessibility': { focusBack: true, combination: 'HF', de: null }
+							}
+						]
+					},
 					{
 						'type': 'toolbox',
 						'children': [
@@ -1408,18 +1425,6 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 								'text': _UNO('.uno:CharmapControl'),
 								'command': 'charmapcontrol',
 								'accessibility': { focusBack: true, combination: 'IM', de: null }
-							}
-						]
-					},
-					{
-						'type': 'toolbox',
-						'children': [
-							{
-								'id': 'insert-insert-annotation',
-								'type': 'toolitem',
-								'text': _UNO('.uno:InsertAnnotation', 'text'),
-								'command': '.uno:InsertAnnotation',
-								'accessibility': { focusBack: true, combination: 'L', de: null }
 							}
 						]
 					}
@@ -1711,9 +1716,9 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 			},
 			{
 				'id': 'LanguageMenu',
-				'type': 'bigtoolitem',
+				'type': 'bigcustomtoolitem',
 				'text': _UNO('.uno:LanguageMenu'),
-				'command': '.uno:LanguageMenu',
+				'command': 'languagemenu',
 				'accessibility': { focusBack: false, combination: 'TM', de: null }
 			},
 			{
@@ -2010,7 +2015,8 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 						'type': 'toolbox',
 						'children': [
 							{
-								'id': 'table-xline-color',
+								'id': 'table-xline-color:ColorPickerMenu',
+								'noLabel': true,
 								'type': 'toolitem',
 								'text': _UNO('.uno:XLineColor'),
 								'command': '.uno:XLineColor',
@@ -2022,7 +2028,8 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 						'type': 'toolbox',
 						'children': [
 							{
-								'id': 'table-fill-color',
+								'id': 'table-fill-color:ColorPickerMenu',
+								'noLabel': true,
 								'type': 'toolitem',
 								'text': _UNO('.uno:FillColor'),
 								'command': '.uno:FillColor',
@@ -2187,7 +2194,8 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 						'type': 'toolbox',
 						'children': [
 							{
-								'id': 'draw-xline-color',
+								'id': 'draw-xline-color:ColorPickerMenu',
+								'noLabel': true,
 								'type': 'toolitem',
 								'text': _UNO('.uno:XLineColor'),
 								'command': '.uno:XLineColor',
@@ -2199,7 +2207,8 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 						'type': 'toolbox',
 						'children': [
 							{
-								'id': 'draw-fill-color',
+								'id': 'draw-fill-color:ColorPickerMenu',
+								'noLabel': true,
 								'type': 'toolitem',
 								'text': _UNO('.uno:FillColor'),
 								'command': '.uno:FillColor',
@@ -2209,6 +2218,13 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 					}
 				],
 				'vertical': 'true'
+			},
+			{
+				'id': 'draw-convert-curve',
+				'type': 'bigtoolitem',
+				'text': _UNO('.uno:ChangeBezier'),
+				'command': '.uno:ChangeBezier',
+				'accessibility': { focusBack: true, combination: 'CB', de: null }
 			},
 			{
 				'type': 'container',
@@ -2364,8 +2380,9 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 						'type': 'toolbox',
 						'children': [
 							{
-								'id': 'draw-basic-shapes',
-								'type': 'toolitem',
+								'id': 'draw-basic-shapes:InsertShapesMenu',
+								'type': 'menubutton',
+								'noLabel': true,
 								'text': _('Shapes'),
 								'command': '.uno:BasicShapes',
 								'accessibility': { focusBack: true, combination: 'BS', de: null }
@@ -2377,8 +2394,9 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 						'type': 'toolbox',
 						'children': [
 							{
-								'id': 'draw-connector-toolbox',
-								'type': 'toolitem',
+								'id': 'draw-connector-toolbox:InsertConnectorsMenu',
+								'type': 'menubutton',
+								'noLabel': true,
 								'text': _UNO('.uno:ConnectorToolbox', 'presentation'),
 								'command': '.uno:ConnectorToolbox',
 								'accessibility': { focusBack: true, combination: 'CT', de: null }

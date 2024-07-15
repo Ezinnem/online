@@ -1,21 +1,16 @@
-/* global describe it cy beforeEach require afterEach */
+/* global describe it cy beforeEach require */
 
 var helper = require('../../common/helper');
 var desktopHelper = require('../../common/desktop_helper');
 
 describe(['tagdesktop', 'tagnextcloud', 'tagproxy'], 'Scroll through document', function() {
-	var testFileName = 'scrolling.odt';
 
 	beforeEach(function() {
-		helper.beforeAll(testFileName, 'writer');
+		helper.setupAndLoadDocument('writer/scrolling.odt');
 		desktopHelper.switchUIToCompact();
 
-		cy.cGet('#toolbar-up .w2ui-scroll-right').click();
-		cy.cGet('#tb_editbar_item_sidebar').click();
-	});
-
-	afterEach(function() {
-		helper.afterAll(testFileName, this.currentTest.state);
+		cy.cGet('#toolbar-up .ui-scroll-right').click();
+		cy.cGet('#sidebar').click({force: true});
 	});
 
 	it('Scrolling to bottom/top', function() {
@@ -43,10 +38,11 @@ describe(['tagdesktop', 'tagnextcloud', 'tagproxy'], 'Scroll through document', 
 		desktopHelper.selectZoomLevel('200');
 		//show horizontal scrollbar
 		cy.cGet('.leaflet-layer').click('bottom');
-		cy.wait(500);
+		cy.wait(1000);
 		helper.typeIntoDocument('{home}{end}{home}');
+		cy.wait(1000);
 		cy.cGet('#test-div-horizontal-scrollbar').should('have.text', '0');
 		helper.typeIntoDocument('{end}{home}{end}');
-		desktopHelper.assertScrollbarPosition('horizontal', 570, 653);
+		desktopHelper.assertScrollbarPosition('horizontal', 430, 653);
 	});
 });

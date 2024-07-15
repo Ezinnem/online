@@ -23,10 +23,10 @@ online_SOURCES = \
 	wasmapp.cpp \
 	../common/Authorization.cpp \
 	../common/ConfigUtil.cpp \
+	../common/Crypto-stub.cpp \
 	../common/FileUtil.cpp \
 	../common/CommandControl.cpp \
 	../common/Log.cpp \
-	../common/MessageQueue.cpp \
 	../common/TraceEvent.cpp \
 	../common/Protocol.cpp \
 	../common/StringVector.cpp \
@@ -36,14 +36,18 @@ online_SOURCES = \
 	../common/SpookyV2.cpp \
 	../common/Unit.cpp \
 	../common/Util.cpp \
+	../common/Util-mobile.cpp \
 	../kit/ChildSession.cpp \
 	../kit/Kit.cpp \
+	../kit/KitQueue.cpp \
+	../kit/KitWebSocket.cpp \
 	../kit/DeltaSimd.c \
 	../net/FakeSocket.cpp \
 	../net/Socket.cpp \
 	../wsd/ClientSession.cpp \
 	../wsd/DocumentBroker.cpp \
 	../wsd/COOLWSD.cpp \
+	../wsd/ClientRequestDispatcher.cpp \
 	../wsd/RequestDetails.cpp \
 	../wsd/Storage.cpp \
 	../wsd/TileCache.cpp \

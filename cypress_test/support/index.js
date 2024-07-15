@@ -1,12 +1,40 @@
 /* -*- js-indent-level: 8 -*- */
-/* global require cy Cypress */
+/* global require cy Cypress beforeEach afterEach */
 
 require('cypress-wait-until');
 require('cypress-file-upload');
-require('cypress-iframe');
 import installLogsCollector from 'cypress-terminal-report/src/installLogsCollector';
 
-installLogsCollector();
+
+beforeEach(function() {
+	cy.log('Starting test: ' + getFullTestName());
+});
+
+// This afterEach must be before installLogsCollector, otherwise the
+// cypress-terminal-report afterEach gets called first, and so this log does
+// not get printed
+afterEach(function() {
+	cy.log('Finishing test: ' + getFullTestName());
+});
+
+installLogsCollector({
+	// Filter xhr requests from log
+	filterLog: function(log) {
+		var type = log[0];
+		return type !== 'cy:xhr';
+	},
+	// Filter assertion values when assertion passes
+	processLog: function(log) {
+		var type = log[0];
+		var message = log[1];
+		var severity = log[2];
+		if (type == 'cy:command' && message.startsWith('assert') && severity !== 'error') {
+			return [type,message.split('\n')[0],severity];
+		} else {
+			return log;
+		}
+	}
+});
 
 if (Cypress.env('INTEGRATION') === 'php-proxy') {
 	Cypress.Server.defaults({
@@ -35,17 +63,14 @@ if (Cypress.env('INTEGRATION') === 'nextcloud') {
 }
 
 Cypress.on('fail', function(error) {
-	Cypress.log({ name:'fail:',
-		      message: error.codeFrame.absoluteFile + ':'
-		      + error.codeFrame.line + ':'
-		      + error.codeFrame.column + '\n'
-		      + error.codeFrame.frame });
-
-	//https://stackoverflow.com/a/63519375/1592055
-	//returning false here prevents Cypress from failing the test */
-	if (error.message.includes('ResizeObserver loop limit exceeded')) {
-		return false;
-	}
+	var message = '\n';
+	message += 'Test failed: ' + getFullTestName() + '\n';
+	message += '\n';
+	message += error.message + '\n';
+	message += '\n';
+	message += error.codeFrame.absoluteFile + ':' + error.codeFrame.line + ':' + error.codeFrame.column + '\n';
+	message += error.codeFrame.frame;
+	Cypress.log({name: 'fail:', message: message});
 
 	throw error;
 });
@@ -66,7 +91,9 @@ Cypress.Commands.overwrite('waitUntil', function(originalFn, subject, checkFunct
 	if (!options)
 		options = {};
 	if (!options.interval)
-		options.interval = 10; // ms
+		options.interval = 100; // ms
+	if (!options.verbose)
+		options.verbose = true;
 	return originalFn(subject, checkFunction, options);
 });
 
@@ -77,11 +104,6 @@ Cypress.Commands.overwrite('waitUntil', function(originalFn, subject, checkFunct
 Cypress.Commands.add('cSetActiveFrame', function(frameID) {
 	Cypress.log();
 	cy.cActiveFrame = frameID;
-});
-
-Cypress.Commands.add('cSetLevel', function(level) {
-	Cypress.log();
-	cy.cLevel = level;
 });
 
 /**
@@ -149,24 +171,16 @@ Cypress.Commands.add('cGet', function(selector, options) {
 		optionsWithLogFalse = {log: false};
 	}
 
-	if (cy.cLevel === '1') {
-		if (selector)
-			return cy.get(cy.cActiveFrame, {log: false})
-				.its('0.contentDocument', {log: false})
-				.find(selector, optionsWithLogFalse);
-		else
-			return cy.get(cy.cActiveFrame, optionsWithLogFalse)
-				.its('0.contentDocument', {log: false});
-	}
-	else if (selector) // This is not cool frame and there is a selector.
+	if (selector) {
 		return cy.get(cy.cActiveFrame, {log: false})
 			.its('0.contentDocument', {log: false})
-			.find('#coolframe', {log: false})
-			.its('0.contentDocument', {log: false})
 			.find(selector, optionsWithLogFalse);
-	else // Not cool frame without a selector.
+	} else {
 		return cy.get(cy.cActiveFrame, optionsWithLogFalse)
-			.its('0.contentDocument', {log: false})
-			.find('#coolframe', {log: false})
 			.its('0.contentDocument', {log: false});
+	}
 });
+
+function getFullTestName() {
+	return Cypress.spec.relative + ' / ' + Cypress.currentTest.titlePath.join(' / ');
+}

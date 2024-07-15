@@ -23,7 +23,6 @@ common_sources = \
                  ../common/ConfigUtil.cpp \
                  ../common/FileUtil.cpp \
                  ../common/Log.cpp \
-                 ../common/MessageQueue.cpp \
                  ../common/Protocol.cpp \
                  ../common/Session.cpp \
                  ../common/SigUtil.cpp \
@@ -31,10 +30,13 @@ common_sources = \
                  ../common/StringVector.cpp \
                  ../common/TraceEvent.cpp \
                  ../common/Unit.cpp \
-                 ../common/Util.cpp
+                 ../common/Util.cpp \
+                 ../common/Util-mobile.cpp
 
 kit_sources = ../kit/ChildSession.cpp \
-              ../kit/Kit.cpp
+              ../kit/Kit.cpp \
+              ../kit/KitQueue.cpp \
+              ../kit/KitWebSocket.cpp
 
 net_sources = ../net/FakeSocket.cpp \
               ../net/Socket.cpp
@@ -42,6 +44,7 @@ net_sources = ../net/FakeSocket.cpp \
 wsd_sources = ../wsd/ClientSession.cpp \
               ../wsd/DocumentBroker.cpp \
               ../wsd/COOLWSD.cpp \
+              ../wsd/ClientRequestDispatcher.cpp \
               ../wsd/RequestDetails.cpp \
               ../wsd/Storage.cpp \
               ../wsd/TileCache.cpp \

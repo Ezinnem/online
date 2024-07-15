@@ -21,6 +21,8 @@ declare var outOfFocusTimeoutSecs: number;
 
 /**/
 
+app.idleHandlerId = 'inactive_user_message';
+
 class IdleHandler {
     _serverRecycling: boolean = false;
     _documentIdle: boolean = false;
@@ -29,7 +31,7 @@ class IdleHandler {
 	_outOfFocusTimer: ReturnType<typeof setTimeout> = null;
     _active: boolean = true;
     map: any;
-	dimId: string = 'inactive_user_message';
+	dimId: string = app.idleHandlerId;
 
 	getIdleMessage(): string {
 		if (this.map['wopi'] && this.map['wopi'].DisableInactiveMessages) {
@@ -80,7 +82,12 @@ class IdleHandler {
 			}
 		}
 
-		if (window.mode.isDesktop() && !this.map.uiManager.isAnyDialogOpen()) {
+		// Ideally instead of separate isAnyEdit check here, we could check isAnyEdit inside isAnyDialogOpen,
+		// but unfortunatly that causes problem in _deactivate and unnecessary 'userinactive' message is sent
+		if (window.mode.isDesktop()
+		&& !this.map.uiManager.isAnyDialogOpen()
+		&& !cool.Comment.isAnyEdit()
+		&& $('input:focus').length === 0) {
 			this.map.focus();
 		}
 
@@ -124,6 +131,7 @@ class IdleHandler {
 	}
 
 	_dim() {
+		this.map.fire('closealldialogs');
 		const message = this.getIdleMessage();
 
 		window.app.console.debug('IdleHandler: _dim()');

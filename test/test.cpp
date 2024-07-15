@@ -37,7 +37,6 @@
 
 #include <helpers.hpp>
 #include <Unit.hpp>
-#include <wsd/COOLWSD.hpp>
 #if ENABLE_SSL
 #include <Ssl.hpp>
 #include <SslSocket.hpp>
@@ -292,29 +291,5 @@ bool runClientTests(const char* cmd, bool standalone, bool verbose)
 
     return result.wasSuccessful();
 }
-
-// Standalone tests don't really use WSD
-#ifndef STANDALONE_CPPUNIT
-
-std::set<pid_t> getKitPids()
-{
-    return COOLWSD::getKitPids();
-}
-
-/// Get the PID of the forkit
-std::set<pid_t> getForKitPids()
-{
-    std::set<pid_t> pids;
-    if (COOLWSD::ForKitProcId >= 0)
-        pids.emplace(COOLWSD::ForKitProcId);
-    return pids;
-}
-
-/// How many live coolkit processes do we have ?
-int getCoolKitProcessCount()
-{
-    return getKitPids().size();
-}
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -14,7 +14,6 @@
 **/.cache
 Makefile
 Makefile.in
-coolkitconfig.xcu
 coolwsd.spec
 coolwsd.xml
 aclocal.m4
@@ -101,6 +100,8 @@ unittest
 clientnb
 libsimd.a
 coolwsd-inproc
+coolbench
+coolforkitns
 
 # Fuzzer
 *_fuzzer
@@ -123,6 +124,7 @@ ios/Mobile/Info.plist
 ios/Mobile/Fonts
 ios/Mobile/Branding
 ios/Mobile/Resources/Settings.bundle/Root.plist
+ios/Mobile/coolkitconfig.xcu
 
 # symlinks created by configure for the iOS app Xcode project
 lobuilddir-symlink
@@ -133,8 +135,9 @@ zstdlib-symlink
 ICU.dat
 ios/Mobile/Assets.xcassets/AppIcon.appiconset
 
-# iOS app build number
+# build numbers/versions
 BUNDLE-VERSION
+/dist_git_hash
 
 # android stuff
 /android/lib/src/main/assets/dist
@@ -166,3 +169,6 @@ Makecache
 
 # autoconf stuff
 autogen.input
+
+# MacOS file manager metadata
+.DS_Store

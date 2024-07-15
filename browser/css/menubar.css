@@ -40,8 +40,11 @@
 	height: 32px;
 	white-space: nowrap;
 	display: flex;
-	align-items: center;
-	justify-content: flex-start;
+	align-items: flex-start;
+	justify-content: center;
+	gap: 5px;
+	flex-direction: column;
+	width: fit-content;
 }
 
 .readonly .document-title {
@@ -66,7 +69,7 @@
 	align-self: center;
 }
 
-@media screen and (max-width: 1238px) {
+@media screen and (max-width: 900px) {
 	.main-nav.hasnotebookbar:not(.readonly) #document-titlebar {
 		display: none;
 	}

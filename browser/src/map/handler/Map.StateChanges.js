@@ -3,7 +3,7 @@
  * L.Map.StateChanges stores the state changes commands coming from core
  * LOK_CALLBACK_STATE_CHANGED callback
  */
-/* global $ */
+/* global $ app */
 /*eslint no-extend-native:0*/
 L.Map.mergeOptions({
 	stateChangeHandler: true
@@ -33,8 +33,14 @@ L.Map.StateChangeHandler = L.Handler.extend({
 		if (typeof (e.state) == 'object') {
 			state = e.state;
 		} else if (typeof (e.state) == 'string') {
-			var index = e.state.indexOf('{');
-			state = index !== -1 ? JSON.parse(e.state.substring(index)) : e.state;
+			var firstIndex = e.state.indexOf('{');
+			var lastIndex = e.state.lastIndexOf('}');
+
+			if (firstIndex !== -1 && lastIndex !== -1) {
+				state = JSON.parse(e.state.substring(firstIndex, lastIndex + 1));
+			} else {
+				state = e.state;
+			}
 		}
 
 		this._items[e.commandName] = state;
@@ -52,6 +58,13 @@ L.Map.StateChangeHandler = L.Handler.extend({
 				$('.leaflet-pane.leaflet-map-pane').addClass('bucket-cursor');
 			else
 				$('.leaflet-pane.leaflet-map-pane').removeClass('bucket-cursor');
+		}
+
+		if (e.commandName === '.uno:StartWithPresentation' && (state === true || state === 'true')) {
+			let startPresentationParam = window.coolParams.get('startPresentation');
+			if (startPresentationParam === '' || startPresentationParam === 'true' || startPresentationParam === '1') {
+				app.dispatcher.dispatch('presentation');
+			}
 		}
 
 		$('#document-container').removeClass('slide-master-mode');

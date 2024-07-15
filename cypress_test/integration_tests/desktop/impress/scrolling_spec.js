@@ -1,21 +1,16 @@
-/* global describe it cy beforeEach require afterEach expect */
+/* global describe it cy beforeEach require expect */
 
 var helper = require('../../common/helper');
 var desktopHelper = require('../../common/desktop_helper');
 
 describe(['tagdesktop', 'tagnextcloud', 'tagproxy'], 'Scroll through document', function() {
-	var testFileName = 'scrolling.odp';
 
 	beforeEach(function() {
-		helper.beforeAll(testFileName, 'impress');
+		helper.setupAndLoadDocument('impress/scrolling.odp');
 		desktopHelper.switchUIToCompact();
-		cy.cGet('#toolbar-up .w2ui-scroll-right').click();
-		cy.cGet('#tb_editbar_item_modifypage').click();
+		cy.cGet('#toolbar-up .ui-scroll-right').click();
+		cy.cGet('#modifypage').click({force: true});
 		desktopHelper.selectZoomLevel('200');
-	});
-
-	afterEach(function() {
-		helper.afterAll(testFileName, this.currentTest.state);
 	});
 
 	function clickOnTheCenter() {
@@ -49,6 +44,6 @@ describe(['tagdesktop', 'tagnextcloud', 'tagproxy'], 'Scroll through document', 
 		helper.typeIntoDocument('{home}');
 		cy.cGet('#test-div-horizontal-scrollbar').should('have.text', '0').wait(500);
 		helper.typeIntoDocument('{end}');
-		desktopHelper.assertScrollbarPosition('horizontal', 540, 660);
+		desktopHelper.assertScrollbarPosition('horizontal', 340, 660);
 	});
 });

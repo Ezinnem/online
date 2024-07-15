@@ -17,6 +17,10 @@ L.Control.DocumentNameInput = L.Control.extend({
 
 	onAdd: function (map) {
 		this.map = map;
+		if (window.mode.isMobile())
+			this.progressBar = document.getElementById('mobile-progress-bar');
+		else
+			this.progressBar = document.getElementById('document-name-input-progress-bar');
 
 		map.on('doclayerinit', this.onDocLayerInit, this);
 		map.on('wopiprops', this.onWopiProps, this);
@@ -57,6 +61,20 @@ L.Control.DocumentNameInput = L.Control.extend({
 
 		$('#document-name-input').val(this.map['wopi'].BreadcrumbDocName);
 		this.map._onGotFocus();
+	},
+
+	disableDocumentNameInput : function() {
+		$('#document-name-input').prop('disabled', true);
+		$('#document-name-input').removeClass('editable');
+		$('#document-name-input').off('keypress', this.onDocumentNameKeyPress);
+	},
+
+	enableDocumentNameInput : function() {
+		$('#document-name-input').prop('disabled', false);
+		$('#document-name-input').addClass('editable');
+		$('#document-name-input').off('keypress', this.onDocumentNameKeyPress).on('keypress', this.onDocumentNameKeyPress.bind(this));
+		$('#document-name-input').off('focus', this.onDocumentNameFocus).on('focus', this.onDocumentNameFocus.bind(this));
+		$('#document-name-input').off('blur', this.documentNameCancel).on('blur', this.documentNameCancel.bind(this));
 	},
 
 	onDocumentNameKeyPress: function(e) {
@@ -119,24 +137,48 @@ L.Control.DocumentNameInput = L.Control.extend({
 							  // TODO: Yes, it would be better to see it change as you rotate the device or invoke Split View.
 							 );
 		}
+
+		if (this.map.isReadOnlyMode()) {
+			this.disableDocumentNameInput();
+		}
 	},
 
 	onWopiProps: function(e) {
-		if (e.BaseFileName !== null)
+		if (e.BaseFileName !== null) {
 			// set the document name into the name field
 			$('#document-name-input').val(e.BreadcrumbDocName !== undefined ? e.BreadcrumbDocName : e.BaseFileName);
-		if (e.UserCanNotWriteRelative === false) {
-			// Save As allowed
-			$('#document-name-input').prop('disabled', false);
-			$('#document-name-input').addClass('editable');
-			$('#document-name-input').off('keypress', this.onDocumentNameKeyPress).on('keypress', this.onDocumentNameKeyPress.bind(this));
-			$('#document-name-input').off('focus', this.onDocumentNameFocus).on('focus', this.onDocumentNameFocus.bind(this));
-			$('#document-name-input').off('blur', this.documentNameCancel).on('blur', this.documentNameCancel.bind(this));
-		} else {
-			$('#document-name-input').prop('disabled', true);
-			$('#document-name-input').removeClass('editable');
-			$('#document-name-input').off('keypress', this.onDocumentNameKeyPress);
+			this.map.uiManager.enableTooltip($('#document-name-input'));
 		}
+		if (!e.UserCanNotWriteRelative && !this.map.isReadOnlyMode()) {
+			// Save As allowed
+			this.enableDocumentNameInput();
+		} else {
+			this.disableDocumentNameInput();
+		}
+	},
+
+	showProgressBar: function() {
+		this.disableDocumentNameInput();
+		this.progressBar.style.display = 'block';
+	},
+
+	hideProgressBar: function() {
+		this.enableDocumentNameInput();
+		this.progressBar.style.display = 'none';
+	},
+
+	setProgressBarValue: function(value) {
+		this.progressBar.value = value;
+	},
+
+	showLoadingAnimation : function() {
+		this.disableDocumentNameInput();
+		$('#document-name-input-loading-bar').css('display', 'block');
+	},
+
+	hideLoadingAnimation : function() {
+		this.enableDocumentNameInput();
+		$('#document-name-input-loading-bar').css('display', 'none');
 	},
 
 	_getMaxAvailableWidth: function() {

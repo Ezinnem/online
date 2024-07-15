@@ -12,7 +12,7 @@ L.Map = L.Evented.extend({
 	},
 
 	options: {
-		crs: L.CRS.Simple,
+		crs: L.CRS,
 		center: [0, 0],
 		docParams: {},
 		// Default zoom level in which the document will be loaded.
@@ -70,8 +70,7 @@ L.Map = L.Evented.extend({
 			this.options.documentContainer = L.DomUtil.get(this.options.documentContainer);
 		}
 
-		if (!window.ThisIsAMobileApp)
-			this._clip = L.clipboard(this);
+		this._clip = L.clipboard(this);
 		this._initContainer(id);
 		this._initLayout();
 
@@ -118,7 +117,7 @@ L.Map = L.Evented.extend({
 		// Focusing:
 		//
 		// Cursor is visible or hidden (e.g. for graphic selection).
-		this._isCursorVisible = true;
+		app.file.textCursor.visible = true;
 		// The ID of the window with focus. 0 for the document.
 		this._winId = 0;
 		// The object of the dialog, if any (must have .focus callable).
@@ -128,9 +127,9 @@ L.Map = L.Evented.extend({
 
 		this._accessibilityState = false;
 
-		if (L.Browser.cypressTest && window.enableAccessibility && window.isLocalStorageAllowed) {
+		if (L.Browser.cypressTest && window.enableAccessibility) {
 			this._accessibilityState = true;
-			window.localStorage.setItem('accessibilityState', 'true');
+			window.prefs.set('accessibilityState', true);
 		}
 
 		this.callInitHooks();
@@ -152,6 +151,13 @@ L.Map = L.Evented.extend({
 		app.socket = new app.definitions.Socket(this);
 
 		this._progressBar = L.progressOverlay(new L.point(150, 25));
+
+		this._debug = new L.DebugManager(this);
+		this.on('docloaded', function() {
+			if (this.options.debug && !this._debug.debugOn) {
+				this._debug.toggle();
+			}
+		});
 
 		// When all these conditions are met, fire statusindicator:initializationcomplete
 		this.initConditions = {
@@ -276,6 +282,7 @@ L.Map = L.Evented.extend({
 			this._docLoaded = e.status;
 			if (this._docLoaded) {
 				app.idleHandler.notifyActive();
+				app.dispatcher = new app.definitions['dispatcher']();
 				if (!document.hasFocus()) {
 					this.fire('editorgotfocus');
 					this.focus();
@@ -295,7 +302,7 @@ L.Map = L.Evented.extend({
 				this.initializeModificationIndicator();
 
 			// Show sidebar.
-			if (this._docLayer) {
+			if (this._docLayer && !this._docLoadedOnce) {
 				// Let the first page finish loading then load the sidebar.
 				setTimeout(this.uiManager.initializeSidebar.bind(this.uiManager), 200);
 			}
@@ -487,88 +494,94 @@ L.Map = L.Evented.extend({
 		return Math.pow(1.2, (zoom - this.options.zoom));
 	},
 
-	setDesktopCalcViewOnZoom: function (zoom, animate) {
-		var calcLayer = this._docLayer;
-		if (!calcLayer.options.sheetGeometryDataEnabled || !calcLayer.sheetGeometry)
-			return false;
+	getDesktopCalcZoomCenter: function() {
+		const docLayer = this._docLayer;
 
-		var sheetGeom = calcLayer.sheetGeometry;
-		var zoomScaleAbs = this.zoomToFactor(zoom);
+		if (app.calc.cellCursorRectangle) {
+			const twipsTopLeft = [app.calc.cellCursorRectangle.x1, app.calc.cellCursorRectangle.y1];
+			const cursorInBounds = app.file.viewedRectangle.containsPoint(twipsTopLeft);
 
-		var cssBounds = this.getPixelBounds();
-		var cssBoundsSize = cssBounds.getSize();
-
-		var topLeftCell = sheetGeom.getCellFromPos(
-			cssBounds.getTopLeft().multiplyBy(app.dpiScale), 'corepixels');
-		// top-left w.r.t current zoom.
-		var topLeftPx = sheetGeom.getCellRect(topLeftCell.x, topLeftCell.y)
-			.getTopLeft().divideBy(window.devicePixelRatio);
-		// top-left w.r.t new zoom.
-		var newTopLeftPx = sheetGeom.getCellRect(topLeftCell.x, topLeftCell.y, zoomScaleAbs)
-			.getTopLeft().divideBy(app.dpiScale);
-
-		var cursorInBounds = calcLayer._cursorCorePixels ?
-			cssBounds.contains(
-				L.point(calcLayer._cursorCorePixels.getTopLeft().divideBy(app.dpiScale))) : false;
-
-		var cursorActive = calcLayer.isCursorVisible();
-		if (cursorActive && cursorInBounds) {
-			var cursorBounds = calcLayer._cursorCorePixels;
-			var cursorCenter = calcLayer._corePixelsToTwips(cursorBounds.getCenter());
-			var newCursorCenter = sheetGeom.getTileTwipsAtZoom(cursorCenter, zoomScaleAbs);
-			// convert to css pixels at zoomScale.
-			newCursorCenter._multiplyBy(zoomScaleAbs / 15 / app.dpiScale)._round();
-			var newBounds = new L.Bounds(newTopLeftPx, newTopLeftPx.add(cssBoundsSize));
-
-			if (!newBounds.contains(newCursorCenter)) {
-				var margin = 10;
-				var diffX = 0;
-				var diffY = 0;
-				var docSize = sheetGeom.getSize('corepixels').divideBy(app.dpiScale);
-				if (newCursorCenter.x < newBounds.min.x) {
-					diffX = Math.max(0, newCursorCenter.x - margin) - newBounds.min.x;
-				} else if (newCursorCenter.x > newBounds.max.x) {
-					diffX = Math.min(docSize.x, newCursorCenter.x + margin) - newBounds.max.x;
-				}
-
-				if (newCursorCenter.y < newBounds.min.y) {
-					diffY = Math.max(0, newCursorCenter.y - margin) - newBounds.min.y;
-				} else if (newCursorCenter.y > newBounds.max.y) {
-					diffY = Math.min(docSize.y, newCursorCenter.y + margin) - newBounds.max.y;
-				}
-
-				newTopLeftPx._add(new L.Point(diffX, diffY));
-				topLeftPx._add(new L.Point(diffX / zoomScaleAbs, diffY / zoomScaleAbs));
-				// FIXME: pan to topLeftPx before the animation ?
+			if (cursorInBounds) {
+				return new L.Point(...twipsTopLeft);
 			}
 		}
 
-		var newHalfSize = cssBoundsSize.divideBy(2);
-		var newCenter = newTopLeftPx.add(newHalfSize);
-		var newCenterLatLng = this.unproject(newCenter, zoom);
-		// pinch center w.r.t current zoom scale.
-		var newPinchCenterLatLng = this.unproject(topLeftPx, this.getZoom());
+		if (docLayer._cellSelectionArea) {
+			const twipsCenter = docLayer._cellSelectionArea.center;
+			const selectionInBounds = app.file.viewedRectangle.containsPoint(twipsCenter);
+
+			if (selectionInBounds) {
+				return new L.Point(...twipsCenter);
+			}
+		}
+
+		const viewBounds = this.getPixelBoundsCore();
+		return docLayer._corePixelsToTwips(viewBounds.getCenter());
+	},
+
+	setDesktopCalcViewOnZoom: function (zoom, animate) {
+		zoom = this._limitZoom(zoom);
+
+		if (zoom === this.getZoom()) {
+			return;
+		}
+
+		const docLayer = this._docLayer;
+		if (!docLayer.options.sheetGeometryDataEnabled || !docLayer.sheetGeometry)
+			return false;
+
+		const typing = app.file.textCursor.visible;
+
+		const tsManager = docLayer._painter;
+
+		const ctx = tsManager._paintContext();
+		const splitPos = ctx.splitPos;
+		const viewBounds = ctx.viewBounds;
+		const freePaneBounds = new L.Bounds(viewBounds.min.add(splitPos), viewBounds.max);
+
+		const zoomCenter = docLayer._twipsToCorePixels(this.getDesktopCalcZoomCenter());
+
+		tsManager._offset = new L.Point(0, 0);
+		const docPos = docLayer._painter._getZoomDocPos(
+			zoomCenter,
+			zoomCenter,
+			freePaneBounds,
+			{ freezeX: false, freezeY: false },
+			splitPos,
+			this.getZoomScale(zoom),
+			true
+		);
+
+		const newCenterLatLng = this.unproject(docPos.center.divideBy(app.dpiScale), zoom);
 
 		this._ignoreCursorUpdate = true;
-		var thisObj = this;
-		var mapUpdater = function() {
-			thisObj._resetView(L.latLng(newCenterLatLng), thisObj._limitZoom(zoom));
+
+		const mapUpdater = (animationCalculatedNewCenter) => {
+			if (animationCalculatedNewCenter) {
+				this._resetView(L.latLng(animationCalculatedNewCenter), zoom);
+				return;
+			}
+
+			this._resetView(L.latLng(newCenterLatLng), zoom);
 		};
-		var runAtFinish = function() {
-			thisObj._ignoreCursorUpdate = false;
-			if (cursorActive) {
-				calcLayer.activateCursor();
+		const runAtFinish = () => {
+			this._ignoreCursorUpdate = false;
+			if (typing) {
+				docLayer.activateCursor();
 			}
 		};
 
 		if (animate) {
-			this._docLayer.runZoomAnimation(zoom, newPinchCenterLatLng,
+			this._docLayer.runZoomAnimation(
+				zoom,
+				this.unproject(zoomCenter.divideBy(app.dpiScale), this.getZoom()),
 				mapUpdater,
 				runAtFinish);
-		} else {
-			mapUpdater();
-			runAtFinish();
+			return;
 		}
+
+		mapUpdater(newCenterLatLng);
+		runAtFinish();
 	},
 
 	ignoreCursorUpdate: function () {
@@ -589,7 +602,7 @@ L.Map = L.Evented.extend({
 			return;
 		this._ignoreCursorUpdate = !enable;
 
-		if (!docLayer.isCursorVisible())
+		if (!app.file.textCursor.visible)
 			return;
 
 		if (!enable) {
@@ -633,11 +646,11 @@ L.Map = L.Evented.extend({
 		var cssBounds = this.getPixelBounds();
 		var mapUpdater;
 		var runAtFinish;
-		if (this._docLayer && this._docLayer._visibleCursor && this.getBounds().contains(this._docLayer._visibleCursor.getCenter())) {
+		if (this._docLayer && app.file.textCursor.visible && app.file.viewedRectangle.containsPoint(app.file.textCursor.rectangle.center)) {
 			// Calculate new center after zoom. The intent is that the caret
 			// position stays the same.
 			var zoomScale = 1.0 / this.getZoomScale(zoom, this._zoom);
-			var caretPos = this._docLayer._visibleCursor.getCenter();
+			var caretPos = this._docLayer._twipsToLatLng({ x: app.file.textCursor.rectangle.center[0], y: app.file.textCursor.rectangle.center[1] });
 			var newCenter = new L.LatLng(curCenter.lat + (caretPos.lat - curCenter.lat) * (1.0 - zoomScale),
 						     curCenter.lng + (caretPos.lng - curCenter.lng) * (1.0 - zoomScale));
 
@@ -1038,10 +1051,6 @@ L.Map = L.Evented.extend({
 		return projectedPoint._subtract(this.getPixelOrigin());
 	},
 
-	wrapLatLng: function (latlng) {
-		return this.options.crs.wrapLatLng(L.latLng(latlng));
-	},
-
 	distance: function (latlng1, latlng2) {
 		return this.options.crs.distance(L.latLng(latlng1), L.latLng(latlng2));
 	},
@@ -1248,7 +1257,6 @@ L.Map = L.Evented.extend({
 		this.createPane('shadowPane');
 		this.createPane('overlayPane');
 		this.createPane('markerPane');
-		this.createPane('popupPane');
 		this.createPane('formfieldPane');
 
 		if (!this.options.markerZoomAnimation) {
@@ -1353,9 +1361,8 @@ L.Map = L.Evented.extend({
 	},
 
 	showCalcInputBar: function() {
-		var wrapper = document.getElementById('calc-inputbar-wrapper');
-		if (wrapper)
-			wrapper.style.display = 'block';
+		if (this.formulabar)
+			this.formulabar.showFormulabar();
 	},
 
 	// Change the focus to a dialog or editor.
@@ -1421,17 +1428,43 @@ L.Map = L.Evented.extend({
 	},
 
 	_onUpdateProgress: function (e) {
-		if (e.statusType === 'start') {
-			if (e.text) {
-				// e.text translated by Core
-				this.showBusy(e.text);
+
+		// Minimal UX disruption for background save
+		if (e.background)
+		{
+			switch (e.statusType)
+			{
+			case 'start':
+				this.uiManager.documentNameInput.showProgressBar();
+				break;
+			case 'setvalue':
+				this.uiManager.documentNameInput.setProgressBarValue(e.value);
+				break;
+			case 'finish':
+				this.uiManager.documentNameInput.hideProgressBar();
+				break;
 			}
 		}
-		else if (e.statusType === 'setvalue') {
-			this._progressBar.setValue(e.value);
-		}
-		else if (e.statusType === 'finish' || e.statusType === 'coolloaded' || e.statusType === 'reconnected') {
-			this.hideBusy();
+		else
+		{
+			switch (e.statusType)
+			{
+			case 'start':
+				if (e.text) {
+					// e.text translated by Core
+					this.showBusy(e.text);
+				}
+				break;
+			case 'setvalue':
+				this._progressBar.setBar(true);
+				this._progressBar.setValue(e.value);
+				break;
+			case 'finish':
+			case 'coolloaded':
+			case 'reconnected':
+				this.hideBusy();
+				break;
+			}
 		}
 	},
 
@@ -1470,12 +1503,6 @@ L.Map = L.Evented.extend({
 			if (app.sectionContainer.doesSectionExist(L.CSections.CommentList.name)) {
 				app.sectionContainer.getSectionWithName(L.CSections.CommentList.name).unselect();
 			}
-		}
-
-		// we need to keep track about the last action, this
-		// will help us to avoid wrongly removing the editor
-		if (type === 'keypress') {
-			this.lastActionByUser = true;
 		}
 
 		// we need to keep track if we have entered/left the map
@@ -1650,7 +1677,7 @@ L.Map = L.Evented.extend({
 		var followEditor = true;
 		var followUser = false;
 
-		if (userDefined && viewId !== -1 && viewId !== this._docLayer.viewId) {
+		if (userDefined && viewId !== -1) {
 			followUser = true;
 			followEditor = false;
 		}
@@ -1660,28 +1687,25 @@ L.Map = L.Evented.extend({
 			followUser = false;
 		}
 
-		this._docLayer._followUser = followUser;
-		this._docLayer._followEditor = followEditor;
-
 		if (followUser) {
 			this._goToViewId(viewId);
-			this._docLayer._followThis = viewId;
+			app.setFollowingUser(viewId);
 		}
 		else if (followEditor) {
 			var editorId = this._docLayer._editorId;
 			if (editorId !== -1 && editorId !== this._docLayer.viewId) {
 				this._goToViewId(editorId);
-				this._docLayer._followThis = editorId;
+				app.setFollowingEditor(editorId);
 			}
 		}
 		else {
-			this.fire('deselectuser', {viewId: this._docLayer._followThis});
-			this._docLayer._followThis = -1;
+			this.fire('deselectuser', {viewId: app.getFollowedViewId()});
+			app.setFollowingOff();
 		}
 
 		// Notify about changes
 		this.fire('postMessage', {msgId: 'FollowUser_Changed',
-			args: {FollowedViewId: this._docLayer._followThis,
+			args: {FollowedViewId: app.getFollowedViewId(),
 				IsFollowUser: followUser,
 				IsFollowEditor: followEditor}});
 	},

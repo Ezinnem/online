@@ -13,9 +13,8 @@
 
 #include "FileServer.hpp"
 #include "StringVector.hpp"
-#include "Util.hpp"
 
-#include <Poco/JSON/Object.h>
+#include <JsonUtil.hpp>
 
 #include <cctype>
 
@@ -202,7 +201,7 @@ std::string FileServerRequestHandler::uiDefaultsToJSON(const std::string& uiDefa
     Poco::JSON::Object presentationDefs;
     Poco::JSON::Object drawingDefs;
 
-    uiMode = "";
+    uiMode.clear();
     uiTheme = "light";
     savedUIState = "true";
     StringVector tokens(StringVector::tokenize(uiDefaults, ';'));
@@ -234,7 +233,11 @@ std::string FileServerRequestHandler::uiDefaultsToJSON(const std::string& uiDefa
         // detect the UITheme default, light or dark
         if (keyValue.equals(0, "UITheme"))
         {
-            json.set("darkTheme", keyValue.equals(1, "dark"));
+            if (keyValue.equals(1, "dark")) {
+                json.set("darkTheme", "true");
+            } else {
+                json.set("darkTheme", "false");
+            }
             uiTheme = keyValue[1];
             continue;
         }
@@ -263,12 +266,12 @@ std::string FileServerRequestHandler::uiDefaultsToJSON(const std::string& uiDefa
         }
         if (keyValue.equals(0, "TouchscreenHint"))
         {
-            json.set("touchscreenHint", keyValue.equals(1, "true"));
+            json.set("touchscreenHint", keyValue[1]);
             continue;
         }
         if (keyValue.equals(0, "OnscreenKeyboardHint"))
         {
-            json.set("onscreenKeyboardHint", keyValue.equals(1, "true"));
+            json.set("onscreenKeyboardHint", keyValue[1]);
             continue;
         }
         else if (keyValue.startsWith(0, "Text"))
@@ -286,7 +289,7 @@ std::string FileServerRequestHandler::uiDefaultsToJSON(const std::string& uiDefa
             currentDef = &presentationDefs;
             key = keyValue[0].substr(12);
         }
-        else if (Util::startsWith(keyValue[0], "Drawing"))
+        else if (keyValue[0].starts_with("Drawing"))
         {
             currentDef = &drawingDefs;
             key = keyValue[0].substr(7);
@@ -302,9 +305,9 @@ std::string FileServerRequestHandler::uiDefaultsToJSON(const std::string& uiDefa
         // detect the actual UI widget we want to hide or show
         if (key == "Ruler" || key == "Sidebar" || key == "Statusbar" || key == "Toolbar")
         {
-            bool value(true);
+            std::string value("true");
             if (keyValue.equals(1, "false") || keyValue.equals(1, "False") || keyValue.equals(1, "0"))
-                value = false;
+                value = "false";
 
             currentDef->set("Show" + key, value);
         }
@@ -420,17 +423,6 @@ std::string FileServerRequestHandler::cssVarsToStyle(const std::string& cssVars)
     previousStyle = styleOSS.str();
 
     return previousStyle;
-}
-
-std::string FileServerRequestHandler::stringifyBoolFromConfig(
-                                                const Poco::Util::LayeredConfiguration& config,
-                                                std::string propertyName,
-                                                bool defaultValue)
-{
-    std::string value = "false";
-    if (config.getBool(propertyName, defaultValue))
-        value = "true";
-    return value;
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

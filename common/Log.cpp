@@ -29,13 +29,9 @@
 #include <unordered_map>
 
 #include <Poco/AutoPtr.h>
-#include <Poco/ConsoleChannel.h>
 #include <Poco/FileChannel.h>
-#include <Poco/FormattingChannel.h>
-#include <Poco/PatternFormatter.h>
-#include <Poco/SplitterChannel.h>
+#include <Poco/Logger.h>
 
-#include "Common.hpp"
 #include "Log.hpp"
 #include "Util.hpp"
 
@@ -53,6 +49,70 @@ constexpr int LOG_FILE_FD = STDERR_FILENO;
 #endif
 
 } // namespace
+
+/// Which log areas should be disabled
+bool AreasDisabled[Log::AreaMax] = { false, };
+
+/// Wrapper to expose protected 'log' and genericise
+class GenericLogger : public Poco::Logger
+{
+public:
+    GenericLogger(const std::string& name,
+                  Poco::AutoPtr<Poco::Channel> chan, int lvl)
+        : Poco::Logger(name, std::move(chan), lvl)
+    {
+    }
+
+    static GenericLogger& create(const std::string& name,
+                                 Poco::AutoPtr<Poco::Channel> chan, int lvl)
+    {
+        // Expect no thread contention creating
+        // loggers and we can't access the internal mutex.
+        if (find(name))
+            throw Poco::ExistsException();
+        auto log = new GenericLogger(name, std::move(chan), lvl);
+        add(log);
+        return *log;
+    }
+
+    void doLog(Log::Level l, const std::string& text)
+    {
+        Poco::Message::Priority prio = Poco::Message::Priority::PRIO_TRACE;
+#define MAP(l,p) case Log::Level::l: prio = Poco::Message::Priority::p;break
+        switch (l) {
+            MAP(FTL, PRIO_FATAL);
+            MAP(CTL, PRIO_CRITICAL);
+            MAP(ERR, PRIO_ERROR);
+            MAP(WRN, PRIO_WARNING);
+            MAP(NTC, PRIO_NOTICE);
+            MAP(INF, PRIO_INFORMATION);
+            MAP(DBG, PRIO_DEBUG);
+            MAP(TRC, PRIO_TRACE);
+        default:
+            break;
+#undef MAP
+        }
+        log(text, prio);
+    }
+
+    static Log::Level mapToLevel(Poco::Message::Priority prio)
+    {
+#define MAP(l,p) case Poco::Message::Priority::p: return Log::Level::l;
+        switch (prio) {
+            MAP(FTL, PRIO_FATAL);
+            MAP(CTL, PRIO_CRITICAL);
+            MAP(ERR, PRIO_ERROR);
+            MAP(WRN, PRIO_WARNING);
+            MAP(NTC, PRIO_NOTICE);
+            MAP(INF, PRIO_INFORMATION);
+            MAP(DBG, PRIO_DEBUG);
+            MAP(TRC, PRIO_TRACE);
+        default:
+            return Log::Level::TRC;
+        }
+#undef MAP
+    }
+};
 
 namespace Log
 {
@@ -123,6 +183,13 @@ namespace Log
             log(s.data(), s.size());
         }
     };
+
+    void postFork()
+    {
+        /// after forking we can end up with threads that
+        /// logged in the parent confusing our counting.
+        ThreadLocalBufferCount = 0;
+    }
 
     class BufferedConsoleChannel : public ConsoleChannel
     {
@@ -309,8 +376,8 @@ namespace Log
     static struct StaticHelper
     {
     private:
-        Poco::Logger* _logger;
-        static thread_local Poco::Logger* _threadLocalLogger;
+        GenericLogger* _logger;
+        static thread_local GenericLogger* _threadLocalLogger;
         std::string _name;
         std::string _logLevel;
         std::string _id;
@@ -340,9 +407,9 @@ namespace Log
 
         const std::string& getLevel() const { return _logLevel; }
 
-        void setLogger(Poco::Logger* logger) { _logger = logger; };
+        void setLogger(GenericLogger* logger) { _logger = logger; };
 
-        void setThreadLocalLogger(Poco::Logger* logger)
+        void setThreadLocalLogger(GenericLogger* logger)
         {
             // FIXME: What to do with the previous thread-local logger, if any? Will deleting it
             // destroy also its channel? That won't be good as we use the same channel for all
@@ -350,13 +417,13 @@ namespace Log
             _threadLocalLogger = logger;
         }
 
-        Poco::Logger* getLogger() const { return _logger; }
+        GenericLogger* getLogger() const { return _logger; }
 
-        Poco::Logger* getThreadLocalLogger() const { return _threadLocalLogger; }
+        GenericLogger* getThreadLocalLogger() const { return _threadLocalLogger; }
 
     } Static;
 
-    thread_local Poco::Logger* StaticHelper::_threadLocalLogger = nullptr;
+    thread_local GenericLogger* StaticHelper::_threadLocalLogger = nullptr;
 
     bool IsShutdown = false;
 
@@ -534,10 +601,8 @@ namespace Log
         Static.setName(name);
         std::ostringstream oss;
         oss << Static.getName();
-#if !MOBILEAPP // Just one process in a mobile app, the pid is uninteresting.
-        oss << '-'
-            << std::setw(5) << std::setfill('0') << getpid();
-#endif
+        if (!Util::isMobileApp())
+            oss << '-' << std::setw(5) << std::setfill('0') << getpid();
         Static.setId(oss.str());
 
         // Configure the logger.
@@ -545,25 +610,50 @@ namespace Log
 
         if (logToFile)
         {
-            channel = static_cast<Poco::Channel*>(new Poco::FileChannel("coolwsd.log"));
-            for (const auto& pair : config)
+            /* For linux namespaces we have a difficulty with "rotateOnOpen".
+               These namespacess cannot be created with another thread running and
+               with "rotateOnOpen" an existing log is moved and then compressed
+               in a thread whose presence then blocks namespace creation.
+
+               So, if there is "rotateOnOpen" then do this twice and force
+               destruction of the initial channel to wait for and join the
+               compression thread on the old log, and then create another which
+               then has no need to do any rotateOnOpen work.
+            */
+            bool logRotateOnOpen = false;
+
+            for (int i = 0; i < 2; ++i)
             {
-                channel->setProperty(pair.first, pair.second);
+                channel = static_cast<Poco::Channel*>(new Poco::FileChannel("coolwsd.log"));
+                for (const auto& pair : config)
+                {
+                    if (pair.first == "rotateOnOpen" && pair.second == "true")
+                        logRotateOnOpen = true;
+                    channel->setProperty(pair.first, pair.second);
+                }
+
+                // no rotation -> no thread, no need to repeat again
+                if (!logRotateOnOpen)
+                    break;
+
+                // or this is the 2nd creation
+                if (i)
+                    break;
+
+                // otherwise, trigger the compression thread and the next loop
+                // at channel = ... will destroy the first and join the
+                // problematic thread
+                channel->open();
+                channel->close();
             }
         }
         else if (withColor)
         {
-            if (EnableExperimental)
-                channel = static_cast<Poco::Channel*>(new Log::ColorConsoleChannel());
-            else
-                channel = static_cast<Poco::Channel*>(new Poco::ColorConsoleChannel());
+            channel = static_cast<Poco::Channel*>(new Log::ColorConsoleChannel());
         }
         else
         {
-            if (EnableExperimental)
-                channel = static_cast<Poco::Channel*>(new Log::BufferedConsoleChannel());
-            else
-                channel = static_cast<Poco::Channel*>(new Poco::ConsoleChannel());
+            channel = static_cast<Poco::Channel*>(new Log::BufferedConsoleChannel());
         }
 
         /**
@@ -575,13 +665,13 @@ namespace Log
 
         try
         {
-            auto& logger = Poco::Logger::create(Static.getName(), channel, Poco::Message::PRIO_TRACE);
+            auto& logger = GenericLogger::create(Static.getName(), channel, Poco::Message::PRIO_TRACE);
             Static.setLogger(&logger);
         }
         catch (ExistsException&)
         {
-            auto& logger = Poco::Logger::get(Static.getName());
-            Static.setLogger(&logger);
+            auto logger = static_cast<GenericLogger *>(&Poco::Logger::get(Static.getName()));
+            Static.setLogger(logger);
         }
 
         auto logger = Static.getLogger();
@@ -597,32 +687,53 @@ namespace Log
                                 << ". Log level is [" << logger->getLevel() << ']');
     }
 
-    Poco::Logger& logger()
+    GenericLogger& logger()
     {
-        Poco::Logger* pLogger = Static.getThreadLocalLogger();
+        GenericLogger* pLogger = Static.getThreadLocalLogger();
         if (pLogger != nullptr)
             return *pLogger;
 
         pLogger = Static.getLogger();
         return pLogger ? *pLogger
-                       : Poco::Logger::get(Static.getInited() ? Static.getName() : std::string());
+            : *static_cast<GenericLogger *>(
+                &GenericLogger::get(Static.getInited() ? Static.getName() : std::string()));
+    }
+
+    bool isEnabled(Level l, Area a)
+    {
+        if (IsShutdown)
+            return false;
+
+        Log::Level logLevel = GenericLogger::mapToLevel(
+            static_cast<Poco::Message::Priority>(logger().getLevel()));
+
+        if (logLevel < static_cast<int>(l))
+            return false;
+
+        bool disabled = AreasDisabled[static_cast<size_t>(a)];
+
+        // Areas shouldn't disable warnings & errors
+        assert(!disabled || logLevel > static_cast<int>(Level::WRN));
+
+        return !disabled;
     }
 
     void shutdown()
     {
-#if !MOBILEAPP
+        if (Util::isMobileApp())
+            return;
         if (!Util::isKitInProcess())
             assert(ThreadLocalBufferCount <= 1 &&
                    "Unstopped threads may have unflushed buffered log entries");
 
-        IsShutdown = true;
+        // continue logging shutdown on mobile
+        IsShutdown = !Util::isMobileApp();
 
         Poco::Logger::shutdown();
 
         // Flush
         fflush(stdout);
         fflush(stderr);
-#endif
     }
 
     void setThreadLocalLogLevel(const std::string& logLevel)
@@ -632,22 +743,101 @@ namespace Log
             return;
         }
 
+        if (Util::isFuzzing())
+        {
+            // loggingleveloverride tries to increase log level, ignore.
+            return;
+        }
+
         // Use the same channel for all Poco loggers.
         auto channel = Static.getLogger()->getChannel();
 
         // The Poco loggers have to have names that are unique, but those aren't displayed anywhere.
         // So just use the name of the default logger for this process plus a counter.
         static int counter = 1;
-        auto& logger = Poco::Logger::create(Static.getName() + "." + std::to_string(counter++),
-                                            std::move(channel),
-                                            Poco::Logger::parseLevel(logLevel));
+        auto& logger = GenericLogger::create(Static.getName() + "." + std::to_string(counter++),
+                                             std::move(channel),
+                                             Poco::Logger::parseLevel(logLevel));
+
         Static.setThreadLocalLogger(&logger);
     }
 
-    const std::string& getLevel()
+    const std::string& getLevelName()
     {
         return Static.getLevel();
     }
-}
+
+    Level getLevel()
+    {
+        return GenericLogger::mapToLevel(
+            static_cast<Poco::Message::Priority>(
+                Log::logger().getLevel()));
+    }
+
+    void setLevel(const std::string &l)
+    {
+        Log::logger().setLevel(l);
+        // Update our public flags in the array now ...
+    }
+
+    /// Set disabled areas
+    void setDisabledAreas(const std::string &areaStr)
+    {
+        if (areaStr != "")
+            LOG_INF("Setting disabled log areas to [" << areaStr << "]");
+        StringVector areas = StringVector::tokenize(areaStr, ',');
+        std::vector<bool> enabled(Log::AreaMax, true);
+        for (size_t t = 0; t < areas.size(); ++t)
+        {
+            for (size_t i = 0; i < Log::AreaMax; ++i)
+            {
+                if (areas.equals(t, nameShort(static_cast<Log::Area>(i))))
+                {
+                    enabled[i] = false;
+                    break;
+                }
+            }
+        }
+        for (size_t i = 0; i < Log::AreaMax; ++i)
+            AreasDisabled[i] = !enabled[i];
+    }
+
+    void log(Level l, const std::string &text)
+    {
+        Log::logger().doLog(l, text);
+    }
+
+    const std::string levelList[] = {"none", "fatal", "critical", "error", "warning", "notice", "information", "debug", "trace"};
+
+    std::string getLogLevelName(const std::string &channel)
+    {
+        unsigned int wsdLogLevel =
+            Log::logger().get(channel).getLevel();
+        return levelList[wsdLogLevel];
+    }
+
+    void setLogLevelByName(const std::string &channel,
+                           const std::string &level)
+    {
+        if (Util::isFuzzing())
+        {
+            // update-log-levels tries to increase log level, ignore.
+            return;
+        }
+
+        // FIXME: seems redundant do we need that ?
+        std::string lvl = level;
+
+        // Get the list of channels..
+        std::vector<std::string> nameList;
+        Log::logger().names(nameList);
+
+        if (std::find(std::begin(levelList), std::end(levelList), level) == std::end(levelList))
+            lvl = "debug";
+
+        Log::logger().get(channel).setLevel(lvl);
+    }
+
+} // namespace Log
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

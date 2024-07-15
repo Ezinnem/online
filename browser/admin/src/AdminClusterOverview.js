@@ -524,7 +524,7 @@ var AdminClusterOverview = AdminSocketBase.extend({
             }
             var serverId = tokens[0];
             var cardId = 'card-' + serverId;
-            var card = document.getElementById(cardId);
+            var card = document.getElementById(cardId).parentElement;
             if (card) {
                 card.remove();
             }
@@ -532,7 +532,6 @@ var AdminClusterOverview = AdminSocketBase.extend({
             if (anchor) {
                 anchor.remove();
             }
-            location.reload();
         } else if (textMsg.startsWith('scaling')) {
             var msg = textMsg.split(' ')[1];
             if (msg == 'true') {
@@ -550,8 +549,8 @@ var AdminClusterOverview = AdminSocketBase.extend({
                 msg = _('Failed to set jwt authentication cookie over insecure connection');
             }
             else {
-                msg = _('Failed to authenticate this session over protocol %0');
-                msg = msg.replace('%0', window.location.protocol);
+                msg = _('Failed to authenticate this session over protocol {0}');
+                msg = msg.replace('{0}', window.location.protocol);
             }
 
             var dialog = (new DlgYesNo())

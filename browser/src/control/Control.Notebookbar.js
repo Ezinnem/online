@@ -13,7 +13,7 @@
  * L.Control.Notebookbar - container for tabbed menu on the top of application
  */
 
-/* global $ _ _UNO */
+/* global $ _ _UNO JSDialog */
 L.Control.Notebookbar = L.Control.extend({
 
 	_currentScrollPosition: 0,
@@ -38,17 +38,18 @@ L.Control.Notebookbar = L.Control.extend({
 			this._RTL = true;
 
 		this.builder = new L.control.notebookbarBuilder({windowId: -2, mobileWizard: this, map: map, cssClass: 'notebookbar', useSetTabs: true});
+		this.map.on('commandstatechanged', this.builder.onCommandStateChanged, this.builder);
+
+		// remove old toolbar
 		var toolbar = L.DomUtil.get('toolbar-up');
-		// In case it contains garbage
 		if (toolbar)
-			toolbar.remove();
+			toolbar.outerHTML = '';
+
+		// create toolbar from template
 		$('#toolbar-logo').after(this.map.toolbarUpTemplate.cloneNode(true));
-		toolbar = $('#toolbar-up');
+		this.parentContainer = L.DomUtil.get('toolbar-up');
 
 		this.loadTab(this.getFullJSON(this.HOME_TAB_ID));
-
-		this.createScrollButtons();
-		this.setupResizeHandler();
 
 		this.map.on('contextchange', this.onContextChange, this);
 		this.map.on('notebookbar', this.onNotebookbar, this);
@@ -67,7 +68,6 @@ L.Control.Notebookbar = L.Control.extend({
 		this.initializeInCore();
 
 		$('#toolbar-wrapper').addClass('hasnotebookbar');
-		$('.main-nav').removeProp('overflow');
 		$('.main-nav').addClass('hasnotebookbar');
 		$('.main-nav').addClass(docType + '-color-indicator');
 		document.getElementById('document-container').classList.add('notebookbar-active');
@@ -89,6 +89,9 @@ L.Control.Notebookbar = L.Control.extend({
 		$(docLogo).data('id', 'document-logo');
 		$(docLogo).data('type', 'action');
 		$('.main-nav').prepend(docLogoHeader);
+		var isDarkMode = window.prefs.getBoolean('darkTheme');
+		if (!isDarkMode)
+			$('#invertbackground').hide();
 
 		var that = this;
 		var retryNotebookbarInit = function() {
@@ -106,17 +109,13 @@ L.Control.Notebookbar = L.Control.extend({
 	onRemove: function() {
 		clearTimeout(this.retry);
 		this.resetInCore();
+		this.map.off('commandstatechanged', this.builder.onCommandStateChanged, this.builder);
 		this.map.off('contextchange', this.onContextChange, this);
 		this.map.off('updatepermission', this.onUpdatePermission, this);
 		this.map.off('notebookbar');
 		this.map.off('jsdialogupdate', this.onJSUpdate, this);
 		this.map.off('jsdialogaction', this.onJSAction, this);
 		$('.main-nav #document-header').remove();
-		if (this._map.isReadOnlyMode()) {
-			$('.main-nav.hasnotebookbar').css('overflow', 'visible');
-		} else {
-			$('.main-nav.hasnotebookbar').css('overflow', 'scroll hidden');
-		}
 		$('.main-nav').removeClass('hasnotebookbar');
 		$('#toolbar-wrapper').removeClass('hasnotebookbar');
 		$('.main-nav').removeClass(this._map.getDocType() + '-color-indicator');
@@ -216,15 +215,16 @@ L.Control.Notebookbar = L.Control.extend({
 	clearNotebookbar: function() {
 		$('.root-container.notebookbar').remove();
 		$('.notebookbar-tabs-container').remove();
-		$('.notebookbar-scroll-wrapper').remove();
 		$('.notebookbar-shortcuts-bar').remove();
+		$(this.container).remove();
 	},
 
 	loadTab: function(tabJSON) {
 		this.clearNotebookbar();
 
-		var parent = $('#toolbar-up').get(0);
-		this.container = L.DomUtil.create('div', 'notebookbar-scroll-wrapper', parent);
+		this.container = L.DomUtil.create('div', 'notebookbar-scroll-wrapper', this.parentContainer);
+
+		JSDialog.MakeScrollable(this.parentContainer, this.container);
 
 		this.builder.build(this.container, [tabJSON]);
 
@@ -339,7 +339,7 @@ L.Control.Notebookbar = L.Control.extend({
 	},
 
 	showNotebookbarButton: function(buttonId, show) {
-		var button = $('.notebookbar-scroll-wrapper #' + buttonId);
+		var button = $(this.container).find('#' + buttonId);
 		if (show) {
 			button.show();
 		} else {
@@ -347,14 +347,14 @@ L.Control.Notebookbar = L.Control.extend({
 		}
 	},
 
-        showNotebookbarCommand: function(commandId, show) {
+	showNotebookbarCommand: function(commandId, show) {
 		var cssClass;
 		if (commandId.indexOf('.uno:') == 0) {
 			cssClass = 'uno' + commandId.substring(5);
 		} else {
 			cssClass = commandId;
 		}
-		var button = $('.notebookbar-scroll-wrapper div.' + cssClass);
+		var button = $(this.container).find('div.' + cssClass);
 		if (show) {
 			button.show();
 		} else {
@@ -363,73 +363,17 @@ L.Control.Notebookbar = L.Control.extend({
 	},
 
 	setCurrentScrollPosition: function() {
-		this._currentScrollPosition = $('.notebookbar-scroll-wrapper').scrollLeft();
+		this._currentScrollPosition = $(this.container).scrollLeft();
 	},
 
 	scrollToLastPositionIfNeeded: function() {
-		var rootContainer = $('.notebookbar-scroll-wrapper div').get(0);
+		var rootContainer = $(this.container).children('div').get(0);
 
 		if (this._currentScrollPosition && $(rootContainer).outerWidth() > $(window).width()) {
-			$('.notebookbar-scroll-wrapper').animate({ scrollLeft: this._currentScrollPosition }, 0);
+			$(this.container).animate({ scrollLeft: this._currentScrollPosition }, 0);
 		} else {
-			$(window).resize();
+			JSDialog.RefreshScrollables();
 		}
-	},
-
-	createScrollButtons: function() {
-		var parent = $('#toolbar-up').get(0);
-
-		var left = L.DomUtil.create('div', 'w2ui-scroll-left', parent);
-		var right = L.DomUtil.create('div', 'w2ui-scroll-right', parent);
-
-		$(left).click(function () {
-			var scroll = $('.notebookbar-scroll-wrapper').scrollLeft() - 300;
-			$('.notebookbar-scroll-wrapper').animate({ scrollLeft: scroll }, 300);
-			setTimeout(function () { $(window).resize(); }, 350);
-		});
-
-		$(right).click(function () {
-			var scroll = $('.notebookbar-scroll-wrapper').scrollLeft() + 300;
-			$('.notebookbar-scroll-wrapper').animate({ scrollLeft: scroll }, 300);
-			setTimeout(function () { $(window).resize(); }, 350);
-		});
-	},
-
-	setupResizeHandler: function() {
-		var handler = function() {
-			var container = $('#toolbar-up').get(0);
-			var rootContainer = $('.notebookbar-scroll-wrapper div').get(0);
-
-			if ($(rootContainer).outerWidth() > $(window).width()) {
-				// we have overflowed content
-				var direction = this._RTL ? -1 : 1;
-				if (direction * $('.notebookbar-scroll-wrapper').scrollLeft() > 0) {
-					if (this._RTL)
-						$(container).find('.w2ui-scroll-right').show();
-					else
-						$(container).find('.w2ui-scroll-left').show();
-				} else if (this._RTL)
-					$(container).find('.w2ui-scroll-right').hide();
-				else
-					$(container).find('.w2ui-scroll-left').hide();
-
-				if (direction * $('.notebookbar-scroll-wrapper').scrollLeft() < $(rootContainer).outerWidth() - $(window).width() - 1) {
-					if (this._RTL)
-						$(container).find('.w2ui-scroll-left').show();
-					else
-						$(container).find('.w2ui-scroll-right').show();
-				} else if (this._RTL)
-					$(container).find('.w2ui-scroll-left').hide();
-				else
-					$(container).find('.w2ui-scroll-right').hide();
-			} else {
-				$(container).find('.w2ui-scroll-left').hide();
-				$(container).find('.w2ui-scroll-right').hide();
-			}
-		}.bind(this);
-
-		$(window).resize(handler);
-		$('.notebookbar-scroll-wrapper').scroll(handler);
 	},
 
 	onContextChange: function(event) {
@@ -514,16 +458,18 @@ L.Control.Notebookbar = L.Control.extend({
 	},
 
 	onDarkModeToggleChange: function() {
-		if (this.map.uiManager.getDarkModeState()) {
+		if (window.prefs.getBoolean('darkTheme')) {
 			$('#toggledarktheme').addClass('selected');
+			$('#invertbackground').show();
 		}
 		else {
 			$('#toggledarktheme').removeClass('selected');
+			$('#invertbackground').hide();
 		}
 	},
 
 	onAccessibilityToggleChange: function() {
-		if (this.map.uiManager.getAccessibilityState()) {
+		if (window.prefs.getBoolean('accessibilityState')) {
 			$('#togglea11ystate').addClass('selected');
 		} else {
 			$('#togglea11ystate').removeClass('selected');
@@ -570,7 +516,7 @@ L.Control.Notebookbar = L.Control.extend({
 		$('.notebookbar-options-section').remove();
 
 		var optionsSection = L.DomUtil.create('div', 'notebookbar-options-section');
-		$(optionsSection).insertBefore('#closebuttonwrapper');
+		$(optionsSection).insertBefore('#closebuttonwrapperseparator');
 
 		var builderOptions = {
 			mobileWizard: this,

@@ -12,7 +12,7 @@
  * L.Control.LokDialog used for displaying LOK dialogs
  */
 
-/* global app $ L Hammer w2ui brandProductName UNOModifier */
+/* global app $ L Hammer brandProductName UNOModifier */
 
 L.WinUtil = {
 
@@ -187,8 +187,8 @@ L.Control.LokDialog = L.Control.extend({
 	},
 
 	_isSelectionHandle: function(el) {
-		return L.DomUtil.hasClass(el, 'leaflet-selection-marker-start')	||
-			L.DomUtil.hasClass(el, 'leaflet-selection-marker-end');
+		return L.DomUtil.hasClass(el, 'text-selection-handle-start')	||
+			L.DomUtil.hasClass(el, 'text-selection-handle-end');
 	},
 
 	// Given a prefixed dialog id like 'lokdialog-323', gives a raw id, 323.
@@ -227,6 +227,7 @@ L.Control.LokDialog = L.Control.extend({
 		this._sendPaintWindow(id, this._createRectStr(id, x, y, width, height));
 	},
 
+	// TODO: Extract to tool in Debug.js
 	_debugPaintWindow: function(id, rectangle) {
 		var strId = this._toStrId(id);
 		var canvas = document.getElementById(strId + '-canvas');
@@ -251,7 +252,7 @@ L.Control.LokDialog = L.Control.extend({
 		//window.app.console.log('_sendPaintWindow: rectangle: ' + rectangle + ', dpiscale: ' + dpiscale);
 		app.socket.sendMessage('paintwindow ' + id + ' rectangle=' + rectangle + ' dpiscale=' + app.roundedDpiScale);
 
-		if (this._map._docLayer && this._map._docLayer._debug)
+		if (this._map._debug.debugOn)
 			this._debugPaintWindow(id, rectangle);
 	},
 
@@ -394,9 +395,9 @@ L.Control.LokDialog = L.Control.extend({
 			$('#' + strId).remove();
 			this._launchDialog(e.id, null, null, width, height, this._dialogs[parseInt(e.id)].title, null, e.unique_id);
 			if (this._map._docLayer && this._map._docLayer._docType === 'spreadsheet') {
-				if (this._map._docLayer._painter._sectionContainer.doesSectionExist(L.CSections.RowHeader.name)) {
-					this._map._docLayer._painter._sectionContainer.getSectionWithName(L.CSections.RowHeader.name)._updateCanvas();
-					this._map._docLayer._painter._sectionContainer.getSectionWithName(L.CSections.ColumnHeader.name)._updateCanvas();
+				if (app.sectionContainer.doesSectionExist(L.CSections.RowHeader.name)) {
+					app.sectionContainer.getSectionWithName(L.CSections.RowHeader.name)._updateCanvas();
+					app.sectionContainer.getSectionWithName(L.CSections.ColumnHeader.name)._updateCanvas();
 				}
 			}
 		} else if (e.action === 'cursor_invalidate') {
@@ -594,10 +595,8 @@ L.Control.LokDialog = L.Control.extend({
 	},
 
 	_launchDialog: function(id, leftTwips, topTwips, width, height, title, type, uniqueId) {
-		if (window.ThisIsTheiOSApp) {
-			if (w2ui['editbar'])
-				w2ui['editbar'].disable('closemobile');
-		}
+		if (window.ThisIsTheiOSApp && app.map.mobileTopBar)
+				app.map.mobileTopBar.enableItem('closemobile', false);
 		this.onCloseCurrentPopUp();
 		var dialogContainer = L.DomUtil.create('div', 'lokdialog', document.body);
 		L.DomUtil.setStyle(dialogContainer, 'padding', '0px');
@@ -871,10 +870,8 @@ L.Control.LokDialog = L.Control.extend({
 	_onDialogClose: function(dialogId, notifyBackend) {
 		this._closeChildWindows(dialogId);
 
-		if (window.ThisIsTheiOSApp) {
-			if (w2ui['editbar'])
-				w2ui['editbar'].enable('closemobile');
-		}
+		if (window.ThisIsTheiOSApp && app.map.mobileTopBar)
+			app.map.mobileTopBar.enableItem('closemobile', true);
 
 		if (notifyBackend)
 			this._sendCloseWindow(dialogId);

@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.63])
 
-AC_INIT([coolwsd], [23.05.7.5], [https://github.com/CollaboraOnline/online/issues], [coolwsd], [https://collaboraonline.github.io/])
+AC_INIT([coolwsd], [24.04.5.1], [https://github.com/CollaboraOnline/online/issues], [coolwsd], [https://collaboraonline.github.io/])
 LT_INIT([shared, disable-static, dlopen])
 
 AM_INIT_AUTOMAKE([1.10 foreign subdir-objects tar-pax -Wno-portability])
@@ -121,6 +121,10 @@ AC_LINK_IFELSE([AC_LANG_SOURCE([
 AC_ARG_ENABLE([debug],
               AS_HELP_STRING([--enable-debug],
                              [Enable debugging, link with debugging version of Poco libraries]))
+
+AC_ARG_ENABLE([hardening-flags],
+              AS_HELP_STRING([--disable-hardening-flags],
+                             [Disable detection and use of compiler hardening flags]))
 
 AC_ARG_ENABLE([bundle],
               AS_HELP_STRING([--enable-bundle],
@@ -401,7 +405,6 @@ AC_ARG_ENABLE([experimental],
               AS_HELP_STRING([--enable-experimental],
                              [Enable experimental features and behavior]))
 
-
 # Handle options
 AS_IF([test "$enable_debug" = yes -a -n "$with_poco_libs"],
       [POCO_DEBUG_SUFFIX=d],
@@ -423,6 +426,11 @@ experimental_msg="disabled by default"
 bundle_msg="using uglified bundled JS and CSS"
 LOK_LOG_ASSERTIONS=0
 log_asserts_msg="disabled"
+SSL_VERIFY="true"
+
+# a reasonable default
+NUM_PRESPAWN_CHILDREN=4
+
 AC_MSG_CHECKING([whether to enable debug build])
 if test "$enable_debug" = "yes"; then
    AC_MSG_RESULT([yes])
@@ -436,6 +444,10 @@ if test "$enable_debug" = "yes"; then
    COOLWSD_ANONYMIZE_USER_DATA=false
    BROWSER_LOGGING="true"
    debug_msg="low security debugging mode"
+   SSL_VERIFY="false"
+
+   # helps attaching to the right process
+   NUM_PRESPAWN_CHILDREN=1
 
    AC_MSG_CHECKING([whether to bundle JS and CSS files])
    if test "$enable_bundle" != "yes"; then
@@ -463,6 +475,7 @@ AC_SUBST(ENABLE_BUNDLE)
 AC_SUBST(COOLWSD_LOGLEVEL)
 AC_SUBST(COOLWSD_LOG_TO_FILE)
 AC_SUBST(BROWSER_LOGGING)
+AC_SUBST(NUM_PRESPAWN_CHILDREN)
 
 if test "$enable_debug_protocol" = no; then
    ENABLE_DEBUG_PROTOCOL=false
@@ -509,8 +522,14 @@ fi
 if test "$enable_experimental" = "yes" ; then
   ENABLE_EXPERIMENTAL=true
   experimental_msg="enabled by default"
+  SSL_VERIFY="false"
 fi
 AC_SUBST(ENABLE_EXPERIMENTAL)
+
+AC_MSG_CHECKING([if ssl verification is enabled by default])
+AC_MSG_RESULT([$SSL_VERIFY])
+AC_DEFINE_UNQUOTED([SSL_VERIFY],["$SSL_VERIFY"],[Default SSL Verification mode])
+AC_SUBST(SSL_VERIFY)
 
 dnl check for a file at a path with an env-var with a given suffix
 AC_DEFUN([CHK_FILE_VAR], dnl env-var, suffix, file-to-match, msg
@@ -934,6 +953,73 @@ else
     AC_MSG_RESULT([no])
 fi
 
+AC_MSG_CHECKING([whether to use extra compiler hardening flags])
+if test "$enable_hardening_flags" = no -o "$host_os" = "emscripten" -o "x$with_sanitizer" != "x"; then
+    AC_MSG_RESULT([no])
+ else
+    AC_MSG_RESULT([yes])
+
+    AC_LANG_PUSH([C])
+    AC_MSG_CHECKING([whether $CC supports -grecord-gcc-switches])
+    save_CFLAGS=$CFLAGS
+    CFLAGS="$CFLAGS -Werror -grecord-gcc-switches"
+    AC_LINK_IFELSE(
+        [AC_LANG_PROGRAM(, [[return 0;]])],
+        [AC_MSG_RESULT([yes]); HARDENING_CFLAGS="$HARDENING_CFLAGS -grecord-gcc-switches"],
+        [AC_MSG_RESULT([no])])
+    CFLAGS=$save_CFLAGS
+
+    AC_MSG_CHECKING([whether $CC supports -D_FORTIFY_SOURCE=2])
+    save_CFLAGS=$CFLAGS
+    CFLAGS="$CFLAGS -Werror -Wp,-U_FORTIFY_SOURCE,-D_FORTIFY_SOURCE=2"
+    AC_LINK_IFELSE(
+        [AC_LANG_PROGRAM([[#include <string.h>]], [[return 0;]])],
+        [AC_MSG_RESULT([yes]); HARDENING_CFLAGS="$HARDENING_CFLAGS -Wp,-U_FORTIFY_SOURCE,-D_FORTIFY_SOURCE=2"],
+        [AC_MSG_RESULT([no])])
+    CFLAGS=$save_CFLAGS
+
+    AC_MSG_CHECKING([whether $CC supports -D_GLIBCXX_ASSERTIONS])
+    save_CFLAGS=$CFLAGS
+    CFLAGS="$CFLAGS -Werror -Wp,-D_GLIBCXX_ASSERTIONS"
+    AC_LINK_IFELSE(
+        [AC_LANG_PROGRAM(, [[return 0;]])],
+        [AC_MSG_RESULT([yes]); HARDENING_CFLAGS="$HARDENING_CFLAGS -Wp,-D_GLIBCXX_ASSERTIONS"],
+        [AC_MSG_RESULT([no])])
+    CFLAGS=$save_CFLAGS
+
+    AC_MSG_CHECKING([whether $CC supports -fstack-protector-strong])
+    save_CFLAGS=$CFLAGS
+    CFLAGS="$CFLAGS -Werror -fstack-protector-strong"
+    AC_LINK_IFELSE(
+        [AC_LANG_PROGRAM(, [[return 0;]])],
+        [AC_MSG_RESULT([yes]); HARDENING_CFLAGS="$HARDENING_CFLAGS -fstack-protector-strong"],
+        [AC_MSG_RESULT([no])])
+    CFLAGS=$save_CFLAGS
+
+    AC_MSG_CHECKING([whether $CC supports -fstack-clash-protection])
+    save_CFLAGS=$CFLAGS
+    CFLAGS="$CFLAGS -Werror -fstack-clash-protection"
+    AC_LINK_IFELSE(
+        [AC_LANG_PROGRAM(, [[return 0;]])],
+        [AC_MSG_RESULT([yes]); HARDENING_CFLAGS="$HARDENING_CFLAGS -fstack-clash-protection"],
+        [AC_MSG_RESULT([no])])
+    CFLAGS=$save_CFLAGS
+
+    AC_MSG_CHECKING([whether $CC supports -fcf-protection])
+    save_CFLAGS=$CFLAGS
+    CFLAGS="$CFLAGS -Werror -fcf-protection"
+    AC_LINK_IFELSE(
+        [AC_LANG_PROGRAM(, [[return 0;]])],
+        [AC_MSG_RESULT([yes]); HARDENING_CFLAGS="$HARDENING_CFLAGS -fcf-protection"],
+        [AC_MSG_RESULT([no])])
+    CFLAGS=$save_CFLAGS
+
+    AC_LANG_POP([C])
+
+    CFLAGS="$CFLAGS $HARDENING_CFLAGS"
+    CXXFLAGS="$CXXFLAGS $HARDENING_CFLAGS"
+fi
+
 # Code Coverage.
 AC_MSG_CHECKING([whether code-coverage is enabled])
 if test "x$with_coverage" != "x"; then
@@ -1001,11 +1087,11 @@ else
     AC_MSG_RESULT([no])
 fi
 
-# Check for C++17 support.
+# Check for C++20 support.
 HAVE_CXXSTD=
 CXXFLAGS_CXXSTD=
-AC_MSG_CHECKING([whether $CXX supports C++17])
-for flag in -std=c++17 -std=c++1z ; do
+AC_MSG_CHECKING([whether $CXX supports C++20])
+for flag in -std=c++20 -std=c++2a ; do
     save_CXXFLAGS=$CXXFLAGS
     CXXFLAGS="$CXXFLAGS $flag -Werror"
     AC_LANG_PUSH([C++])
@@ -1028,7 +1114,7 @@ if test "$HAVE_CXXSTD" = TRUE; then
     AC_MSG_RESULT([yes ($CXXFLAGS_CXXSTD)])
 else
     AC_MSG_RESULT([no])
-    AC_MSG_ERROR(Compiler doesn't support C++17)
+    AC_MSG_ERROR(Compiler doesn't support C++20)
 fi
 
 # Check if we have clang, rather than gcc, which
@@ -1049,69 +1135,6 @@ AC_SUBST(HAVE_CLANG)
 
 AS_IF([test "$ENABLE_GTKAPP" != true],
 [CXXFLAGS="$CXXFLAGS $CXXFLAGS_CXXSTD"])
-
-STD_FILESYSTEM=
-if test "$HAVE_CXXSTD" = TRUE -a "$ENABLE_ANDROIDAPP" != "true" ; then
-    save_CXXFLAGS=$CXXFLAGS
-    CXXFLAGS="$CXXFLAGS -Werror"
-    save_LIBS=$LIBS
-    LIBS="$save_LIBS -lstdc++fs"
-    AC_LANG_PUSH([C++])
-    AC_LINK_IFELSE([AC_LANG_SOURCE([[
-        #include <experimental/filesystem>
-        int main()
-        {
-            if (!std::experimental::filesystem::temp_directory_path().empty())
-                return 0;
-            return 1;
-        }
-        ]])],[STD_FILESYSTEM=experimental])
-    AC_LINK_IFELSE([AC_LANG_SOURCE([[
-        #include <filesystem>
-        int main()
-        {
-            if (!std::filesystem::temp_directory_path().empty())
-                return 0;
-            return 1;
-        }
-        ]])],[STD_FILESYSTEM=TRUE])
-    AC_LANG_POP([C++])
-    CXXFLAGS=$save_CXXFLAGS
-    LIBS=$save_LIBS
-fi
-
-if test -n "$STD_FILESYSTEM" ; then
-    LIBS="$LIBS -lstdc++fs"
-    AC_DEFINE([HAVE_STD_FILESYSTEM],1,[Whether the used C++ has support for std::filesystem.])
-    if test "$STD_FILESYSTEM" = "experimental" ; then
-        AC_DEFINE([HAVE_STD_FILESYSTEM_EXPERIMENTAL],1,[Whether the std::filesystem is in the experimental header.])
-    else
-        AC_DEFINE([HAVE_STD_FILESYSTEM_EXPERIMENTAL],0,[Whether the std::filesystem is in the experimental header.])
-    fi
-else
-    AC_DEFINE([HAVE_STD_FILESYSTEM],0,[Whether the used C++ has support for std::filesystem.])
-    AC_DEFINE([HAVE_STD_FILESYSTEM_EXPERIMENTAL],0,[Whether the std::filesystem is in the experimental header.])
-fi
-
-SYS_RANDOM=
-AC_LANG_PUSH([C++])
-AC_LINK_IFELSE(
-    [AC_LANG_SOURCE([[
-    #include <sys/random.h>
-    int main()
-    {
-        char buffer[8];
-        getrandom(buffer, sizeof(buffer), GRND_NONBLOCK);
-    }
-    ]])],
-    [SYS_RANDOM=TRUE])
-AC_LANG_POP([C++])
-
-if test "$SYS_RANDOM" == "TRUE" ; then
-    AC_DEFINE([HAVE_SYS_RANDOM_H],1,[Define to 1 if you have the <sys/random.h> header file.])
-else
-    AC_DEFINE([HAVE_SYS_RANDOM_H],0,[Define to 1 if you have the <sys/random.h> header file.])
-fi
 
 AS_IF([test -n "$LOKIT_PATH"],
       [CPPFLAGS="$CPPFLAGS -I${LOKIT_PATH}"])
@@ -1235,7 +1258,7 @@ AC_SUBST(ENABLE_EMSCRIPTENAPP)
 has_simd=no
 if test "$mobile_app" != "true"; then
     # Check for SIMD / AVX2 acceleration compile-time goodness
-    SIMD_CFLAGS=-mavx2
+    SIMD_CFLAGS="-mavx2 -O3"
     AC_MSG_CHECKING([whether $CC has AVX2 SIMD support])
 
     save_CFLAGS=$CFLAGS
@@ -1267,9 +1290,26 @@ else
 fi
 AC_SUBST(SIMD_CFLAGS)
 
+
+has_pfm=no
+LIBPFM_LIBS=
+if test "$mobile_app" != "true"; then
+    AC_MSG_CHECKING([whether we have perf counter support])
+    AC_CHECK_LIB(pfm, pfm_initialize, [has_pfm=yes], [has_pfm=no])
+    AC_MSG_RESULT([${has_pfm}])
+fi
+
+if test "${has_pfm}" = "no" ; then
+   AC_DEFINE([ENABLE_PFM],0,[Whether to enable PFM])
+else
+   AC_DEFINE([ENABLE_PFM],1,[Whether to enable PFM])
+   LIBPFM_LIBS="$LIBS -lpfm"
+fi
+AC_SUBST(LIBPFM_LIBS)
+
 ENABLE_SSL=true
 if test "$enable_ssl" != "no" -a "$mobile_app" != "true"; then
-   ssl_msg="ssl enabled"
+   ssl_msg="ssl enabled. cert verification: $SSL_VERIFY"
    ENABLE_SSL=true
    AC_DEFINE([ENABLE_SSL],1,[Whether to enable SSL])
 else
@@ -1378,11 +1418,7 @@ AS_IF([test `uname -s` = "Linux" -o `uname -s` = "FreeBSD" -o `uname -s` = "Darw
       # optional. If node and npm are not available, cool will have to be built on a Linux box.
       [AC_PATH_PROG(NODE, node, no)
        if test "$NODE" = "no"; then
-           if test `uname -s` = "Darwin"; then
-               AC_MSG_WARN([The cool bits will have to be built on a Linux machine and copied over])
-           else
-               AC_MSG_ERROR([node required to build cool, but not installed])
-           fi
+            AC_MSG_ERROR([node required to build cool, but not installed])
        else
            NODE_VER=`node --version | sed 's/^v//' | awk -F. '{ print (($1 * 100) + $2) * 100 + $3;}'`
            if test "$NODE_VER" -lt 100000; then
@@ -1446,6 +1482,8 @@ AC_SUBST(ENABLE_SETCAP)
 
 AC_CONFIG_LINKS([discovery.xml:discovery.xml])
 AC_CONFIG_LINKS([browser/package.json:browser/package.json])
+AC_CONFIG_LINKS([browser/.eslintrc:browser/.eslintrc])
+AC_CONFIG_LINKS([browser/.prettierrc:browser/.prettierrc])
 AC_CONFIG_LINKS([cypress_test/package.json:cypress_test/package.json])
 AC_CONFIG_COMMANDS_PRE([
 if test "$srcdir" != '.'; then
@@ -1695,7 +1733,6 @@ AC_CONFIG_FILES([Makefile
                  test/Makefile
                  browser/Makefile
                  browser/npm-shrinkwrap.json
-                 coolkitconfig.xcu
                  coolwsd.spec
                  coolwsd.xml
                  debian/coolwsd.postinst])

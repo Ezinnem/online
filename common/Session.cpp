@@ -36,13 +36,15 @@ Session::Session(const std::shared_ptr<ProtocolHandlerInterface> &protocol,
     _isActive(true),
     _lastActivityTime(std::chrono::steady_clock::now()),
     _isCloseFrame(false),
-    _isWritable(readOnly),
+    _isWritable(!readOnly),
     _isReadOnly(readOnly),
     _isAllowChangeComments(false),
     _haveDocPassword(false),
     _isDocPasswordProtected(false),
+    _isAdminUser(std::nullopt),
     _watermarkOpacity(0.2),
-    _accessibilityState(false)
+    _accessibilityState(false),
+    _disableVerifyHost(false)
 {
 }
 
@@ -195,6 +197,11 @@ void Session::parseDocOptions(const StringVector& tokens, int& part, std::string
             _spellOnline = value;
             ++offset;
         }
+        else if (name == "darkTheme")
+        {
+            _darkTheme = value;
+            ++offset;
+        }
         else if (name == "batch")
         {
             _batch = value;
@@ -213,6 +220,16 @@ void Session::parseDocOptions(const StringVector& tokens, int& part, std::string
         else if (name == "accessibilityState")
         {
             _accessibilityState = value == "true";
+            ++offset;
+        }
+        else if (name == "isAllowChangeComments")
+        {
+            _isAllowChangeComments = value == "true";
+            ++offset;
+        }
+        else if (name == "verifyHost")
+        {
+            _disableVerifyHost = value == "false";
             ++offset;
         }
     }
@@ -250,7 +267,7 @@ void Session::shutdown(bool goingAway, const std::string& statusMessage)
     {
         // skip the queue; FIXME: should we flush SessionClient's queue ?
         std::string closeMsg = "close: " + statusMessage;
-        _protocol->sendTextMessage(closeMsg.c_str(), closeMsg.size());
+        _protocol->sendTextMessage(closeMsg);
         _protocol->shutdown(goingAway, statusMessage);
     }
 }

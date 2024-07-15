@@ -24,10 +24,10 @@
 #include <Poco/Net/HTTPResponse.h>
 #include <Poco/StreamCopier.h>
 #include <Poco/URI.h>
-#include <Poco/JSON/Object.h>
 
 #include "DocumentBroker.hpp"
 #include "COOLWSD.hpp"
+#include "FileServer.hpp"
 #include <common/Common.hpp>
 #include <common/JsonUtil.hpp>
 #include <common/Log.hpp>
@@ -93,7 +93,8 @@ ClientSession::ClientSession(
     _serverURL(requestDetails),
     _isTextDocument(false),
     _thumbnailSession(false),
-    _canonicalViewId(0)
+    _canonicalViewId(0),
+    _sentAudit(false)
 {
     const std::size_t curConnections = ++COOLWSD::NumConnections;
     LOG_INF("ClientSession ctor [" << getName() << "] for URI: [" << _uriPublic.toString()
@@ -170,15 +171,10 @@ bool ClientSession::disconnectFromKit()
 {
     assert(_state != SessionState::WAIT_DISCONNECT);
     auto docBroker = getDocumentBroker();
-    if (_state == SessionState::LIVE && docBroker)
+    if (docBroker && (_state == SessionState::LIVE || _state == SessionState::LOADING))
     {
         setState(SessionState::WAIT_DISCONNECT);
 
-#ifndef IOS
-        LOG_TRC("request/rescue clipboard on disconnect for " << getId());
-        // rescue clipboard before shutdown.
-        docBroker->forwardToChild(client_from_this(), "getclipboard");
-#endif
         // handshake nicely; so wait for 'disconnected'
         LOG_TRC("Sending 'disconnect' command to session " << getId());
         docBroker->forwardToChild(client_from_this(), "disconnect");
@@ -203,7 +199,7 @@ void ClientSession::rotateClipboardKey(bool notifyClient)
         return;
 
     _clipboardKeys[1] = _clipboardKeys[0];
-    _clipboardKeys[0] = Util::rng::getHardRandomHexString(
+    _clipboardKeys[0] = Util::rng::getHexString(
         ClipboardTokenLengthBytes);
     LOG_TRC("Clipboard key on [" << getId() << "] set to " << _clipboardKeys[0] <<
             " last was " << _clipboardKeys[1]);
@@ -287,6 +283,10 @@ void ClientSession::handleClipboardRequest(DocumentBroker::ClipboardRequest     
     std::string specific;
     if (type == DocumentBroker::CLIP_REQUEST_GET_RICH_HTML_ONLY)
         specific = " text/html";
+    else if (type == DocumentBroker::CLIP_REQUEST_GET_HTML_PLAIN_ONLY)
+    {
+        specific = " text/html,text/plain;charset=utf-8";
+    }
 
     if (type != DocumentBroker::CLIP_REQUEST_SET)
     {
@@ -298,7 +298,7 @@ void ClientSession::handleClipboardRequest(DocumentBroker::ClipboardRequest     
             std::ostringstream oss;
             oss << "HTTP/1.1 403 Forbidden\r\n"
                 << "Date: " << Util::getHttpTimeNow() << "\r\n"
-                << "User-Agent: " << WOPI_AGENT_STRING << "\r\n"
+                << "User-Agent: " << http::getAgentString() << "\r\n"
                 << "Content-Length: 0\r\n"
                 << "Connection: close\r\n"
                 << "\r\n";
@@ -319,13 +319,92 @@ void ClientSession::handleClipboardRequest(DocumentBroker::ClipboardRequest     
         if (data.get())
         {
             preProcessSetClipboardPayload(*data);
-            docBroker->forwardToChild(client_from_this(), "setclipboard\n" + *data, true);
+
+#if !MOBILEAPP
+            if (data->starts_with('{'))
+            {
+                // We got JSON, extract the URL and the UNO command name.
+                Poco::JSON::Object::Ptr json;
+                if (JsonUtil::parseJSON(*data, json))
+                {
+                    std::string url;
+                    JsonUtil::findJSONValue(json, "url", url);
+                    std::string commandName;
+                    JsonUtil::findJSONValue(json, "commandName", commandName);
+                    http::Session::FinishedCallback finishedCallback =
+                        [this, docBroker,
+                         commandName](const std::shared_ptr<http::Session>& session)
+                    {
+                        const std::shared_ptr<const http::Response> httpResponse =
+                            session->response();
+                        if (httpResponse->statusLine().statusCode() != http::StatusCode::OK)
+                        {
+                            LOG_ERR("Clipboard download request failed");
+                            return;
+                        }
+
+                        // Check if this is likely produced by us.
+                        std::string clipboardHeader = httpResponse->get("X-COOL-Clipboard");
+                        if (clipboardHeader != "true")
+                        {
+                            LOG_ERR("Clipboard response is missing the required 'X-COOL-Clipboard: true' header");
+                            return;
+                        }
+
+                        std::string body = httpResponse->getBody();
+                        std::istringstream stream(body);
+                        if (ClipboardData::isOwnFormat(stream))
+                        {
+                            docBroker->forwardToChild(client_from_this(), "setclipboard\n" + body,
+                                    true);
+                            docBroker->forwardToChild(client_from_this(), "uno " + commandName);
+                        }
+                        else
+                        {
+                            LOG_ERR("Clipboard download: unexpected data format");
+                            return;
+                        }
+                    };
+
+                    const std::string pathAndQuery = Poco::URI(url).getPathAndQuery();
+                    if (pathAndQuery.find("/cool/clipboard") != std::string::npos)
+                    {
+                        std::shared_ptr<http::Session> httpSession = http::Session::create(url);
+                        if (httpSession)
+                        {
+                            httpSession->setFinishedHandler(std::move(finishedCallback));
+                            http::Request httpRequest(Poco::URI(url).getPathAndQuery());
+                            if (!httpSession->asyncRequest(httpRequest, docBroker->getPoll()))
+                            {
+                                LOG_ERR(
+                                    "Failed to start an async clipboard download request with URL ["
+                                    << url << ']');
+                            }
+                        }
+                        else
+                        {
+                            LOG_ERR("Failed to create clipboard request with URL [" << url << ']');
+                        }
+                    }
+                    else
+                    {
+                        LOG_ERR("Clipboard download URL ["
+                                << url << "] does not look like a clipboard one");
+                    }
+                }
+            }
+            else
+#endif
+            {
+                // List of mimetype-size-data tuples, pass that over as-is.
+                docBroker->forwardToChild(client_from_this(), "setclipboard\n" + *data, true);
+            }
 
             // FIXME: work harder for error detection ?
             std::ostringstream oss;
             oss << "HTTP/1.1 200 OK\r\n"
                 << "Date: " << Util::getHttpTimeNow() << "\r\n"
-                << "User-Agent: " << WOPI_AGENT_STRING << "\r\n"
+                << "User-Agent: " << http::getAgentString() << "\r\n"
                 << "Content-Length: 0\r\n"
                 << "Connection: close\r\n"
                 << "\r\n";
@@ -562,10 +641,15 @@ bool ClientSession::_handleInput(const char *buffer, int length)
         if (COOLWSD::EnableTraceEventLogging)
             sendTextFrame("enabletraceeventlogging yes");
 
-        #if !MOBILEAPP
+        if (!Util::isMobileApp())
+        {
             // If it is not mobile, it must be Linux (for now).
-            sendTextFrame(std::string("osinfo ") + Util::getLinuxVersion());
-        #endif
+            std::string osVersionInfo(COOLWSD::getConfigValue<std::string>("per_view.custom_os_info", ""));
+            if (osVersionInfo.empty())
+                osVersionInfo = Util::getLinuxVersion();
+
+            sendTextFrame(std::string("osinfo ") + osVersionInfo);
+        }
 
         // Send clipboard key
         rotateClipboardKey(true);
@@ -593,7 +677,7 @@ bool ClientSession::_handleInput(const char *buffer, int length)
     }
     else if (tokens.equals(0, "load"))
     {
-        if (getDocURL() != "")
+        if (!getDocURL().empty())
         {
             sendTextFrameAndLogError("error: cmd=load kind=docalreadyloaded");
             return false;
@@ -774,6 +858,16 @@ bool ClientSession::_handleInput(const char *buffer, int length)
 
                 _splitX = splitX;
                 _splitY = splitY;
+            }
+
+            // Untrusted user input, make sure these are not negative.
+            if (width < 0)
+            {
+                width = 0;
+            }
+            if (height < 0)
+            {
+                height = 0;
             }
 
             _clientVisibleArea = Util::Rectangle(x, y, width, height);
@@ -960,7 +1054,7 @@ bool ClientSession::_handleInput(const char *buffer, int length)
                 LOG_INF("Thread-local logging level being set to default ["
                         << Log::getLevel()
                         << "]");
-                Log::setThreadLocalLogLevel(Log::getLevel());
+                Log::setThreadLocalLogLevel(Log::getLevelName());
             }
             else
             {
@@ -1106,7 +1200,8 @@ bool ClientSession::_handleInput(const char *buffer, int length)
              tokens.equals(0, "removetextcontext") ||
              tokens.equals(0, "rendersearchresult") ||
              tokens.equals(0, "geta11yfocusedparagraph") ||
-             tokens.equals(0, "geta11ycaretposition"))
+             tokens.equals(0, "geta11ycaretposition") ||
+             tokens.equals(0, "getpresentationinfo"))
     {
         if (tokens.equals(0, "key"))
             _keyEvents++;
@@ -1125,10 +1220,6 @@ bool ClientSession::_handleInput(const char *buffer, int length)
         {
             return forwardToChild(std::string(buffer, length), docBroker);
         }
-    }
-    else if (tokens.equals(0, "readonlyclick"))
-    {
-        return forwardToChild(std::string(buffer, length), docBroker);
     }
     else if (tokens.equals(0, "attemptlock"))
     {
@@ -1179,19 +1270,26 @@ bool ClientSession::loadDocument(const char* /*buffer*/, int /*length*/,
         std::ostringstream oss;
         oss << "load url=" << docBroker->getPublicUri().toString();
 
+#if ENABLE_SSL
+        // if ssl client verification was disabled in online for the wopi server,
+        // then exempt that host from ssl host verification also in core
+        if (ssl::Manager::getClientVerification() == ssl::CertificateVerification::Disabled)
+            oss << " verifyHost=false";
+#endif
+
         if (!getUserId().empty() && !getUserName().empty())
         {
             std::string encodedUserId;
             Poco::URI::encode(getUserId(), "", encodedUserId);
             oss << " authorid=" << encodedUserId;
-            encodedUserId = "";
+            encodedUserId.clear();
             Poco::URI::encode(COOLWSD::anonymizeUsername(getUserId()), "", encodedUserId);
             oss << " xauthorid=" << encodedUserId;
 
             std::string encodedUserName;
             Poco::URI::encode(getUserName(), "", encodedUserName);
             oss << " author=" << encodedUserName;
-            encodedUserName = "";
+            encodedUserName.clear();
             Poco::URI::encode(COOLWSD::anonymizeUsername(getUserName()), "", encodedUserName);
             oss << " xauthor=" << encodedUserName;
         }
@@ -1211,6 +1309,11 @@ bool ClientSession::loadDocument(const char* /*buffer*/, int /*length*/,
         }
 
         oss << " readonly=" << isReadOnly();
+
+        if (isAllowChangeComments())
+        {
+            oss << " isAllowChangeComments=true";
+        }
 
         if (loadPart >= 0)
         {
@@ -1240,6 +1343,11 @@ bool ClientSession::loadDocument(const char* /*buffer*/, int /*length*/,
         if (!getSpellOnline().empty())
         {
             oss << " spellOnline=" << getSpellOnline();
+        }
+
+        if (!getDarkTheme().empty())
+        {
+            oss << " darkTheme=" << getDarkTheme();
         }
 
         if (!getWatermarkText().empty())
@@ -1434,7 +1542,7 @@ bool ClientSession::sendCombinedTiles(const char* /*buffer*/, int /*length*/, co
 bool ClientSession::forwardToChild(const std::string& message,
                                    const std::shared_ptr<DocumentBroker>& docBroker)
 {
-    const bool binary = Util::startsWith(message, "paste") || Util::startsWith(message, "urp");
+    const bool binary = message.starts_with("paste") || message.starts_with("urp");
     return docBroker->forwardToChild(client_from_this(), message, binary);
 }
 
@@ -1459,6 +1567,12 @@ bool ClientSession::filterMessage(const std::string& message) const
                 allowed = false;
                 LOG_WRN("WOPI host has disabled export for this session");
             }
+            else if (id == "slideshow" && _wopiFileInfo &&
+                     (_wopiFileInfo->getDisableExport() || !_wopiFileInfo->getWatermarkText().empty()))
+            {
+                allowed = false;
+                LOG_WRN("WOPI host has disabled slideshow for this session");
+            }
         }
         else
         {
@@ -1474,36 +1588,6 @@ bool ClientSession::filterMessage(const std::string& message) const
         {
             allowed = false;
             LOG_WRN("WOPI host has disabled copying from the document");
-        }
-    }
-    else if (isReadOnly())
-    {
-        // By default, don't allow anything
-        allowed = false;
-        if (tokens.equals(0, "userinactive") || tokens.equals(0, "useractive") || tokens.equals(0, "saveas")
-            || tokens.equals(0, "rendersearchresult") || tokens.equals(0, "exportas"))
-        {
-            allowed = true;
-        }
-        else if (tokens.equals(0, "uno"))
-        {
-            if (tokens.size() > 1 && (tokens.equals(1, ".uno:ExecuteSearch") || tokens.equals(1, ".uno:Signature")
-                 || tokens.equals(1, ".uno:ExportToPDF")
-                 || tokens.equals(1,".uno:ExportDirectToPDF")
-                 || tokens.equals(1,".uno:ExportToEPUB")
-                 || tokens.equals(1,".uno:ChangeTheme")))
-            {
-                allowed = true;
-            }
-
-            if (isAllowChangeComments()
-                && tokens.size() > 1
-                && (tokens.equals(1, ".uno:EditAnnotation")
-                    || tokens.equals(1, ".uno:InsertAnnotation")
-                    || tokens.equals(1, ".uno:DeleteAnnotation")))
-            {
-                allowed = true;
-            }
         }
     }
 
@@ -1599,45 +1683,38 @@ void ClientSession::writeQueuedMessages(std::size_t capacity)
 
 // NB. also see browser/src/map/Clipboard.js that does this in JS for stubs.
 // See also ClientSession::preProcessSetClipboardPayload() which removes the
-// <meta name="origin"...>  tag added here.
+// <div id="meta-origin"...>  tag added here.
 void ClientSession::postProcessCopyPayload(const std::shared_ptr<Message>& payload)
 {
     // Insert our meta origin if we can
-    payload->rewriteDataBody([=](std::vector<char>& data) {
-            std::size_t pos = Util::findInVector(data, "<meta name=\"generator\" content=\"");
-
-            if (pos == std::string::npos)
-                pos = Util::findInVector(data, "<meta http-equiv=\"content-type\" content=\"text/html;");
-
-            // cf. TileLayer.js /_dataTransferToDocument/
-            if (pos != std::string::npos) // assume text/html
+    payload->rewriteDataBody([this](std::vector<char>& data) {
+            if (Util::findInVector(data, "clipboardcontent: content\ntext/plain") == 0)
             {
-                const std::string meta = getClipboardURI();
-                LOG_TRC("Inject clipboard meta origin of '" << meta << '\'');
-                const std::string origin = "<meta name=\"origin\" content=\"" + meta + "\"/>\n";
-                data.insert(data.begin() + pos, origin.begin(), origin.end());
-                return true;
-            }
-            else
-            {
-                LOG_DBG("Missing generator in textselectioncontent/clipboardcontent payload.");
+                // Single format and it's plain text (not HTML): no need to rewrite anything.
                 return false;
             }
-        });
 
-    // New-style: <div> inside <body>, that is not sanitized by Chrome.
-    payload->rewriteDataBody([=](std::vector<char>& data) {
+            bool json = Util::findInVector(data, "textselectioncontent:\n{") == 0;
+            if (!json)
+            {
+                json = Util::findInVector(data, "clipboardcontent: content\n{") == 0;
+            }
             std::size_t pos = Util::findInVector(data, "<body");
             if (pos != std::string::npos)
             {
                 pos = Util::findInVector(data, ">", pos);
             }
 
+            // cf. TileLayer.js /_dataTransferToDocument/
             if (pos != std::string::npos)
             {
                 const std::string meta = getClipboardURI();
                 LOG_TRC("Inject clipboard cool origin of '" << meta << "'");
                 std::string origin = "<div id=\"meta-origin\" data-coolorigin=\"" + meta + "\">\n";
+                if (json)
+                {
+                    origin = "<div id=\\\"meta-origin\\\" data-coolorigin=\\\"" + meta + "\\\">\\n";
+                }
                 data.insert(data.begin() + pos + strlen(">"), origin.begin(), origin.end());
 
                 const char* end = "</body>";
@@ -1651,7 +1728,8 @@ void ClientSession::postProcessCopyPayload(const std::shared_ptr<Message>& paylo
             }
             else
             {
-                LOG_DBG("Missing <body> in textselectioncontent/clipboardcontent payload.");
+                LOG_DBG("Missing <body> in textselectioncontent/clipboardcontent payload: "
+                        << Util::dumpHex(data));
                 return false;
             }
         });
@@ -1671,9 +1749,8 @@ bool ClientSession::handleKitToClientMessage(const std::shared_ptr<Message>& pay
 
     const bool isConvertTo = static_cast<bool>(_saveAsSocket);
 
-#if !MOBILEAPP
-    COOLWSD::dumpOutgoingTrace(docBroker->getJailId(), getId(), firstLine);
-#endif
+    if (!Util::isMobileApp())
+        COOLWSD::dumpOutgoingTrace(docBroker->getJailId(), getId(), firstLine);
 
     const auto& tokens = payload->tokens();
     if (tokens.equals(0, "unocommandresult:"))
@@ -1724,8 +1801,7 @@ bool ClientSession::handleKitToClientMessage(const std::shared_ptr<Message>& pay
                 {
                     if (isConvertTo)
                     {
-                        Poco::Net::HTTPResponse response;
-                        response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED);
+                        http::Response response(http::StatusCode::Unauthorized);
                         response.set("X-ERROR-KIND", errorKind);
                         _saveAsSocket->send(response);
 
@@ -1818,7 +1894,8 @@ bool ClientSession::handleKitToClientMessage(const std::shared_ptr<Message>& pay
                 relative = relative.substr(1);
 
             // Rewrite file:// URLs to be visible to the outside world.
-            const Path path(docBroker->getJailRoot(), relative);
+            const Path path(FileUtil::buildLocalPathToJail(COOLWSD::EnableMountNamespaces,
+                                                           docBroker->getJailRoot(), relative));
             if (Poco::File(path).exists())
             {
                 if (!isConvertTo)
@@ -1867,6 +1944,7 @@ bool ClientSession::handleKitToClientMessage(const std::shared_ptr<Message>& pay
 
                 const std::string fileName = Poco::Path(resultURL.getPath()).getFileName();
                 http::Response response(http::StatusCode::OK);
+                FileServerRequestHandler::hstsHeaders(response);
                 if (!fileName.empty())
                     response.set("Content-Disposition", "attachment; filename=\"" + fileName + '"');
                 response.setContentType("application/octet-stream");
@@ -1958,8 +2036,7 @@ bool ClientSession::handleKitToClientMessage(const std::shared_ptr<Message>& pay
         const bool empty = header >= payload->size();
 
         // final cleanup ...
-        if (!empty && _state == SessionState::WAIT_DISCONNECT &&
-            (!_wopiFileInfo || !_wopiFileInfo->getDisableCopy()))
+        if (!empty && (!_wopiFileInfo || !_wopiFileInfo->getDisableCopy()))
             COOLWSD::SavedClipboards->insertClipboard(
                 _clipboardKeys, &payload->data()[header], payload->size() - header);
 
@@ -1970,12 +2047,14 @@ bool ClientSession::handleKitToClientMessage(const std::shared_ptr<Message>& pay
                 continue;
 
             std::ostringstream oss;
+            // The custom header for the clipboard of a living document.
             oss << "HTTP/1.1 200 OK\r\n"
                 << "Last-Modified: " << Util::getHttpTimeNow() << "\r\n"
-                << "User-Agent: " << WOPI_AGENT_STRING << "\r\n"
+                << "User-Agent: " << http::getAgentString() << "\r\n"
                 << "Content-Length: " << (empty ? 0 : (payload->size() - header)) << "\r\n"
                 << "Content-Type: application/octet-stream\r\n"
                 << "X-Content-Type-Options: nosniff\r\n"
+                << "X-COOL-Clipboard: true\r\n"
                 << "Connection: close\r\n"
                 << "\r\n";
 
@@ -2271,6 +2350,29 @@ bool ClientSession::handleKitToClientMessage(const std::shared_ptr<Message>& pay
                 LOG_ERR("invalidatecursor parsing failure: " << exception.what());
             }
         }
+#if !MOBILEAPP
+        // don't sent it again, eg when some user joins
+        else if (!_sentAudit && tokens.equals(0, "viewinfo:"))
+        {
+            bool status = forwardToClient(payload);
+
+            if (docBroker)
+            {
+                _sentAudit = true;
+                // send information about admin user
+                const std::string admin = std::string("adminuser: ") + getIsAdminUserStatus();
+                forwardToClient(std::make_shared<Message>(admin, Message::Dir::Out));
+
+                // send server audit results after we received information about users (who is admin)
+                const ServerAuditUtil& serverAudit = docBroker->getServerAudit();
+                std::string audit = serverAudit.isDisabled() ? "disabled" : serverAudit.getResultsJSON();
+                const std::string auditMessage = std::string("serveraudit: ") + audit;
+                forwardToClient(std::make_shared<Message>(auditMessage, Message::Dir::Out));
+            }
+
+            return status;
+        }
+#endif
         else if (tokens.equals(0, "renderfont:"))
         {
             std::string font, text;
@@ -2298,6 +2400,7 @@ bool ClientSession::handleKitToClientMessage(const std::shared_ptr<Message>& pay
                 const std::string stringJSON = payload->jsonString();
 
                 http::Response httpResponse(http::StatusCode::OK);
+                FileServerRequestHandler::hstsHeaders(httpResponse);
                 httpResponse.set("Last-Modified", Util::getHttpTimeNow());
                 httpResponse.set("X-Content-Type-Options", "nosniff");
                 httpResponse.setBody(stringJSON, "application/json");
@@ -2306,6 +2409,48 @@ bool ClientSession::handleKitToClientMessage(const std::shared_ptr<Message>& pay
 
             // Now terminate.
             docBroker->closeDocument("extractedlinktargets");
+            return true;
+        }
+        else if (tokens.equals(0, "extracteddocumentstructure:"))
+        {
+            LOG_TRC("Sending extracted document structure response.");
+            if (!_saveAsSocket)
+                LOG_ERR("Error in extracteddocumentstructure: not in isConvertTo mode");
+            else
+            {
+                const std::string stringJSON = payload->jsonString();
+
+                http::Response httpResponse(http::StatusCode::OK);
+                FileServerRequestHandler::hstsHeaders(httpResponse);
+                httpResponse.set("Last-Modified", Util::getHttpTimeNow());
+                httpResponse.set("X-Content-Type-Options", "nosniff");
+                httpResponse.setBody(stringJSON, "application/json");
+                _saveAsSocket->sendAndShutdown(httpResponse);
+            }
+
+            // Now terminate.
+            docBroker->closeDocument("extracteddocumentstructure");
+            return true;
+        }
+        else if (tokens.equals(0, "transformeddocumentstructure:"))
+        {
+            LOG_TRC("Sending transformed document structure response.");
+            if (!_saveAsSocket)
+                LOG_ERR("Error in transformeddocumentstructure: not in isConvertTo mode");
+            else
+            {
+                const std::string stringJSON = payload->jsonString();
+
+                http::Response httpResponse(http::StatusCode::OK);
+                FileServerRequestHandler::hstsHeaders(httpResponse);
+                httpResponse.set("Last-Modified", Util::getHttpTimeNow());
+                httpResponse.set("X-Content-Type-Options", "nosniff");
+                httpResponse.setBody(stringJSON, "application/json");
+                _saveAsSocket->sendAndShutdown(httpResponse);
+            }
+
+            // Now terminate.
+            docBroker->closeDocument("transformeddocumentstructure");
             return true;
         }
         else if (tokens.equals(0, "sendthumbnail:"))
@@ -2326,9 +2471,10 @@ bool ClientSession::handleKitToClientMessage(const std::shared_ptr<Message>& pay
                     std::string thumbnail(payload->data().data() + firstLineSize, payload->data().size() - firstLineSize);
 
                     http::Response httpResponse(http::StatusCode::OK);
+                    FileServerRequestHandler::hstsHeaders(httpResponse);
                     httpResponse.set("Last-Modified", Util::getHttpTimeNow());
                     httpResponse.set("X-Content-Type-Options", "nosniff");
-                    httpResponse.setBody(thumbnail, "image/png");
+                    httpResponse.setBody(std::move(thumbnail), "image/png");
                     _saveAsSocket->sendAndShutdown(httpResponse);
                 }
 
@@ -2574,7 +2720,7 @@ void ClientSession::dumpState(std::ostream& os)
 const std::string &ClientSession::getOrCreateProxyAccess()
 {
     if (_proxyAccess.size() <= 0)
-        _proxyAccess = Util::rng::getHardRandomHexString(
+        _proxyAccess = Util::rng::getHexString(
             ProxyAccessTokenLengthBytes);
     return _proxyAccess;
 }
@@ -2767,7 +2913,7 @@ bool ClientSession::isTileInsideVisibleArea(const TileDesc& tile) const
     return false;
 }
 
-// This removes the <meta name="origin" ...> tag which was added in
+// This removes the <div id="meta-origin" ...> tag which was added in
 // ClientSession::postProcessCopyPayload(), else the payload parsing
 // in ChildSession::setClipboard() will fail.
 // To see why, refer
@@ -2776,21 +2922,7 @@ bool ClientSession::isTileInsideVisibleArea(const TileDesc& tile) const
 // 2. The clipboard payload parsing code in ClipboardData::read().
 void ClientSession::preProcessSetClipboardPayload(std::string& payload)
 {
-    std::size_t start = payload.find("<meta name=\"origin\" content=\"");
-    if (start != std::string::npos)
-    {
-        std::size_t end = payload.find("\"/>\n", start);
-        if (end == std::string::npos)
-        {
-            LOG_DBG("Found unbalanced <meta name=\"origin\".../> tag in setclipboard payload.");
-            return;
-        }
-
-        std::size_t len = end - start + 4;
-        payload.erase(start, len);
-    }
-
-    start = payload.find("<div id=\"meta-origin\" data-coolorigin=\"");
+    std::size_t start = payload.find("<div id=\"meta-origin\" data-coolorigin=\"");
     if (start != std::string::npos)
     {
         std::size_t end = payload.find("\">\n", start);
@@ -2865,6 +2997,11 @@ std::string ClientSession::processSVGContent(const std::string& svg)
     }
 
     return broken ? svg : oss.str();
+}
+
+std::string ClientSession::getIsAdminUserStatus() const
+{
+    return getIsAdminUser().has_value() ? (getIsAdminUser().value() ? "true" : "false") : "null";
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

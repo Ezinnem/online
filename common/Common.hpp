@@ -37,6 +37,7 @@ constexpr int COMMAND_TIMEOUT_MS = COMMAND_TIMEOUT_SECS * 1000;
 constexpr int CHILD_TIMEOUT_MS = COMMAND_TIMEOUT_MS;
 constexpr int CHILD_REBALANCE_INTERVAL_MS = CHILD_TIMEOUT_MS / 10;
 constexpr int POLL_TIMEOUT_MICRO_S = (COMMAND_TIMEOUT_MS / 5) * 1000;
+constexpr int POLL_FORKIT_TIMEOUT_SECS = 5;
 constexpr int WS_SEND_TIMEOUT_MS = 1000 * TRACE_MULTIPLIER;
 constexpr int CLIPBOARD_EXPIRY_MINUTES = 10;
 
@@ -76,15 +77,6 @@ constexpr const char UPLOADING_SUFFIX[] = "ing";
 /// name prefixed. And of course these threads are unrelated to the classes in
 /// the code: they are logical execution unit names.
 #define SHARED_DOC_THREADNAME_SUFFIX "broker_"
-
-/// The HTTP request User-Agent. Used only in Requests.
-#define HTTP_AGENT_STRING "COOLWSD HTTP Agent " COOLWSD_VERSION
-
-/// The WOPI User-Agent. Depricated: use HTTP_AGENT_STRING.
-#define WOPI_AGENT_STRING HTTP_AGENT_STRING
-
-/// The HTTP response Server. Used only in Responses.
-#define HTTP_SERVER_STRING "COOLWSD HTTP Server " COOLWSD_VERSION
 
 /// The client port number, both coolwsd and the kits have this.
 extern int ClientPortNumber;
